@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>World Cup ELO - 2026</title>
+<style>
+  body { font-family: sans-serif; max-width: 1100px; margin: 2rem auto; overflow-x: auto; }
+  table { border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; white-space: nowrap; }
+  .table-wrap { overflow-x: auto; }
+  th, td { padding: 0.4rem 0.6rem; text-align: left; border-bottom: 1px solid #ddd; }
+  th { background: #f0f0f0; position: sticky; top: 0; }
+  .num { text-align: right; }
+  .narrow { text-align: center; }
+  .spacer { padding: 0 0.3rem; }
+  .score-sep { text-align: center; padding: 0 0.2rem; }
+  .elo { text-align: left; }
+  .flag { text-align: center; }
+  .flag .icon { display: inline-block; width: 2.2em; height: 1.5em; background-size: cover; background-position: center; background-repeat: no-repeat; vertical-align: middle; border: 1px solid #ccc; }
+  .conf { text-align: center; min-width: 5em; }
+  nav { margin-bottom: 1rem; }
+  nav a { margin-right: 1rem; }
+
+  tbody tr { cursor: pointer; }
+  tbody tr:hover { background: #f9f9f9; }
+  .expand-row td { background: #f4f8ff; border-top: none; cursor: default; padding: 0.5rem 0.8rem; }
+  .expand-row .ur-line { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin: 0.3rem 0; }
+  .expand-row label { display: flex; align-items: center; gap: 0.3rem; white-space: nowrap; }
+  .expand-row input[type=number] { width: 4.5rem; padding: 0.2rem; }
+  .expand-row .ur-cmd { font-family: monospace; flex: 1; min-width: 16rem; padding: 0.2rem; }
+  .view-toggle { display: inline-flex; border: 1px solid #bbb; border-radius: 4px; overflow: hidden; }
+  .view-toggle button { border: none; border-right: 1px solid #bbb; background: #f0f0f0; padding: 0.2rem 0.7rem; cursor: pointer; font-size: 0.8rem; color: #333; }
+  .view-toggle button:last-child { border-right: none; }
+  .view-toggle button.active { background: #4a7fcb; color: white; }
+  .view-toggle button:hover:not(.active) { background: #e0e0e0; }
+  .toggle-cell { text-align: right; background: #f0f0f0; border-bottom: none; padding: 0.25rem 0.5rem; vertical-align: middle; }
+
+  /* Page-level view toggle */
+  .page-toggle { margin-bottom: 1rem; }
+
+  /* Rankings table */
+  #rankings-view { display: none; }
+  .rankings-table { border-collapse: collapse; font-size: 0.85rem; white-space: nowrap; table-layout: fixed; width: 100%; }
+  .rankings-table col.snap-col { width: calc(90% / 9); }
+  .rankings-table col.rank-col-el { width: 10%; }
+  .rankings-table th { background: #f0f0f0; position: sticky; top: 0; padding: 0.3rem 0.5rem; text-align: center; border-bottom: 2px solid #ccc; }
+  .rankings-table td { padding: 0.25rem 0.4rem; border-bottom: 1px solid #eee; text-align: center; vertical-align: middle; }
+  .rankings-table .rank-col { font-weight: bold; color: #555; text-align: right; padding-right: 0.6rem; }
+  .rank-cell { display: flex; flex-direction: column; align-items: center; gap: 0.1rem; min-width: 3.8rem; }
+  .rank-cell .icon { display: inline-block; width: 2.2em; height: 1.5em; background-size: cover; background-position: center; background-repeat: no-repeat; vertical-align: middle; border: 1px solid #ccc; }
+  .rank-cell .elo-val { font-size: 0.78rem; color: #333; }
+</style>
+</head>
+<body>
+<nav><a href="2018.html">2018</a> | <a href="2022.html">2022</a> | <strong>2026</strong> | <a href="index.html">Home</a></nav>
+<h1>World Cup ELO - 2026</h1>
+
+<div class="page-toggle view-toggle">
+  <button id="tab-matches" class="active" onclick="setPageView('matches')">Match List</button>
+  <button id="tab-rankings" onclick="setPageView('rankings')">Rankings</button>
+</div>
+
+<div id="matches-view">
+  <table>
+    <thead></thead>
+    <tbody id="games"></tbody>
+  </table>
+</div>
+
+<div id="rankings-view">
+  <div class="table-wrap">
+    <table class="rankings-table">
+      <thead id="rankings-thead"></thead>
+      <tbody id="rankings-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+
+<script>
+// Source of truth: data/2026.json
+const games2026 = [
+  {
+    "gameNumber": 1,
+    "homeTeam": "Mexico",
+    "homeScore": 2,
+    "awayTeam": "South Africa",
+    "awayScore": 0,
+    "date": "2026-06-11",
+    "eloChange": 6,
+    "homeEloPre": 1875,
+    "awayEloPre": 1517
+  },
+  {
+    "gameNumber": 2,
+    "homeTeam": "South Korea",
+    "homeScore": 2,
+    "awayTeam": "Czechia",
+    "awayScore": 1,
+    "date": "2026-06-11",
+    "eloChange": 28,
+    "homeEloPre": 1758,
+    "awayEloPre": 1740
+  },
+  {
+    "gameNumber": 3,
+    "homeTeam": "Canada",
+    "homeScore": 1,
+    "awayTeam": "Bosnia",
+    "awayScore": 1,
+    "date": "2026-06-12",
+    "eloChange": -21,
+    "homeEloPre": 1788,
+    "awayEloPre": 1595
+  },
+  {
+    "gameNumber": 4,
+    "homeTeam": "USA",
+    "homeScore": 4,
+    "awayTeam": "Paraguay",
+    "awayScore": 1,
+    "date": "2026-06-12",
+    "eloChange": 54,
+    "homeEloPre": 1726,
+    "awayEloPre": 1834
+  },
+  {
+    "gameNumber": 5,
+    "homeTeam": "Switzerland",
+    "homeScore": 1,
+    "awayTeam": "Qatar",
+    "awayScore": 1,
+    "date": "2026-06-13",
+    "eloChange": -26,
+    "homeEloPre": 1891,
+    "awayEloPre": 1421
+  },
+  {
+    "gameNumber": 6,
+    "homeTeam": "Brazil",
+    "homeScore": 1,
+    "awayTeam": "Morocco",
+    "awayScore": 1,
+    "date": "2026-06-13",
+    "eloChange": -13,
+    "homeEloPre": 1991,
+    "awayEloPre": 1827
+  },
+  {
+    "gameNumber": 7,
+    "homeTeam": "Haiti",
+    "homeScore": 0,
+    "awayTeam": "Scotland",
+    "awayScore": 1,
+    "date": "2026-06-13",
+    "eloChange": -12,
+    "homeEloPre": 1548,
+    "awayEloPre": 1782
+  },
+  {
+    "gameNumber": 8,
+    "homeTeam": "Australia",
+    "homeScore": 2,
+    "awayTeam": "Turkey",
+    "awayScore": 0,
+    "date": "2026-06-13",
+    "eloChange": 62,
+    "homeEloPre": 1777,
+    "awayEloPre": 1911
+  },
+  {
+    "gameNumber": 9,
+    "homeTeam": "Germany",
+    "homeScore": 7,
+    "awayTeam": "Curacao",
+    "awayScore": 1,
+    "date": "2026-06-14",
+    "eloChange": 7,
+    "homeEloPre": 1932,
+    "awayEloPre": 1434
+  },
+  {
+    "gameNumber": 10,
+    "homeTeam": "Japan",
+    "homeScore": 2,
+    "awayTeam": "Netherlands",
+    "awayScore": 2,
+    "date": "2026-06-14",
+    "eloChange": 4,
+    "homeEloPre": 1906,
+    "awayEloPre": 1948
+  },
+  {
+    "gameNumber": 11,
+    "homeTeam": "Ivory Coast",
+    "homeScore": 1,
+    "awayTeam": "Ecuador",
+    "awayScore": 0,
+    "date": "2026-06-14",
+    "eloChange": 48,
+    "homeEloPre": 1695,
+    "awayEloPre": 1938
+  },
+  {
+    "gameNumber": 12,
+    "homeTeam": "Sweden",
+    "homeScore": 5,
+    "awayTeam": "Tunisia",
+    "awayScore": 1,
+    "date": "2026-06-14",
+    "eloChange": 43,
+    "homeEloPre": 1712,
+    "awayEloPre": 1628
+  },
+  {
+    "gameNumber": 13,
+    "homeTeam": "Belgium",
+    "homeScore": 1,
+    "awayTeam": "Egypt",
+    "awayScore": 1,
+    "date": "2026-06-15",
+    "eloChange": -15,
+    "homeEloPre": 1894,
+    "awayEloPre": 1696
+  },
+  {
+    "gameNumber": 14,
+    "homeTeam": "Iran",
+    "homeScore": 2,
+    "awayTeam": "New Zealand",
+    "awayScore": 2,
+    "date": "2026-06-15",
+    "eloChange": -16,
+    "homeEloPre": 1772,
+    "awayEloPre": 1562
+  },
+  {
+    "gameNumber": 15,
+    "homeTeam": "Spain",
+    "homeScore": 0,
+    "awayTeam": "Cape Verde",
+    "awayScore": 0,
+    "date": "2026-06-15",
+    "eloChange": -28,
+    "homeEloPre": 2157,
+    "awayEloPre": 1578
+  },
+  {
+    "gameNumber": 16,
+    "homeTeam": "Saudi Arabia",
+    "homeScore": 1,
+    "awayTeam": "Uruguay",
+    "awayScore": 1,
+    "date": "2026-06-15",
+    "eloChange": 22,
+    "homeEloPre": 1578,
+    "awayEloPre": 1892
+  },
+  {
+    "gameNumber": 17,
+    "homeTeam": "France",
+    "homeScore": 3,
+    "awayTeam": "Senegal",
+    "awayScore": 1,
+    "date": "2026-06-16",
+    "eloChange": 21,
+    "homeEloPre": 2063,
+    "awayEloPre": 1860
+  },
+  {
+    "gameNumber": 18,
+    "homeTeam": "Iraq",
+    "homeScore": 1,
+    "awayTeam": "Norway",
+    "awayScore": 4,
+    "date": "2026-06-16",
+    "eloChange": -15,
+    "homeEloPre": 1608,
+    "awayEloPre": 1914
+  },
+  {
+    "gameNumber": 19,
+    "homeTeam": "Argentina",
+    "homeScore": 3,
+    "awayTeam": "Algeria",
+    "awayScore": 0,
+    "date": "2026-06-16",
+    "eloChange": 13,
+    "homeEloPre": 2115,
+    "awayEloPre": 1772
+  },
+  {
+    "gameNumber": 20,
+    "homeTeam": "Austria",
+    "homeScore": 3,
+    "awayTeam": "Jordan",
+    "awayScore": 1,
+    "date": "2026-06-16",
+    "eloChange": 27,
+    "homeEloPre": 1830,
+    "awayEloPre": 1680
+  },
+  {
+    "gameNumber": 21,
+    "homeTeam": "Portugal",
+    "homeScore": 1,
+    "awayTeam": "DR Congo",
+    "awayScore": 1,
+    "date": "2026-06-17",
+    "eloChange": -22,
+    "homeEloPre": 1989,
+    "awayEloPre": 1652
+  },
+  {
+    "gameNumber": 22,
+    "homeTeam": "Uzbekistan",
+    "homeScore": 1,
+    "awayTeam": "Colombia",
+    "awayScore": 3,
+    "date": "2026-06-17",
+    "eloChange": -16,
+    "homeEloPre": 1714,
+    "awayEloPre": 1982
+  },
+  {
+    "gameNumber": 23,
+    "homeTeam": "England",
+    "homeScore": 4,
+    "awayTeam": "Croatia",
+    "awayScore": 2,
+    "date": "2026-06-17",
+    "eloChange": 31,
+    "homeEloPre": 2024,
+    "awayEloPre": 1912
+  },
+  {
+    "gameNumber": 24,
+    "homeTeam": "Ghana",
+    "homeScore": 1,
+    "awayTeam": "Panama",
+    "awayScore": 0,
+    "date": "2026-06-17",
+    "eloChange": 47,
+    "homeEloPre": 1510,
+    "awayEloPre": 1730
+  },
+  {
+    "gameNumber": 25,
+    "homeTeam": "Czechia",
+    "homeScore": null,
+    "awayTeam": "South Africa",
+    "awayScore": null,
+    "date": "2026-06-18",
+    "eloChange": null,
+    "homeEloPre": 1712,
+    "awayEloPre": 1511
+  },
+  {
+    "gameNumber": 26,
+    "homeTeam": "Mexico",
+    "homeScore": null,
+    "awayTeam": "South Korea",
+    "awayScore": null,
+    "date": "2026-06-18",
+    "eloChange": null,
+    "homeEloPre": 1881,
+    "awayEloPre": 1786
+  },
+  {
+    "gameNumber": 27,
+    "homeTeam": "Switzerland",
+    "homeScore": null,
+    "awayTeam": "Bosnia",
+    "awayScore": null,
+    "date": "2026-06-18",
+    "eloChange": null,
+    "homeEloPre": 1865,
+    "awayEloPre": 1616
+  },
+  {
+    "gameNumber": 28,
+    "homeTeam": "Canada",
+    "homeScore": null,
+    "awayTeam": "Qatar",
+    "awayScore": null,
+    "date": "2026-06-18",
+    "eloChange": null,
+    "homeEloPre": 1767,
+    "awayEloPre": 1447
+  },
+  {
+    "gameNumber": 29,
+    "homeTeam": "Scotland",
+    "homeScore": null,
+    "awayTeam": "Morocco",
+    "awayScore": null,
+    "date": "2026-06-19",
+    "eloChange": null,
+    "homeEloPre": 1794,
+    "awayEloPre": 1840
+  },
+  {
+    "gameNumber": 30,
+    "homeTeam": "Brazil",
+    "homeScore": null,
+    "awayTeam": "Haiti",
+    "awayScore": null,
+    "date": "2026-06-19",
+    "eloChange": null,
+    "homeEloPre": 1978,
+    "awayEloPre": 1536
+  },
+  {
+    "gameNumber": 31,
+    "homeTeam": "USA",
+    "homeScore": null,
+    "awayTeam": "Australia",
+    "awayScore": null,
+    "date": "2026-06-19",
+    "eloChange": null,
+    "homeEloPre": 1780,
+    "awayEloPre": 1839
+  },
+  {
+    "gameNumber": 32,
+    "homeTeam": "Turkey",
+    "homeScore": null,
+    "awayTeam": "Paraguay",
+    "awayScore": null,
+    "date": "2026-06-19",
+    "eloChange": null,
+    "homeEloPre": 1849,
+    "awayEloPre": 1780
+  },
+  {
+    "gameNumber": 33,
+    "homeTeam": "Germany",
+    "homeScore": null,
+    "awayTeam": "Ivory Coast",
+    "awayScore": null,
+    "date": "2026-06-20",
+    "eloChange": null,
+    "homeEloPre": 1939,
+    "awayEloPre": 1743
+  },
+  {
+    "gameNumber": 34,
+    "homeTeam": "Ecuador",
+    "homeScore": null,
+    "awayTeam": "Curacao",
+    "awayScore": null,
+    "date": "2026-06-20",
+    "eloChange": null,
+    "homeEloPre": 1890,
+    "awayEloPre": 1427
+  },
+  {
+    "gameNumber": 35,
+    "homeTeam": "Netherlands",
+    "homeScore": null,
+    "awayTeam": "Sweden",
+    "awayScore": null,
+    "date": "2026-06-20",
+    "eloChange": null,
+    "homeEloPre": 1944,
+    "awayEloPre": 1755
+  },
+  {
+    "gameNumber": 36,
+    "homeTeam": "Tunisia",
+    "homeScore": null,
+    "awayTeam": "Japan",
+    "awayScore": null,
+    "date": "2026-06-20",
+    "eloChange": null,
+    "homeEloPre": 1585,
+    "awayEloPre": 1910
+  },
+  {
+    "gameNumber": 37,
+    "homeTeam": "Belgium",
+    "homeScore": null,
+    "awayTeam": "Iran",
+    "awayScore": null,
+    "date": "2026-06-21",
+    "eloChange": null,
+    "homeEloPre": 1879,
+    "awayEloPre": 1756
+  },
+  {
+    "gameNumber": 38,
+    "homeTeam": "New Zealand",
+    "homeScore": null,
+    "awayTeam": "Egypt",
+    "awayScore": null,
+    "date": "2026-06-21",
+    "eloChange": null,
+    "homeEloPre": 1578,
+    "awayEloPre": 1711
+  },
+  {
+    "gameNumber": 39,
+    "homeTeam": "Spain",
+    "homeScore": null,
+    "awayTeam": "Saudi Arabia",
+    "awayScore": null,
+    "date": "2026-06-21",
+    "eloChange": null,
+    "homeEloPre": 2129,
+    "awayEloPre": 1600
+  },
+  {
+    "gameNumber": 40,
+    "homeTeam": "Uruguay",
+    "homeScore": null,
+    "awayTeam": "Cape Verde",
+    "awayScore": null,
+    "date": "2026-06-21",
+    "eloChange": null,
+    "homeEloPre": 1870,
+    "awayEloPre": 1606
+  },
+  {
+    "gameNumber": 41,
+    "homeTeam": "France",
+    "homeScore": null,
+    "awayTeam": "Iraq",
+    "awayScore": null,
+    "date": "2026-06-22",
+    "eloChange": null,
+    "homeEloPre": 2084,
+    "awayEloPre": 1593
+  },
+  {
+    "gameNumber": 42,
+    "homeTeam": "Norway",
+    "homeScore": null,
+    "awayTeam": "Senegal",
+    "awayScore": null,
+    "date": "2026-06-22",
+    "eloChange": null,
+    "homeEloPre": 1929,
+    "awayEloPre": 1839
+  },
+  {
+    "gameNumber": 43,
+    "homeTeam": "Argentina",
+    "homeScore": null,
+    "awayTeam": "Austria",
+    "awayScore": null,
+    "date": "2026-06-22",
+    "eloChange": null,
+    "homeEloPre": 2128,
+    "awayEloPre": 1857
+  },
+  {
+    "gameNumber": 44,
+    "homeTeam": "Jordan",
+    "homeScore": null,
+    "awayTeam": "Algeria",
+    "awayScore": null,
+    "date": "2026-06-22",
+    "eloChange": null,
+    "homeEloPre": 1653,
+    "awayEloPre": 1759
+  },
+  {
+    "gameNumber": 45,
+    "homeTeam": "Portugal",
+    "homeScore": null,
+    "awayTeam": "Uzbekistan",
+    "awayScore": null,
+    "date": "2026-06-23",
+    "eloChange": null,
+    "homeEloPre": 1967,
+    "awayEloPre": 1698
+  },
+  {
+    "gameNumber": 46,
+    "homeTeam": "Colombia",
+    "homeScore": null,
+    "awayTeam": "DR Congo",
+    "awayScore": null,
+    "date": "2026-06-23",
+    "eloChange": null,
+    "homeEloPre": 1998,
+    "awayEloPre": 1674
+  },
+  {
+    "gameNumber": 47,
+    "homeTeam": "England",
+    "homeScore": null,
+    "awayTeam": "Ghana",
+    "awayScore": null,
+    "date": "2026-06-23",
+    "eloChange": null,
+    "homeEloPre": 2055,
+    "awayEloPre": 1557
+  },
+  {
+    "gameNumber": 48,
+    "homeTeam": "Panama",
+    "homeScore": null,
+    "awayTeam": "Croatia",
+    "awayScore": null,
+    "date": "2026-06-23",
+    "eloChange": null,
+    "homeEloPre": 1683,
+    "awayEloPre": 1881
+  },
+  {
+    "gameNumber": 49,
+    "homeTeam": "Czechia",
+    "homeScore": null,
+    "awayTeam": "Mexico",
+    "awayScore": null,
+    "date": "2026-06-24",
+    "eloChange": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 50,
+    "homeTeam": "South Africa",
+    "homeScore": null,
+    "awayTeam": "South Korea",
+    "awayScore": null,
+    "date": "2026-06-24",
+    "eloChange": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 51,
+    "homeTeam": "Switzerland",
+    "homeScore": null,
+    "awayTeam": "Canada",
+    "awayScore": null,
+    "date": "2026-06-24",
+    "eloChange": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 52,
+    "homeTeam": "Bosnia",
+    "homeScore": null,
+    "awayTeam": "Qatar",
+    "awayScore": null,
+    "date": "2026-06-24",
+    "eloChange": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 53,
+    "homeTeam": "Scotland",
+    "homeScore": null,
+    "awayTeam": "Brazil",
+    "awayScore": null,
+    "date": "2026-06-24",
+    "eloChange": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 54,
+    "homeTeam": "Morocco",
+    "homeScore": null,
+    "awayTeam": "Haiti",
+    "awayScore": null,
+    "date": "2026-06-24",
+    "eloChange": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 55,
+    "homeTeam": "Turkey",
+    "homeScore": null,
+    "awayTeam": "USA",
+    "awayScore": null,
+    "date": "2026-06-25",
+    "eloChange": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 56,
+    "homeTeam": "Paraguay",
+    "homeScore": null,
+    "awayTeam": "Australia",
+    "awayScore": null,
+    "date": "2026-06-25",
+    "eloChange": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 57,
+    "homeTeam": "Curacao",
+    "homeScore": null,
+    "awayTeam": "Ivory Coast",
+    "awayScore": null,
+    "date": "2026-06-25",
+    "eloChange": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 58,
+    "homeTeam": "Ecuador",
+    "homeScore": null,
+    "awayTeam": "Germany",
+    "awayScore": null,
+    "date": "2026-06-25",
+    "eloChange": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 59,
+    "homeTeam": "Japan",
+    "homeScore": null,
+    "awayTeam": "Sweden",
+    "awayScore": null,
+    "date": "2026-06-25",
+    "eloChange": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 60,
+    "homeTeam": "Tunisia",
+    "homeScore": null,
+    "awayTeam": "Netherlands",
+    "awayScore": null,
+    "date": "2026-06-25",
+    "eloChange": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 61,
+    "homeTeam": "Egypt",
+    "homeScore": null,
+    "awayTeam": "Iran",
+    "awayScore": null,
+    "date": "2026-06-26",
+    "eloChange": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 62,
+    "homeTeam": "New Zealand",
+    "homeScore": null,
+    "awayTeam": "Belgium",
+    "awayScore": null,
+    "date": "2026-06-26",
+    "eloChange": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 63,
+    "homeTeam": "Cape Verde",
+    "homeScore": null,
+    "awayTeam": "Saudi Arabia",
+    "awayScore": null,
+    "date": "2026-06-26",
+    "eloChange": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 64,
+    "homeTeam": "Uruguay",
+    "homeScore": null,
+    "awayTeam": "Spain",
+    "awayScore": null,
+    "date": "2026-06-26",
+    "eloChange": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 65,
+    "homeTeam": "Norway",
+    "homeScore": null,
+    "awayTeam": "France",
+    "awayScore": null,
+    "date": "2026-06-26",
+    "eloChange": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 66,
+    "homeTeam": "Senegal",
+    "homeScore": null,
+    "awayTeam": "Iraq",
+    "awayScore": null,
+    "date": "2026-06-26",
+    "eloChange": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 67,
+    "homeTeam": "Algeria",
+    "homeScore": null,
+    "awayTeam": "Austria",
+    "awayScore": null,
+    "date": "2026-06-27",
+    "eloChange": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 68,
+    "homeTeam": "Jordan",
+    "homeScore": null,
+    "awayTeam": "Argentina",
+    "awayScore": null,
+    "date": "2026-06-27",
+    "eloChange": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 69,
+    "homeTeam": "Colombia",
+    "homeScore": null,
+    "awayTeam": "Portugal",
+    "awayScore": null,
+    "date": "2026-06-27",
+    "eloChange": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 70,
+    "homeTeam": "DR Congo",
+    "homeScore": null,
+    "awayTeam": "Uzbekistan",
+    "awayScore": null,
+    "date": "2026-06-27",
+    "eloChange": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 71,
+    "homeTeam": "Panama",
+    "homeScore": null,
+    "awayTeam": "England",
+    "awayScore": null,
+    "date": "2026-06-27",
+    "eloChange": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 72,
+    "homeTeam": "Croatia",
+    "homeScore": null,
+    "awayTeam": "Ghana",
+    "awayScore": null,
+    "date": "2026-06-27",
+    "eloChange": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  }
+];
+
+// Source of truth: data/teams.json
+const teams = [
+  {"name": "Russia", "shorthand": "RUS", "confederation": "Europe", "flag": "ru"},
+  {"name": "Portugal", "shorthand": "POR", "confederation": "Europe", "flag": "pt"},
+  {"name": "Spain", "shorthand": "ESP", "confederation": "Europe", "flag": "es"},
+  {"name": "France", "shorthand": "FRA", "confederation": "Europe", "flag": "fr"},
+  {"name": "Denmark", "shorthand": "DEN", "confederation": "Europe", "flag": "dk"},
+  {"name": "Iceland", "shorthand": "ISL", "confederation": "Europe", "flag": "is"},
+  {"name": "Croatia", "shorthand": "CRO", "confederation": "Europe", "flag": "hr"},
+  {"name": "Serbia", "shorthand": "SRB", "confederation": "Europe", "flag": "rs"},
+  {"name": "Switzerland", "shorthand": "SUI", "confederation": "Europe", "flag": "ch"},
+  {"name": "Germany", "shorthand": "GER", "confederation": "Europe", "flag": "de"},
+  {"name": "Sweden", "shorthand": "SWE", "confederation": "Europe", "flag": "se"},
+  {"name": "Belgium", "shorthand": "BEL", "confederation": "Europe", "flag": "be"},
+  {"name": "England", "shorthand": "ENG", "confederation": "Europe", "flag": "gb-eng"},
+  {"name": "Poland", "shorthand": "POL", "confederation": "Europe", "flag": "pl"},
+  {"name": "Netherlands", "shorthand": "NED", "confederation": "Europe", "flag": "nl"},
+  {"name": "Wales", "shorthand": "WAL", "confederation": "Europe", "flag": "gb-wls"},
+  {"name": "Saudi Arabia", "shorthand": "KSA", "confederation": "Asia", "flag": "sa"},
+  {"name": "Iran", "shorthand": "IRN", "confederation": "Asia", "flag": "ir"},
+  {"name": "Australia", "shorthand": "AUS", "confederation": "Asia", "flag": "au"},
+  {"name": "South Korea", "shorthand": "KOR", "confederation": "Asia", "flag": "kr"},
+  {"name": "Japan", "shorthand": "JPN", "confederation": "Asia", "flag": "jp"},
+  {"name": "Qatar", "shorthand": "QAT", "confederation": "Asia", "flag": "qa"},
+  {"name": "Egypt", "shorthand": "EGY", "confederation": "Africa", "flag": "eg"},
+  {"name": "Morocco", "shorthand": "MAR", "confederation": "Africa", "flag": "ma"},
+  {"name": "Nigeria", "shorthand": "NGA", "confederation": "Africa", "flag": "ng"},
+  {"name": "Tunisia", "shorthand": "TUN", "confederation": "Africa", "flag": "tn"},
+  {"name": "Senegal", "shorthand": "SEN", "confederation": "Africa", "flag": "sn"},
+  {"name": "Cameroon", "shorthand": "CMR", "confederation": "Africa", "flag": "cm"},
+  {"name": "Ghana", "shorthand": "GHA", "confederation": "Africa", "flag": "gh"},
+  {"name": "Uruguay", "shorthand": "URU", "confederation": "South America", "flag": "uy"},
+  {"name": "Peru", "shorthand": "PER", "confederation": "South America", "flag": "pe"},
+  {"name": "Argentina", "shorthand": "ARG", "confederation": "South America", "flag": "ar"},
+  {"name": "Brazil", "shorthand": "BRA", "confederation": "South America", "flag": "br"},
+  {"name": "Colombia", "shorthand": "COL", "confederation": "South America", "flag": "co"},
+  {"name": "Ecuador", "shorthand": "ECU", "confederation": "South America", "flag": "ec"},
+  {"name": "Costa Rica", "shorthand": "CRC", "confederation": "North America", "flag": "cr"},
+  {"name": "Mexico", "shorthand": "MEX", "confederation": "North America", "flag": "mx"},
+  {"name": "Panama", "shorthand": "PAN", "confederation": "North America", "flag": "pa"},
+  {"name": "USA", "shorthand": "USA", "confederation": "North America", "flag": "us"},
+  {"name": "Canada", "shorthand": "CAN", "confederation": "North America", "flag": "ca"},
+  {"name": "South Africa", "shorthand": "RSA", "confederation": "Africa", "flag": "za"},
+  {"name": "Czechia", "shorthand": "CZE", "confederation": "Europe", "flag": "cz"},
+  {"name": "Bosnia", "shorthand": "BIH", "confederation": "Europe", "flag": "ba"},
+  {"name": "Paraguay", "shorthand": "PAR", "confederation": "South America", "flag": "py"},
+  {"name": "Haiti", "shorthand": "HAI", "confederation": "North America", "flag": "ht"},
+  {"name": "Scotland", "shorthand": "SCO", "confederation": "Europe", "flag": "gb-sct"},
+  {"name": "Turkey", "shorthand": "TUR", "confederation": "Europe", "flag": "tr"},
+  {"name": "Curacao", "shorthand": "CUW", "confederation": "North America", "flag": "cw"},
+  {"name": "Ivory Coast", "shorthand": "CIV", "confederation": "Africa", "flag": "ci"},
+  {"name": "New Zealand", "shorthand": "NZL", "confederation": "Oceania", "flag": "nz"},
+  {"name": "Cape Verde", "shorthand": "CPV", "confederation": "Africa", "flag": "cv"},
+  {"name": "Iraq", "shorthand": "IRQ", "confederation": "Asia", "flag": "iq"},
+  {"name": "Norway", "shorthand": "NOR", "confederation": "Europe", "flag": "no"},
+  {"name": "Algeria", "shorthand": "ALG", "confederation": "Africa", "flag": "dz"},
+  {"name": "Austria", "shorthand": "AUT", "confederation": "Europe", "flag": "at"},
+  {"name": "Jordan", "shorthand": "JOR", "confederation": "Asia", "flag": "jo"},
+  {"name": "DR Congo", "shorthand": "COD", "confederation": "Africa", "flag": "cd"},
+  {"name": "Uzbekistan", "shorthand": "UZB", "confederation": "Asia", "flag": "uz"},
+];
+
+// Source of truth: data/2026.json (teamElos)
+const teamElos2026 = {"Mexico":1875,"South Africa":1517,"South Korea":1758,"Czechia":1740,"Canada":1788,"Bosnia":1595,"USA":1726,"Paraguay":1834,"Switzerland":1891,"Qatar":1421,"Brazil":1991,"Morocco":1827,"Haiti":1548,"Scotland":1782,"Australia":1777,"Turkey":1911,"Germany":1932,"Curacao":1434,"Japan":1906,"Netherlands":1948,"Ivory Coast":1695,"Ecuador":1938,"Sweden":1712,"Tunisia":1628,"Belgium":1894,"Egypt":1696,"Iran":1772,"New Zealand":1562,"Spain":2157,"Cape Verde":1578,"Saudi Arabia":1578,"Uruguay":1892,"France":2063,"Senegal":1860,"Iraq":1608,"Norway":1914,"Argentina":2115,"Algeria":1772,"Austria":1830,"Jordan":1680,"Portugal":1989,"DR Congo":1652,"Uzbekistan":1714,"Colombia":1982,"England":2024,"Croatia":1912,"Ghana":1510,"Panama":1730};
+
+const GAMES = games2026;
+const TEAM_ELOS = teamElos2026;
+
+const CONFEDERATIONS = ["Europe", "Asia", "Africa", "South America", "North America", "Oceania"];
+const YEAR = 2026;
+
+const tbody = document.getElementById('games');
+const thead = document.querySelector('#matches-view thead');
+
+const confByTeam = {};
+for (const t of teams) confByTeam[t.name] = t.confederation;
+const flagByTeam = {};
+for (const t of teams) flagByTeam[t.name] = t.flag;
+
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const [, month, day] = dateStr.split('-').map(Number);
+  return `${MONTHS[month - 1]} ${day}`;
+}
+
+function signedElo(val) {
+  if (typeof val !== 'number') return '';
+  return val >= 0 ? `+${val}` : String(val);
+}
+
+function eloCell(preElo, delta) {
+  if (delta !== '') return preElo != null ? `${preElo}${delta}` : delta;
+  return preElo != null ? String(preElo) : '';
+}
+
+const ELO_GRADIENT_MAX = 400;
+function eloColor(value) {
+  const ratio = Math.max(-1, Math.min(1, value / ELO_GRADIENT_MAX));
+  if (ratio >= 0) return `rgb(${255 - ratio * 105}, 255, ${255 - ratio * 105})`;
+  return `rgb(255, ${255 + ratio * 105}, ${255 + ratio * 105})`;
+}
+
+let currentView = 'elo';
+let currentColCount = 10;
+let openExpandRow = null;
+let openGameRow = null;
+
+function gameColsHeader() {
+  return (
+    `<th class="narrow" rowspan="2">Date</th>` +
+    `<th class="narrow" rowspan="2">#</th>` +
+    `<th class="spacer" rowspan="2"></th>` +
+    `<th colspan="3" rowspan="2" style="text-align:center">Home</th>` +
+    `<th class="score-sep" rowspan="2"></th>` +
+    `<th colspan="3" rowspan="2" style="text-align:center">Away</th>`
+  );
+}
+
+function toggleCellHtml(colspan) {
+  return `<th colspan="${colspan}" class="toggle-cell">` +
+    `<div class="view-toggle">` +
+    `<button data-view="elo"${currentView === 'elo' ? ' class="active"' : ''}>ELO Shift</button>` +
+    `<button data-view="wld"${currentView === 'wld' ? ' class="active"' : ''}>W / L / D</button>` +
+    `<button data-view="stats"${currentView === 'stats' ? ' class="active"' : ''}>Stats</button>` +
+    `</div></th>`;
+}
+
+function gameRowCells(game) {
+  const change = game.eloChange;
+  const homeEloDelta = signedElo(change);
+  const awayEloDelta = typeof change === 'number' ? signedElo(-change) : '';
+  const homeScore = game.homeScore ?? '';
+  const awayScore = game.awayScore ?? '';
+  return (
+    `<td class="narrow">${formatDate(game.date)}</td>` +
+    `<td class="narrow">#${game.gameNumber}</td>` +
+    `<td class="spacer"></td>` +
+    `<td class="elo">${eloCell(game.homeEloPre, homeEloDelta)}</td>` +
+    `<td class="flag"><span class="icon" style="background-image:url('data/flags/${flagByTeam[game.homeTeam]}.svg')" title="${game.homeTeam}"></span></td>` +
+    `<td class="narrow">${homeScore}</td>` +
+    `<td class="score-sep">-</td>` +
+    `<td class="narrow">${awayScore}</td>` +
+    `<td class="flag"><span class="icon" style="background-image:url('data/flags/${flagByTeam[game.awayTeam]}.svg')" title="${game.awayTeam}"></span></td>` +
+    `<td class="elo">${eloCell(game.awayEloPre, awayEloDelta)}</td>`
+  );
+}
+
+function wireToggle() {
+  thead.querySelectorAll('.view-toggle button').forEach(btn => {
+    btn.addEventListener('click', () => { currentView = btn.dataset.view; render(); });
+  });
+}
+
+function render() {
+  const games = GAMES;
+  const participating = new Set();
+  for (const game of games) {
+    const hc = confByTeam[game.homeTeam];
+    const ac = confByTeam[game.awayTeam];
+    if (hc) participating.add(hc);
+    if (ac) participating.add(ac);
+  }
+  const confederations = CONFEDERATIONS.filter(c => participating.has(c));
+
+  tbody.innerHTML = '';
+  openExpandRow = null;
+  openGameRow = null;
+
+  if (games.length === 0) {
+    thead.innerHTML = `<tr><th>No games</th></tr><tr></tr>`;
+    tbody.innerHTML = `<tr><td>No games yet</td></tr>`;
+    return;
+  }
+
+  const eloTotals = {};
+  for (const c of confederations) eloTotals[c] = 0;
+  for (const game of games) {
+    if (typeof game.eloChange === 'number') {
+      const hc = confByTeam[game.homeTeam];
+      const ac = confByTeam[game.awayTeam];
+      if (hc) eloTotals[hc] += game.eloChange;
+      if (ac) eloTotals[ac] -= game.eloChange;
+    }
+  }
+  const ordered = [...confederations].sort((a, b) => eloTotals[b] - eloTotals[a]);
+
+  if (currentView === 'elo') renderElo(games, ordered);
+  else if (currentView === 'wld') renderWld(games, ordered);
+  else renderStats(games, ordered);
+
+  wireToggle();
+}
+
+function renderElo(games, ordered) {
+  const totals = {};
+  for (const c of ordered) totals[c] = 0;
+  const rowTotals = [];
+  for (const game of games) {
+    if (typeof game.eloChange === 'number') {
+      const hc = confByTeam[game.homeTeam];
+      const ac = confByTeam[game.awayTeam];
+      if (hc) totals[hc] += game.eloChange;
+      if (ac) totals[ac] -= game.eloChange;
+    }
+    rowTotals.push({ ...totals });
+  }
+  const N = ordered.length;
+  currentColCount = 10 + N;
+
+  thead.innerHTML =
+    `<tr>${gameColsHeader()}${toggleCellHtml(N)}</tr>` +
+    `<tr>${ordered.map(c => `<th class="conf">${c}</th>`).join('')}</tr>`;
+
+  games.forEach((game, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = gameRowCells(game) +
+      ordered.map(c =>
+        typeof game.eloChange === 'number'
+          ? `<td class="num conf" style="background-color:${eloColor(rowTotals[i][c])}">${rowTotals[i][c]}</td>`
+          : `<td class="num conf"></td>`
+      ).join('');
+    tr.addEventListener('click', () => toggleExpand(game, tr));
+    tbody.appendChild(tr);
+  });
+}
+
+function renderWld(games, ordered) {
+  const totals = {};
+  for (const c of ordered) totals[c] = { w: 0, l: 0, d: 0 };
+  const rowTotals = [];
+  for (const game of games) {
+    const hs = game.homeScore;
+    const as_ = game.awayScore;
+    if (hs !== null && as_ !== null) {
+      const hc = confByTeam[game.homeTeam];
+      const ac = confByTeam[game.awayTeam];
+      if (hs > as_) {
+        if (hc) totals[hc].w++;
+        if (ac) totals[ac].l++;
+      } else if (as_ > hs) {
+        if (ac) totals[ac].w++;
+        if (hc) totals[hc].l++;
+      } else {
+        if (hc) totals[hc].d++;
+        if (ac) totals[ac].d++;
+      }
+    }
+    const snap = {};
+    for (const c of ordered) snap[c] = { ...totals[c] };
+    rowTotals.push(snap);
+  }
+  const N = ordered.length;
+  currentColCount = 10 + N;
+
+  thead.innerHTML =
+    `<tr>${gameColsHeader()}${toggleCellHtml(N)}</tr>` +
+    `<tr>${ordered.map(c => `<th class="conf">${c}</th>`).join('')}</tr>`;
+
+  games.forEach((game, i) => {
+    const played = game.homeScore !== null && game.awayScore !== null;
+    const tr = document.createElement('tr');
+    tr.innerHTML = gameRowCells(game) +
+      ordered.map(c => {
+        if (!played) return `<td class="num conf"></td>`;
+        const { w, l, d } = rowTotals[i][c];
+        return `<td class="num conf">${w}-${d}-${l}</td>`;
+      }).join('');
+    tr.addEventListener('click', () => toggleExpand(game, tr));
+    tbody.appendChild(tr);
+  });
+}
+
+function renderStats(games, ordered) {
+  const N = ordered.length;
+  currentColCount = 10 + N;
+  const extra = Math.max(0, N - 3);
+  const emptyTh = Array(extra).fill('<th class="conf"></th>').join('');
+  thead.innerHTML =
+    `<tr>${gameColsHeader()}${toggleCellHtml(N)}</tr>` +
+    `<tr><th class="conf">Wins</th><th class="conf">Draws</th><th class="conf">Win%</th>${emptyTh}</tr>`;
+
+  const emptyTd = Array(N).fill('<td class="num conf"></td>').join('');
+  let wins = 0, draws = 0;
+  games.forEach(game => {
+    const hs = game.homeScore;
+    const as_ = game.awayScore;
+    const played = hs !== null && as_ !== null;
+    const tr = document.createElement('tr');
+    if (played) {
+      if (hs !== as_) wins++;
+      else draws++;
+      const total = wins + draws;
+      const pct = Math.round(wins / total * 100) + '%';
+      const extraTd = Array(extra).fill('<td class="num conf"></td>').join('');
+      tr.innerHTML = gameRowCells(game) +
+        `<td class="num conf">${wins}</td><td class="num conf">${draws}</td><td class="num conf">${pct}</td>${extraTd}`;
+    } else {
+      tr.innerHTML = gameRowCells(game) + emptyTd;
+    }
+    tr.addEventListener('click', () => toggleExpand(game, tr));
+    tbody.appendChild(tr);
+  });
+}
+
+render();
+
+// Gameset boundaries for 2026: [label, lastGameNumber]
+// lastGameNumber=0 means pre-tournament (no games)
+const GAMESETS_2026 = [
+  ['Initial',  0],
+  ['Game 1',  24],
+  ['Game 2',  48],
+  ['Game 3',  72],
+  ['32',      88],
+  ['16',      96],
+  ['8',      100],
+  ['4',      102],
+  ['Final',  104],
+];
+
+function buildEloSnapshots() {
+  // Returns array of snapshots, one per gameset (always all 9).
+  // complete=true if all games in that gameset are done; eloByTeam only set when complete.
+  const gamesByNumber = {};
+  for (const g of GAMES) gamesByNumber[g.gameNumber] = g;
+
+  // Determine which teams appear in each gameset (for elimination detection)
+  const teamsInGameset = GAMESETS_2026.map((_, i) => {
+    if (i === 0) return null;
+    const prevLast = GAMESETS_2026[i - 1][1];
+    const lastGame = GAMESETS_2026[i][1];
+    const s = new Set();
+    for (let gn = prevLast + 1; gn <= lastGame; gn++) {
+      const g = gamesByNumber[gn];
+      if (g) { s.add(g.homeTeam); s.add(g.awayTeam); }
+    }
+    return s;
+  });
+
+  // A team is eliminated after gameset N if it doesn't appear in any gameset > N.
+  // eliminatedAfter[team] = gameset index after which they are eliminated (or null if still active).
+  const eliminatedAfter = {};
+  const allTeams = Object.keys(TEAM_ELOS);
+  for (const team of allTeams) {
+    let lastSeen = 0;
+    for (let i = 1; i < GAMESETS_2026.length; i++) {
+      if (teamsInGameset[i] && teamsInGameset[i].has(team)) lastSeen = i;
+    }
+    // If lastSeen < last gameset index that has any games in the data, they're eliminated after lastSeen.
+    // We consider a team still active if they haven't been seen yet in any completed gameset beyond initial.
+    eliminatedAfter[team] = lastSeen; // 0 means never played (no games yet entered)
+  }
+
+  const snapshots = [];
+  let current = { ...TEAM_ELOS };
+  let completedUpTo = 0; // last fully-completed gameset index
+
+  for (let i = 0; i < GAMESETS_2026.length; i++) {
+    if (i === 0) {
+      snapshots.push({ label: 'Initial', complete: true, eloByTeam: { ...current } });
+      continue;
+    }
+    const prevLast = GAMESETS_2026[i - 1][1];
+    const lastGame = GAMESETS_2026[i][1];
+    let allDone = true;
+    for (let gn = prevLast + 1; gn <= lastGame; gn++) {
+      const g = gamesByNumber[gn];
+      if (!g || g.eloChange === null) { allDone = false; break; }
+    }
+    if (allDone) {
+      for (let gn = prevLast + 1; gn <= lastGame; gn++) {
+        const g = gamesByNumber[gn];
+        if (g && typeof g.eloChange === 'number') {
+          if (g.homeTeam in current) current[g.homeTeam] += g.eloChange;
+          if (g.awayTeam in current) current[g.awayTeam] -= g.eloChange;
+        }
+      }
+      completedUpTo = i;
+      snapshots.push({ label: GAMESETS_2026[i][0], complete: true, eloByTeam: { ...current } });
+    } else {
+      snapshots.push({ label: GAMESETS_2026[i][0], complete: false, eloByTeam: null });
+    }
+  }
+
+  return { snapshots, eliminatedAfter, completedUpTo };
+}
+
+function rankTeams(eloByTeam, prevRank) {
+  const names = Object.keys(eloByTeam);
+  names.sort((a, b) => {
+    const diff = eloByTeam[b] - eloByTeam[a];
+    if (diff !== 0) return diff;
+    const pa = prevRank ? prevRank.indexOf(a) : -1;
+    const pb = prevRank ? prevRank.indexOf(b) : -1;
+    if (pa === -1 && pb === -1) return 0;
+    if (pa === -1) return 1;
+    if (pb === -1) return -1;
+    return pa - pb;
+  });
+  return names;
+}
+
+function renderRankings() {
+  const rthead = document.getElementById('rankings-thead');
+  const rtbody = document.getElementById('rankings-tbody');
+  const { snapshots, eliminatedAfter, completedUpTo } = buildEloSnapshots();
+
+  // Build ranked order for each complete snapshot; incomplete snapshots carry forward last known rank.
+  const ranked = [];
+  let prevRank = null;
+  for (const snap of snapshots) {
+    if (snap.complete) {
+      const order = rankTeams(snap.eloByTeam, prevRank);
+      ranked.push(order);
+      prevRank = order;
+    } else {
+      ranked.push(prevRank); // carry forward — cells will be empty anyway
+    }
+  }
+
+  const numTeams = ranked[0].length;
+
+  // Col group for equal-width snapshot columns
+  const table = document.querySelector('.rankings-table');
+  let colgroup = table.querySelector('colgroup');
+
+  if (!colgroup) {
+    colgroup = document.createElement('colgroup');
+    table.prepend(colgroup);
+  }
+  colgroup.innerHTML = '<col class="rank-col-el">' +
+    snapshots.map(() => '<col class="snap-col">').join('');
+
+  // Header — always all columns
+  rthead.innerHTML = '<tr>' +
+    '<th class="rank-col">#</th>' +
+    snapshots.map(s => `<th>${s.label}</th>`).join('') +
+    '</tr>';
+
+  // Body: one row per rank position
+  rtbody.innerHTML = '';
+  for (let rankIdx = 0; rankIdx < numTeams; rankIdx++) {
+    const tr = document.createElement('tr');
+    let cells = `<td class="rank-col">${rankIdx + 1}</td>`;
+    snapshots.forEach((snap, si) => {
+      if (!snap.complete || !ranked[si]) {
+        cells += `<td></td>`;
+        return;
+      }
+      const team = ranked[si][rankIdx];
+      const elo = snap.eloByTeam[team];
+      const flag = flagByTeam[team] || '';
+      // A team is eliminated in this column if completedUpTo > eliminatedAfter[team]
+      // and eliminatedAfter[team] > 0 (they played at least once)
+      const elim = eliminatedAfter[team] > 0 && si > eliminatedAfter[team];
+      const iconStyle = `background-image:url('data/flags/${flag}.svg')` +
+        (elim ? ';filter:grayscale(100%);opacity:0.4' : '');
+      cells += `<td><div class="rank-cell" data-team="${team}">` +
+        `<span class="icon" style="${iconStyle}" title="${team}"></span>` +
+        `<span class="elo-val">${elo}</span>` +
+        `</div></td>`;
+    });
+    tr.innerHTML = cells;
+    rtbody.appendChild(tr);
+  }
+
+  // Hover highlight: dim all other teams' cells when hovering a flag
+  if (!table._hoverWired) {
+    table._hoverWired = true;
+    table.addEventListener('mouseover', e => {
+      const cell = e.target.closest('[data-team]');
+      if (!cell) return;
+      const hovered = cell.dataset.team;
+      table.querySelectorAll('[data-team]').forEach(el => {
+        el.style.opacity = el.dataset.team === hovered ? '1' : '0.15';
+      });
+    });
+    table.addEventListener('mouseleave', () => {
+      table.querySelectorAll('[data-team]').forEach(el => el.style.opacity = '');
+    });
+  }
+}
+
+let currentPageView = null;
+
+function setPageView(view) {
+  if (view !== 'matches' && view !== 'rankings') view = 'matches';
+  if (view === currentPageView) return;
+  currentPageView = view;
+  document.getElementById('matches-view').style.display = view === 'matches' ? 'block' : 'none';
+  document.getElementById('rankings-view').style.display = view === 'rankings' ? 'block' : 'none';
+  document.getElementById('tab-matches').classList.toggle('active', view === 'matches');
+  document.getElementById('tab-rankings').classList.toggle('active', view === 'rankings');
+  if (view === 'rankings') renderRankings();
+  if (location.hash.slice(1) !== view) location.hash = view;
+}
+
+window.addEventListener('hashchange', () => setPageView(location.hash.slice(1)));
+setPageView(location.hash.slice(1) || 'matches');
+
+function toggleExpand(game, tr) {
+  const colCount = currentColCount;
+  if (openExpandRow) {
+    openExpandRow.remove();
+    openExpandRow = null;
+    if (openGameRow === tr) { openGameRow = null; return; }
+  }
+  openGameRow = tr;
+  const expandTr = document.createElement('tr');
+  expandTr.className = 'expand-row';
+  const td = document.createElement('td');
+  td.colSpan = colCount;
+
+  const hsVal = game.homeScore != null ? game.homeScore : '';
+  const asVal = game.awayScore != null ? game.awayScore : '';
+  const eloVal = game.eloChange != null ? Math.abs(game.eloChange) : '';
+  const gainsVal = game.eloChange != null ? (game.eloChange >= 0 ? 'home' : 'away') : '';
+  const isDraw = hsVal !== '' && asVal !== '' && hsVal === asVal;
+
+  td.innerHTML = `
+    <div class="ur-line"><strong>#${game.gameNumber}: ${game.homeTeam} vs ${game.awayTeam}</strong></div>
+    <div class="ur-line">
+      <label>Home score: <input class="ur-hs" type="number" min="0" value="${hsVal}"></label>
+      <label>Away score: <input class="ur-as" type="number" min="0" value="${asVal}"></label>
+      <label>ELO magnitude (opt): <input class="ur-elo" type="number" min="0" value="${eloVal}"></label>
+      <label class="ur-gains-wrap" style="display:${isDraw ? 'flex' : 'none'}">Who gains ELO:
+        <select class="ur-gains">
+          <option value="" ${gainsVal === '' ? 'selected' : ''}>—</option>
+          <option value="home" ${gainsVal === 'home' ? 'selected' : ''}>${game.homeTeam}</option>
+          <option value="away" ${gainsVal === 'away' ? 'selected' : ''}>${game.awayTeam}</option>
+        </select>
+      </label>
+    </div>
+    <div class="ur-line">
+      <button class="ur-gen">Generate command</button>
+      <input class="ur-cmd" type="text" readonly placeholder="command will appear here">
+      <button class="ur-copy">Copy</button>
+    </div>`;
+
+  td.addEventListener('click', e => e.stopPropagation());
+
+  function updateGainsVisibility() {
+    const hs = td.querySelector('.ur-hs').value;
+    const as_ = td.querySelector('.ur-as').value;
+    const draw = hs !== '' && as_ !== '' && hs === as_;
+    td.querySelector('.ur-gains-wrap').style.display = draw ? 'flex' : 'none';
+  }
+  td.querySelector('.ur-hs').addEventListener('input', updateGainsVisibility);
+  td.querySelector('.ur-as').addEventListener('input', updateGainsVisibility);
+
+  td.querySelector('.ur-gen').addEventListener('click', () => {
+    const hs = td.querySelector('.ur-hs').value;
+    const as_ = td.querySelector('.ur-as').value;
+    const elo = td.querySelector('.ur-elo').value;
+    const gains = td.querySelector('.ur-gains').value;
+    const draw = hs !== '' && as_ !== '' && hs === as_;
+    let cmd = `python3 scripts/set_result.py ${YEAR} ${game.gameNumber} ${hs} ${as_}`;
+    if (elo !== '') cmd += ` ${elo} --gains ${draw ? (gains || '???') : (Number(hs) > Number(as_) ? 'home' : 'away')}`;
+    td.querySelector('.ur-cmd').value = cmd;
+  });
+
+  td.querySelector('.ur-copy').addEventListener('click', () => {
+    const cmdInput = td.querySelector('.ur-cmd');
+    cmdInput.select();
+    navigator.clipboard.writeText(cmdInput.value);
+  });
+
+  expandTr.appendChild(td);
+  tr.after(expandTr);
+  openExpandRow = expandTr;
+}
+
+
+</script>
+
+</body>
+</html>

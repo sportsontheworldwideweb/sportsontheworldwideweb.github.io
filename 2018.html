@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>World Cup ELO - 2018</title>
+<style>
+  body { font-family: sans-serif; max-width: 1100px; margin: 2rem auto; overflow-x: auto; }
+  table { border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; white-space: nowrap; }
+  .table-wrap { overflow-x: auto; }
+  th, td { padding: 0.4rem 0.6rem; text-align: left; border-bottom: 1px solid #ddd; }
+  th { background: #f0f0f0; position: sticky; top: 0; }
+  .num { text-align: right; }
+  .narrow { text-align: center; }
+  .spacer { padding: 0 0.3rem; }
+  .score-sep { text-align: center; padding: 0 0.2rem; }
+  .elo { text-align: left; }
+  .flag { text-align: center; }
+  .flag .icon { display: inline-block; width: 2.2em; height: 1.5em; background-size: cover; background-position: center; background-repeat: no-repeat; vertical-align: middle; border: 1px solid #ccc; }
+  .conf { text-align: center; min-width: 5em; }
+  nav { margin-bottom: 1rem; }
+  nav a { margin-right: 1rem; }
+
+  tbody tr { cursor: pointer; }
+  tbody tr:hover { background: #f9f9f9; }
+  .expand-row td { background: #f4f8ff; border-top: none; cursor: default; padding: 0.5rem 0.8rem; }
+  .expand-row .ur-line { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin: 0.3rem 0; }
+  .expand-row label { display: flex; align-items: center; gap: 0.3rem; white-space: nowrap; }
+  .expand-row input[type=number] { width: 4.5rem; padding: 0.2rem; }
+  .expand-row .ur-cmd { font-family: monospace; flex: 1; min-width: 16rem; padding: 0.2rem; }
+  .view-toggle { display: inline-flex; border: 1px solid #bbb; border-radius: 4px; overflow: hidden; }
+  .view-toggle button { border: none; border-right: 1px solid #bbb; background: #f0f0f0; padding: 0.2rem 0.7rem; cursor: pointer; font-size: 0.8rem; color: #333; }
+  .view-toggle button:last-child { border-right: none; }
+  .view-toggle button.active { background: #4a7fcb; color: white; }
+  .view-toggle button:hover:not(.active) { background: #e0e0e0; }
+  .toggle-cell { text-align: right; background: #f0f0f0; border-bottom: none; padding: 0.25rem 0.5rem; vertical-align: middle; }
+</style>
+</head>
+<body>
+<nav><strong>2018</strong> | <a href="2022.html">2022</a> | <a href="2026.html">2026</a> | <a href="index.html">Home</a></nav>
+<h1>World Cup ELO - 2018</h1>
+
+<table>
+  <thead></thead>
+  <tbody id="games"></tbody>
+</table>
+
+
+<script>
+// Source of truth: data/2018.json
+const games2018 = [
+  {
+    "gameNumber": 1,
+    "homeTeam": "Russia",
+    "homeScore": 5,
+    "awayTeam": "Saudi Arabia",
+    "awayScore": 0,
+    "date": "2018-06-14",
+    "eloChange": 31
+  },
+  {
+    "gameNumber": 2,
+    "homeTeam": "Egypt",
+    "homeScore": 0,
+    "awayTeam": "Uruguay",
+    "awayScore": 1,
+    "date": "2018-06-15",
+    "eloChange": -12
+  },
+  {
+    "gameNumber": 3,
+    "homeTeam": "Morocco",
+    "homeScore": 0,
+    "awayTeam": "Iran",
+    "awayScore": 1,
+    "date": "2018-06-15",
+    "eloChange": -25
+  },
+  {
+    "gameNumber": 4,
+    "homeTeam": "Portugal",
+    "homeScore": 3,
+    "awayTeam": "Spain",
+    "awayScore": 3,
+    "date": "2018-06-15",
+    "eloChange": 6
+  },
+  {
+    "gameNumber": 5,
+    "homeTeam": "France",
+    "homeScore": 2,
+    "awayTeam": "Australia",
+    "awayScore": 1,
+    "date": "2018-06-16",
+    "eloChange": 12
+  },
+  {
+    "gameNumber": 6,
+    "homeTeam": "Argentina",
+    "homeScore": 1,
+    "awayTeam": "Iceland",
+    "awayScore": 1,
+    "date": "2018-06-16",
+    "eloChange": -17
+  },
+  {
+    "gameNumber": 7,
+    "homeTeam": "Peru",
+    "homeScore": 0,
+    "awayTeam": "Denmark",
+    "awayScore": 1,
+    "date": "2018-06-16",
+    "eloChange": -35
+  },
+  {
+    "gameNumber": 8,
+    "homeTeam": "Croatia",
+    "homeScore": 2,
+    "awayTeam": "Nigeria",
+    "awayScore": 0,
+    "date": "2018-06-16",
+    "eloChange": 24
+  },
+  {
+    "gameNumber": 9,
+    "homeTeam": "Costa Rica",
+    "homeScore": 0,
+    "awayTeam": "Serbia",
+    "awayScore": 1,
+    "date": "2018-06-17",
+    "eloChange": -27
+  },
+  {
+    "gameNumber": 10,
+    "homeTeam": "Germany",
+    "homeScore": 0,
+    "awayTeam": "Mexico",
+    "awayScore": 1,
+    "date": "2018-06-17",
+    "eloChange": -47
+  },
+  {
+    "gameNumber": 11,
+    "homeTeam": "Brazil",
+    "homeScore": 1,
+    "awayTeam": "Switzerland",
+    "awayScore": 1,
+    "date": "2018-06-17",
+    "eloChange": -19
+  },
+  {
+    "gameNumber": 12,
+    "homeTeam": "Sweden",
+    "homeScore": 1,
+    "awayTeam": "South Korea",
+    "awayScore": 0,
+    "date": "2018-06-18",
+    "eloChange": 23
+  },
+  {
+    "gameNumber": 13,
+    "homeTeam": "Belgium",
+    "homeScore": 3,
+    "awayTeam": "Panama",
+    "awayScore": 0,
+    "date": "2018-06-18",
+    "eloChange": 17
+  },
+  {
+    "gameNumber": 14,
+    "homeTeam": "Tunisia",
+    "homeScore": 1,
+    "awayTeam": "England",
+    "awayScore": 2,
+    "date": "2018-06-18",
+    "eloChange": -9
+  },
+  {
+    "gameNumber": 15,
+    "homeTeam": "Colombia",
+    "homeScore": 1,
+    "awayTeam": "Japan",
+    "awayScore": 2,
+    "date": "2018-06-19",
+    "eloChange": -48
+  },
+  {
+    "gameNumber": 16,
+    "homeTeam": "Poland",
+    "homeScore": 1,
+    "awayTeam": "Senegal",
+    "awayScore": 2,
+    "date": "2018-06-19",
+    "eloChange": -37
+  },
+  {
+    "gameNumber": 17,
+    "homeTeam": "Russia",
+    "homeScore": 3,
+    "awayTeam": "Egypt",
+    "awayScore": 1,
+    "date": "2018-06-19",
+    "eloChange": 24
+  },
+  {
+    "gameNumber": 18,
+    "homeTeam": "Portugal",
+    "homeScore": 1,
+    "awayTeam": "Morocco",
+    "awayScore": 0,
+    "date": "2018-06-20",
+    "eloChange": 11
+  },
+  {
+    "gameNumber": 19,
+    "homeTeam": "Uruguay",
+    "homeScore": 1,
+    "awayTeam": "Saudi Arabia",
+    "awayScore": 0,
+    "date": "2018-06-20",
+    "eloChange": 7
+  },
+  {
+    "gameNumber": 20,
+    "homeTeam": "Iran",
+    "homeScore": 0,
+    "awayTeam": "Spain",
+    "awayScore": 1,
+    "date": "2018-06-20",
+    "eloChange": -13
+  },
+  {
+    "gameNumber": 21,
+    "homeTeam": "Denmark",
+    "homeScore": 1,
+    "awayTeam": "Australia",
+    "awayScore": 1,
+    "date": "2018-06-21",
+    "eloChange": -13
+  },
+  {
+    "gameNumber": 22,
+    "homeTeam": "France",
+    "homeScore": 1,
+    "awayTeam": "Peru",
+    "awayScore": 0,
+    "date": "2018-06-21",
+    "eloChange": 20
+  },
+  {
+    "gameNumber": 23,
+    "homeTeam": "Argentina",
+    "homeScore": 0,
+    "awayTeam": "Croatia",
+    "awayScore": 3,
+    "date": "2018-06-21",
+    "eloChange": -66
+  },
+  {
+    "gameNumber": 24,
+    "homeTeam": "Brazil",
+    "homeScore": 2,
+    "awayTeam": "Costa Rica",
+    "awayScore": 0,
+    "date": "2018-06-22",
+    "eloChange": 8
+  },
+  {
+    "gameNumber": 25,
+    "homeTeam": "Nigeria",
+    "homeScore": 2,
+    "awayTeam": "Iceland",
+    "awayScore": 0,
+    "date": "2018-06-22",
+    "eloChange": 60
+  },
+  {
+    "gameNumber": 26,
+    "homeTeam": "Serbia",
+    "homeScore": 1,
+    "awayTeam": "Switzerland",
+    "awayScore": 2,
+    "date": "2018-06-22",
+    "eloChange": -21
+  },
+  {
+    "gameNumber": 27,
+    "homeTeam": "South Korea",
+    "homeScore": 1,
+    "awayTeam": "Mexico",
+    "awayScore": 2,
+    "date": "2018-06-23",
+    "eloChange": -14
+  },
+  {
+    "gameNumber": 28,
+    "homeTeam": "Germany",
+    "homeScore": 2,
+    "awayTeam": "Sweden",
+    "awayScore": 1,
+    "date": "2018-06-23",
+    "eloChange": 14
+  },
+  {
+    "gameNumber": 29,
+    "homeTeam": "Belgium",
+    "homeScore": 5,
+    "awayTeam": "Tunisia",
+    "awayScore": 2,
+    "date": "2018-06-23",
+    "eloChange": 15
+  },
+  {
+    "gameNumber": 30,
+    "homeTeam": "England",
+    "homeScore": 6,
+    "awayTeam": "Panama",
+    "awayScore": 1,
+    "date": "2018-06-24",
+    "eloChange": 17
+  },
+  {
+    "gameNumber": 31,
+    "homeTeam": "Japan",
+    "homeScore": 2,
+    "awayTeam": "Senegal",
+    "awayScore": 2,
+    "date": "2018-06-24",
+    "eloChange": null
+  },
+  {
+    "gameNumber": 32,
+    "homeTeam": "Poland",
+    "homeScore": 0,
+    "awayTeam": "Colombia",
+    "awayScore": 3,
+    "date": "2018-06-24",
+    "eloChange": -40
+  },
+  {
+    "gameNumber": 33,
+    "homeTeam": "Uruguay",
+    "homeScore": 3,
+    "awayTeam": "Russia",
+    "awayScore": 0,
+    "date": "2018-06-25",
+    "eloChange": 41
+  },
+  {
+    "gameNumber": 34,
+    "homeTeam": "Saudi Arabia",
+    "homeScore": 2,
+    "awayTeam": "Egypt",
+    "awayScore": 1,
+    "date": "2018-06-25",
+    "eloChange": 35
+  },
+  {
+    "gameNumber": 35,
+    "homeTeam": "Spain",
+    "homeScore": 2,
+    "awayTeam": "Morocco",
+    "awayScore": 2,
+    "date": "2018-06-25",
+    "eloChange": -23
+  },
+  {
+    "gameNumber": 36,
+    "homeTeam": "Iran",
+    "homeScore": 1,
+    "awayTeam": "Portugal",
+    "awayScore": 1,
+    "date": "2018-06-25",
+    "eloChange": 15
+  },
+  {
+    "gameNumber": 37,
+    "homeTeam": "Denmark",
+    "homeScore": 0,
+    "awayTeam": "France",
+    "awayScore": 0,
+    "date": "2018-06-26",
+    "eloChange": 12
+  },
+  {
+    "gameNumber": 38,
+    "homeTeam": "Australia",
+    "homeScore": 0,
+    "awayTeam": "Peru",
+    "awayScore": 2,
+    "date": "2018-06-26",
+    "eloChange": -30
+  },
+  {
+    "gameNumber": 39,
+    "homeTeam": "Nigeria",
+    "homeScore": 1,
+    "awayTeam": "Argentina",
+    "awayScore": 2,
+    "date": "2018-06-26",
+    "eloChange": -15
+  },
+  {
+    "gameNumber": 40,
+    "homeTeam": "Iceland",
+    "homeScore": 1,
+    "awayTeam": "Croatia",
+    "awayScore": 2,
+    "date": "2018-06-26",
+    "eloChange": null
+  },
+  {
+    "gameNumber": 41,
+    "homeTeam": "Serbia",
+    "homeScore": 0,
+    "awayTeam": "Brazil",
+    "awayScore": 2,
+    "date": "2018-06-27",
+    "eloChange": -11
+  },
+  {
+    "gameNumber": 42,
+    "homeTeam": "Switzerland",
+    "homeScore": 2,
+    "awayTeam": "Costa Rica",
+    "awayScore": 2,
+    "date": "2018-06-27",
+    "eloChange": -17
+  },
+  {
+    "gameNumber": 43,
+    "homeTeam": "South Korea",
+    "homeScore": 2,
+    "awayTeam": "Germany",
+    "awayScore": 0,
+    "date": "2018-06-27",
+    "eloChange": 80
+  },
+  {
+    "gameNumber": 44,
+    "homeTeam": "Mexico",
+    "homeScore": 0,
+    "awayTeam": "Sweden",
+    "awayScore": 3,
+    "date": "2018-06-27",
+    "eloChange": -68
+  },
+  {
+    "gameNumber": 45,
+    "homeTeam": "England",
+    "homeScore": 0,
+    "awayTeam": "Belgium",
+    "awayScore": 1,
+    "date": "2018-06-28",
+    "eloChange": -30
+  },
+  {
+    "gameNumber": 46,
+    "homeTeam": "Panama",
+    "homeScore": 1,
+    "awayTeam": "Tunisia",
+    "awayScore": 2,
+    "date": "2018-06-28",
+    "eloChange": -29
+  },
+  {
+    "gameNumber": 47,
+    "homeTeam": "Japan",
+    "homeScore": 0,
+    "awayTeam": "Poland",
+    "awayScore": 1,
+    "date": "2018-06-28",
+    "eloChange": -29
+  },
+  {
+    "gameNumber": 48,
+    "homeTeam": "Senegal",
+    "homeScore": 0,
+    "awayTeam": "Colombia",
+    "awayScore": 1,
+    "date": "2018-06-28",
+    "eloChange": -19
+  },
+  {
+    "gameNumber": 49,
+    "homeTeam": "France",
+    "homeScore": 4,
+    "awayTeam": "Argentina",
+    "awayScore": 3,
+    "date": "2018-06-30",
+    "eloChange": 22
+  },
+  {
+    "gameNumber": 50,
+    "homeTeam": "Uruguay",
+    "homeScore": 2,
+    "awayTeam": "Portugal",
+    "awayScore": 1,
+    "date": "2018-06-30",
+    "eloChange": 32
+  },
+  {
+    "gameNumber": 51,
+    "homeTeam": "Spain",
+    "homeScore": 1,
+    "awayTeam": "Russia",
+    "awayScore": 1,
+    "date": "2018-07-01",
+    "eloChange": -18
+  },
+  {
+    "gameNumber": 52,
+    "homeTeam": "Croatia",
+    "homeScore": 1,
+    "awayTeam": "Denmark",
+    "awayScore": 1,
+    "date": "2018-07-01",
+    "eloChange": 6
+  },
+  {
+    "gameNumber": 53,
+    "homeTeam": "Brazil",
+    "homeScore": 2,
+    "awayTeam": "Mexico",
+    "awayScore": 0,
+    "date": "2018-07-02",
+    "eloChange": 14
+  },
+  {
+    "gameNumber": 54,
+    "homeTeam": "Belgium",
+    "homeScore": 3,
+    "awayTeam": "Japan",
+    "awayScore": 2,
+    "date": "2018-07-02",
+    "eloChange": 9
+  },
+  {
+    "gameNumber": 55,
+    "homeTeam": "Sweden",
+    "homeScore": 1,
+    "awayTeam": "Switzerland",
+    "awayScore": 0,
+    "date": "2018-07-03",
+    "eloChange": 34
+  },
+  {
+    "gameNumber": 56,
+    "homeTeam": "Colombia",
+    "homeScore": 1,
+    "awayTeam": "England",
+    "awayScore": 1,
+    "date": "2018-07-03",
+    "eloChange": 0
+  },
+  {
+    "gameNumber": 57,
+    "homeTeam": "Uruguay",
+    "homeScore": 0,
+    "awayTeam": "France",
+    "awayScore": 2,
+    "date": "2018-07-06",
+    "eloChange": -39
+  },
+  {
+    "gameNumber": 58,
+    "homeTeam": "Brazil",
+    "homeScore": 1,
+    "awayTeam": "Belgium",
+    "awayScore": 2,
+    "date": "2018-07-06",
+    "eloChange": -42
+  },
+  {
+    "gameNumber": 59,
+    "homeTeam": "Sweden",
+    "homeScore": 0,
+    "awayTeam": "England",
+    "awayScore": 2,
+    "date": "2018-07-07",
+    "eloChange": -40
+  },
+  {
+    "gameNumber": 60,
+    "homeTeam": "Russia",
+    "homeScore": 2,
+    "awayTeam": "Croatia",
+    "awayScore": 2,
+    "date": "2018-07-07",
+    "eloChange": -11
+  },
+  {
+    "gameNumber": 61,
+    "homeTeam": "France",
+    "homeScore": 1,
+    "awayTeam": "Belgium",
+    "awayScore": 0,
+    "date": "2018-07-10",
+    "eloChange": 29
+  },
+  {
+    "gameNumber": 62,
+    "homeTeam": "Croatia",
+    "homeScore": 2,
+    "awayTeam": "England",
+    "awayScore": 1,
+    "date": "2018-07-11",
+    "eloChange": 34
+  },
+  {
+    "gameNumber": 63,
+    "homeTeam": "Belgium",
+    "homeScore": 2,
+    "awayTeam": "England",
+    "awayScore": 0,
+    "date": "2018-07-14",
+    "eloChange": 36
+  },
+  {
+    "gameNumber": 64,
+    "homeTeam": "France",
+    "homeScore": 4,
+    "awayTeam": "Croatia",
+    "awayScore": 2,
+    "date": "2018-07-15",
+    "eloChange": 30
+  }
+];
+
+// Source of truth: data/teams.json
+const teams = [
+  {"name": "Russia", "shorthand": "RUS", "confederation": "Europe", "flag": "ru"},
+  {"name": "Portugal", "shorthand": "POR", "confederation": "Europe", "flag": "pt"},
+  {"name": "Spain", "shorthand": "ESP", "confederation": "Europe", "flag": "es"},
+  {"name": "France", "shorthand": "FRA", "confederation": "Europe", "flag": "fr"},
+  {"name": "Denmark", "shorthand": "DEN", "confederation": "Europe", "flag": "dk"},
+  {"name": "Iceland", "shorthand": "ISL", "confederation": "Europe", "flag": "is"},
+  {"name": "Croatia", "shorthand": "CRO", "confederation": "Europe", "flag": "hr"},
+  {"name": "Serbia", "shorthand": "SRB", "confederation": "Europe", "flag": "rs"},
+  {"name": "Switzerland", "shorthand": "SUI", "confederation": "Europe", "flag": "ch"},
+  {"name": "Germany", "shorthand": "GER", "confederation": "Europe", "flag": "de"},
+  {"name": "Sweden", "shorthand": "SWE", "confederation": "Europe", "flag": "se"},
+  {"name": "Belgium", "shorthand": "BEL", "confederation": "Europe", "flag": "be"},
+  {"name": "England", "shorthand": "ENG", "confederation": "Europe", "flag": "gb-eng"},
+  {"name": "Poland", "shorthand": "POL", "confederation": "Europe", "flag": "pl"},
+  {"name": "Netherlands", "shorthand": "NED", "confederation": "Europe", "flag": "nl"},
+  {"name": "Wales", "shorthand": "WAL", "confederation": "Europe", "flag": "gb-wls"},
+  {"name": "Saudi Arabia", "shorthand": "KSA", "confederation": "Asia", "flag": "sa"},
+  {"name": "Iran", "shorthand": "IRN", "confederation": "Asia", "flag": "ir"},
+  {"name": "Australia", "shorthand": "AUS", "confederation": "Asia", "flag": "au"},
+  {"name": "South Korea", "shorthand": "KOR", "confederation": "Asia", "flag": "kr"},
+  {"name": "Japan", "shorthand": "JPN", "confederation": "Asia", "flag": "jp"},
+  {"name": "Qatar", "shorthand": "QAT", "confederation": "Asia", "flag": "qa"},
+  {"name": "Egypt", "shorthand": "EGY", "confederation": "Africa", "flag": "eg"},
+  {"name": "Morocco", "shorthand": "MAR", "confederation": "Africa", "flag": "ma"},
+  {"name": "Nigeria", "shorthand": "NGA", "confederation": "Africa", "flag": "ng"},
+  {"name": "Tunisia", "shorthand": "TUN", "confederation": "Africa", "flag": "tn"},
+  {"name": "Senegal", "shorthand": "SEN", "confederation": "Africa", "flag": "sn"},
+  {"name": "Cameroon", "shorthand": "CMR", "confederation": "Africa", "flag": "cm"},
+  {"name": "Ghana", "shorthand": "GHA", "confederation": "Africa", "flag": "gh"},
+  {"name": "Uruguay", "shorthand": "URU", "confederation": "South America", "flag": "uy"},
+  {"name": "Peru", "shorthand": "PER", "confederation": "South America", "flag": "pe"},
+  {"name": "Argentina", "shorthand": "ARG", "confederation": "South America", "flag": "ar"},
+  {"name": "Brazil", "shorthand": "BRA", "confederation": "South America", "flag": "br"},
+  {"name": "Colombia", "shorthand": "COL", "confederation": "South America", "flag": "co"},
+  {"name": "Ecuador", "shorthand": "ECU", "confederation": "South America", "flag": "ec"},
+  {"name": "Costa Rica", "shorthand": "CRC", "confederation": "North America", "flag": "cr"},
+  {"name": "Mexico", "shorthand": "MEX", "confederation": "North America", "flag": "mx"},
+  {"name": "Panama", "shorthand": "PAN", "confederation": "North America", "flag": "pa"},
+  {"name": "USA", "shorthand": "USA", "confederation": "North America", "flag": "us"},
+  {"name": "Canada", "shorthand": "CAN", "confederation": "North America", "flag": "ca"},
+  {"name": "South Africa", "shorthand": "RSA", "confederation": "Africa", "flag": "za"},
+  {"name": "Czechia", "shorthand": "CZE", "confederation": "Europe", "flag": "cz"},
+  {"name": "Bosnia", "shorthand": "BIH", "confederation": "Europe", "flag": "ba"},
+  {"name": "Paraguay", "shorthand": "PAR", "confederation": "South America", "flag": "py"},
+  {"name": "Haiti", "shorthand": "HAI", "confederation": "North America", "flag": "ht"},
+  {"name": "Scotland", "shorthand": "SCO", "confederation": "Europe", "flag": "gb-sct"},
+  {"name": "Turkey", "shorthand": "TUR", "confederation": "Europe", "flag": "tr"},
+  {"name": "Curacao", "shorthand": "CUW", "confederation": "North America", "flag": "cw"},
+  {"name": "Ivory Coast", "shorthand": "CIV", "confederation": "Africa", "flag": "ci"},
+  {"name": "New Zealand", "shorthand": "NZL", "confederation": "Oceania", "flag": "nz"},
+  {"name": "Cape Verde", "shorthand": "CPV", "confederation": "Africa", "flag": "cv"},
+  {"name": "Iraq", "shorthand": "IRQ", "confederation": "Asia", "flag": "iq"},
+  {"name": "Norway", "shorthand": "NOR", "confederation": "Europe", "flag": "no"},
+  {"name": "Algeria", "shorthand": "ALG", "confederation": "Africa", "flag": "dz"},
+  {"name": "Austria", "shorthand": "AUT", "confederation": "Europe", "flag": "at"},
+  {"name": "Jordan", "shorthand": "JOR", "confederation": "Asia", "flag": "jo"},
+  {"name": "DR Congo", "shorthand": "COD", "confederation": "Africa", "flag": "cd"},
+  {"name": "Uzbekistan", "shorthand": "UZB", "confederation": "Asia", "flag": "uz"},
+];
+
+const GAMES = games2018;
+
+const CONFEDERATIONS = ["Europe", "Asia", "Africa", "South America", "North America", "Oceania"];
+const YEAR = 2018;
+
+const tbody = document.getElementById('games');
+const thead = document.querySelector('thead');
+
+const confByTeam = {};
+for (const t of teams) confByTeam[t.name] = t.confederation;
+const flagByTeam = {};
+for (const t of teams) flagByTeam[t.name] = t.flag;
+
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const [, month, day] = dateStr.split('-').map(Number);
+  return `${MONTHS[month - 1]} ${day}`;
+}
+
+function signedElo(val) {
+  if (typeof val !== 'number') return '';
+  return val >= 0 ? `+${val}` : String(val);
+}
+
+function eloCell(preElo, delta) {
+  if (delta !== '') return preElo != null ? `${preElo}${delta}` : delta;
+  return preElo != null ? String(preElo) : '';
+}
+
+const ELO_GRADIENT_MAX = 400;
+function eloColor(value) {
+  const ratio = Math.max(-1, Math.min(1, value / ELO_GRADIENT_MAX));
+  if (ratio >= 0) return `rgb(${255 - ratio * 105}, 255, ${255 - ratio * 105})`;
+  return `rgb(255, ${255 + ratio * 105}, ${255 + ratio * 105})`;
+}
+
+let currentView = 'elo';
+let currentColCount = 10;
+let openExpandRow = null;
+let openGameRow = null;
+
+function gameColsHeader() {
+  return (
+    `<th class="narrow" rowspan="2">Date</th>` +
+    `<th class="narrow" rowspan="2">#</th>` +
+    `<th class="spacer" rowspan="2"></th>` +
+    `<th colspan="3" rowspan="2" style="text-align:center">Home</th>` +
+    `<th class="score-sep" rowspan="2"></th>` +
+    `<th colspan="3" rowspan="2" style="text-align:center">Away</th>`
+  );
+}
+
+function toggleCellHtml(colspan) {
+  return `<th colspan="${colspan}" class="toggle-cell">` +
+    `<div class="view-toggle">` +
+    `<button data-view="elo"${currentView === 'elo' ? ' class="active"' : ''}>ELO Shift</button>` +
+    `<button data-view="wld"${currentView === 'wld' ? ' class="active"' : ''}>W / L / D</button>` +
+    `<button data-view="stats"${currentView === 'stats' ? ' class="active"' : ''}>Stats</button>` +
+    `</div></th>`;
+}
+
+function gameRowCells(game) {
+  const change = game.eloChange;
+  const homeEloDelta = signedElo(change);
+  const awayEloDelta = typeof change === 'number' ? signedElo(-change) : '';
+  const homeScore = game.homeScore ?? '';
+  const awayScore = game.awayScore ?? '';
+  return (
+    `<td class="narrow">${formatDate(game.date)}</td>` +
+    `<td class="narrow">#${game.gameNumber}</td>` +
+    `<td class="spacer"></td>` +
+    `<td class="elo">${eloCell(game.homeEloPre, homeEloDelta)}</td>` +
+    `<td class="flag"><span class="icon" style="background-image:url('data/flags/${flagByTeam[game.homeTeam]}.svg')" title="${game.homeTeam}"></span></td>` +
+    `<td class="narrow">${homeScore}</td>` +
+    `<td class="score-sep">-</td>` +
+    `<td class="narrow">${awayScore}</td>` +
+    `<td class="flag"><span class="icon" style="background-image:url('data/flags/${flagByTeam[game.awayTeam]}.svg')" title="${game.awayTeam}"></span></td>` +
+    `<td class="elo">${eloCell(game.awayEloPre, awayEloDelta)}</td>`
+  );
+}
+
+function wireToggle() {
+  thead.querySelectorAll('.view-toggle button').forEach(btn => {
+    btn.addEventListener('click', () => { currentView = btn.dataset.view; render(); });
+  });
+}
+
+function render() {
+  const games = GAMES;
+  const participating = new Set();
+  for (const game of games) {
+    const hc = confByTeam[game.homeTeam];
+    const ac = confByTeam[game.awayTeam];
+    if (hc) participating.add(hc);
+    if (ac) participating.add(ac);
+  }
+  const confederations = CONFEDERATIONS.filter(c => participating.has(c));
+
+  tbody.innerHTML = '';
+  openExpandRow = null;
+  openGameRow = null;
+
+  if (games.length === 0) {
+    thead.innerHTML = `<tr><th>No games</th></tr><tr></tr>`;
+    tbody.innerHTML = `<tr><td>No games yet</td></tr>`;
+    return;
+  }
+
+  const eloTotals = {};
+  for (const c of confederations) eloTotals[c] = 0;
+  for (const game of games) {
+    if (typeof game.eloChange === 'number') {
+      const hc = confByTeam[game.homeTeam];
+      const ac = confByTeam[game.awayTeam];
+      if (hc) eloTotals[hc] += game.eloChange;
+      if (ac) eloTotals[ac] -= game.eloChange;
+    }
+  }
+  const ordered = [...confederations].sort((a, b) => eloTotals[b] - eloTotals[a]);
+
+  if (currentView === 'elo') renderElo(games, ordered);
+  else if (currentView === 'wld') renderWld(games, ordered);
+  else renderStats(games, ordered);
+
+  wireToggle();
+}
+
+function renderElo(games, ordered) {
+  const totals = {};
+  for (const c of ordered) totals[c] = 0;
+  const rowTotals = [];
+  for (const game of games) {
+    if (typeof game.eloChange === 'number') {
+      const hc = confByTeam[game.homeTeam];
+      const ac = confByTeam[game.awayTeam];
+      if (hc) totals[hc] += game.eloChange;
+      if (ac) totals[ac] -= game.eloChange;
+    }
+    rowTotals.push({ ...totals });
+  }
+  const N = ordered.length;
+  currentColCount = 10 + N;
+
+  thead.innerHTML =
+    `<tr>${gameColsHeader()}${toggleCellHtml(N)}</tr>` +
+    `<tr>${ordered.map(c => `<th class="conf">${c}</th>`).join('')}</tr>`;
+
+  games.forEach((game, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = gameRowCells(game) +
+      ordered.map(c =>
+        typeof game.eloChange === 'number'
+          ? `<td class="num conf" style="background-color:${eloColor(rowTotals[i][c])}">${rowTotals[i][c]}</td>`
+          : `<td class="num conf"></td>`
+      ).join('');
+    tr.addEventListener('click', () => toggleExpand(game, tr));
+    tbody.appendChild(tr);
+  });
+}
+
+function renderWld(games, ordered) {
+  const totals = {};
+  for (const c of ordered) totals[c] = { w: 0, l: 0, d: 0 };
+  const rowTotals = [];
+  for (const game of games) {
+    const hs = game.homeScore;
+    const as_ = game.awayScore;
+    if (hs !== null && as_ !== null) {
+      const hc = confByTeam[game.homeTeam];
+      const ac = confByTeam[game.awayTeam];
+      if (hs > as_) {
+        if (hc) totals[hc].w++;
+        if (ac) totals[ac].l++;
+      } else if (as_ > hs) {
+        if (ac) totals[ac].w++;
+        if (hc) totals[hc].l++;
+      } else {
+        if (hc) totals[hc].d++;
+        if (ac) totals[ac].d++;
+      }
+    }
+    const snap = {};
+    for (const c of ordered) snap[c] = { ...totals[c] };
+    rowTotals.push(snap);
+  }
+  const N = ordered.length;
+  currentColCount = 10 + N;
+
+  thead.innerHTML =
+    `<tr>${gameColsHeader()}${toggleCellHtml(N)}</tr>` +
+    `<tr>${ordered.map(c => `<th class="conf">${c}</th>`).join('')}</tr>`;
+
+  games.forEach((game, i) => {
+    const played = game.homeScore !== null && game.awayScore !== null;
+    const tr = document.createElement('tr');
+    tr.innerHTML = gameRowCells(game) +
+      ordered.map(c => {
+        if (!played) return `<td class="num conf"></td>`;
+        const { w, l, d } = rowTotals[i][c];
+        return `<td class="num conf">${w}-${d}-${l}</td>`;
+      }).join('');
+    tr.addEventListener('click', () => toggleExpand(game, tr));
+    tbody.appendChild(tr);
+  });
+}
+
+function renderStats(games, ordered) {
+  const N = ordered.length;
+  currentColCount = 10 + N;
+  const extra = Math.max(0, N - 3);
+  const emptyTh = Array(extra).fill('<th class="conf"></th>').join('');
+  thead.innerHTML =
+    `<tr>${gameColsHeader()}${toggleCellHtml(N)}</tr>` +
+    `<tr><th class="conf">Wins</th><th class="conf">Draws</th><th class="conf">Win%</th>${emptyTh}</tr>`;
+
+  const emptyTd = Array(N).fill('<td class="num conf"></td>').join('');
+  let wins = 0, draws = 0;
+  games.forEach(game => {
+    const hs = game.homeScore;
+    const as_ = game.awayScore;
+    const played = hs !== null && as_ !== null;
+    const tr = document.createElement('tr');
+    if (played) {
+      if (hs !== as_) wins++;
+      else draws++;
+      const total = wins + draws;
+      const pct = Math.round(wins / total * 100) + '%';
+      const extraTd = Array(extra).fill('<td class="num conf"></td>').join('');
+      tr.innerHTML = gameRowCells(game) +
+        `<td class="num conf">${wins}</td><td class="num conf">${draws}</td><td class="num conf">${pct}</td>${extraTd}`;
+    } else {
+      tr.innerHTML = gameRowCells(game) + emptyTd;
+    }
+    tr.addEventListener('click', () => toggleExpand(game, tr));
+    tbody.appendChild(tr);
+  });
+}
+
+render();
+
+function toggleExpand(game, tr) {
+  const colCount = currentColCount;
+  if (openExpandRow) {
+    openExpandRow.remove();
+    openExpandRow = null;
+    if (openGameRow === tr) { openGameRow = null; return; }
+  }
+  openGameRow = tr;
+  const expandTr = document.createElement('tr');
+  expandTr.className = 'expand-row';
+  const td = document.createElement('td');
+  td.colSpan = colCount;
+
+  const hsVal = game.homeScore != null ? game.homeScore : '';
+  const asVal = game.awayScore != null ? game.awayScore : '';
+  const eloVal = game.eloChange != null ? Math.abs(game.eloChange) : '';
+  const gainsVal = game.eloChange != null ? (game.eloChange >= 0 ? 'home' : 'away') : '';
+  const isDraw = hsVal !== '' && asVal !== '' && hsVal === asVal;
+
+  td.innerHTML = `
+    <div class="ur-line"><strong>#${game.gameNumber}: ${game.homeTeam} vs ${game.awayTeam}</strong></div>
+    <div class="ur-line">
+      <label>Home score: <input class="ur-hs" type="number" min="0" value="${hsVal}"></label>
+      <label>Away score: <input class="ur-as" type="number" min="0" value="${asVal}"></label>
+      <label>ELO magnitude (opt): <input class="ur-elo" type="number" min="0" value="${eloVal}"></label>
+      <label class="ur-gains-wrap" style="display:${isDraw ? 'flex' : 'none'}">Who gains ELO:
+        <select class="ur-gains">
+          <option value="" ${gainsVal === '' ? 'selected' : ''}>—</option>
+          <option value="home" ${gainsVal === 'home' ? 'selected' : ''}>${game.homeTeam}</option>
+          <option value="away" ${gainsVal === 'away' ? 'selected' : ''}>${game.awayTeam}</option>
+        </select>
+      </label>
+    </div>
+    <div class="ur-line">
+    <div class="ur-line">
+      <button class="ur-gen">Generate command</button>
+      <input class="ur-cmd" type="text" readonly placeholder="command will appear here">
+      <button class="ur-copy">Copy</button>
+    </div>`;
+
+  td.addEventListener('click', e => e.stopPropagation());
+
+  function updateGainsVisibility() {
+    const hs = td.querySelector('.ur-hs').value;
+    const as_ = td.querySelector('.ur-as').value;
+    const draw = hs !== '' && as_ !== '' && hs === as_;
+    td.querySelector('.ur-gains-wrap').style.display = draw ? 'flex' : 'none';
+  }
+  td.querySelector('.ur-hs').addEventListener('input', updateGainsVisibility);
+  td.querySelector('.ur-as').addEventListener('input', updateGainsVisibility);
+
+  td.querySelector('.ur-gen').addEventListener('click', () => {
+    const hs = td.querySelector('.ur-hs').value;
+    const as_ = td.querySelector('.ur-as').value;
+    const elo = td.querySelector('.ur-elo').value;
+    const gains = td.querySelector('.ur-gains').value;
+    const draw = hs !== '' && as_ !== '' && hs === as_;
+    let cmd = `python3 scripts/set_result.py ${YEAR} ${game.gameNumber} ${hs} ${as_}`;
+    if (elo !== '') cmd += ` ${elo} --gains ${draw ? (gains || '???') : (Number(hs) > Number(as_) ? 'home' : 'away')}`;
+    td.querySelector('.ur-cmd').value = cmd;
+  });
+
+  td.querySelector('.ur-copy').addEventListener('click', () => {
+    const cmdInput = td.querySelector('.ur-cmd');
+    cmdInput.select();
+    navigator.clipboard.writeText(cmdInput.value);
+  });
+
+  expandTr.appendChild(td);
+  tr.after(expandTr);
+  openExpandRow = expandTr;
+}
+
+
+</script>
+
+</body>
+</html>

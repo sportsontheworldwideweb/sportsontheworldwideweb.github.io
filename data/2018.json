@@ -1,0 +1,578 @@
+[
+  {
+    "gameNumber": 1,
+    "homeTeam": "Russia",
+    "homeScore": 5,
+    "awayTeam": "Saudi Arabia",
+    "awayScore": 0,
+    "date": "2018-06-14",
+    "eloChange": 31
+  },
+  {
+    "gameNumber": 2,
+    "homeTeam": "Egypt",
+    "homeScore": 0,
+    "awayTeam": "Uruguay",
+    "awayScore": 1,
+    "date": "2018-06-15",
+    "eloChange": -12
+  },
+  {
+    "gameNumber": 3,
+    "homeTeam": "Morocco",
+    "homeScore": 0,
+    "awayTeam": "Iran",
+    "awayScore": 1,
+    "date": "2018-06-15",
+    "eloChange": -25
+  },
+  {
+    "gameNumber": 4,
+    "homeTeam": "Portugal",
+    "homeScore": 3,
+    "awayTeam": "Spain",
+    "awayScore": 3,
+    "date": "2018-06-15",
+    "eloChange": 6
+  },
+  {
+    "gameNumber": 5,
+    "homeTeam": "France",
+    "homeScore": 2,
+    "awayTeam": "Australia",
+    "awayScore": 1,
+    "date": "2018-06-16",
+    "eloChange": 12
+  },
+  {
+    "gameNumber": 6,
+    "homeTeam": "Argentina",
+    "homeScore": 1,
+    "awayTeam": "Iceland",
+    "awayScore": 1,
+    "date": "2018-06-16",
+    "eloChange": -17
+  },
+  {
+    "gameNumber": 7,
+    "homeTeam": "Peru",
+    "homeScore": 0,
+    "awayTeam": "Denmark",
+    "awayScore": 1,
+    "date": "2018-06-16",
+    "eloChange": -35
+  },
+  {
+    "gameNumber": 8,
+    "homeTeam": "Croatia",
+    "homeScore": 2,
+    "awayTeam": "Nigeria",
+    "awayScore": 0,
+    "date": "2018-06-16",
+    "eloChange": 24
+  },
+  {
+    "gameNumber": 9,
+    "homeTeam": "Costa Rica",
+    "homeScore": 0,
+    "awayTeam": "Serbia",
+    "awayScore": 1,
+    "date": "2018-06-17",
+    "eloChange": -27
+  },
+  {
+    "gameNumber": 10,
+    "homeTeam": "Germany",
+    "homeScore": 0,
+    "awayTeam": "Mexico",
+    "awayScore": 1,
+    "date": "2018-06-17",
+    "eloChange": -47
+  },
+  {
+    "gameNumber": 11,
+    "homeTeam": "Brazil",
+    "homeScore": 1,
+    "awayTeam": "Switzerland",
+    "awayScore": 1,
+    "date": "2018-06-17",
+    "eloChange": -19
+  },
+  {
+    "gameNumber": 12,
+    "homeTeam": "Sweden",
+    "homeScore": 1,
+    "awayTeam": "South Korea",
+    "awayScore": 0,
+    "date": "2018-06-18",
+    "eloChange": 23
+  },
+  {
+    "gameNumber": 13,
+    "homeTeam": "Belgium",
+    "homeScore": 3,
+    "awayTeam": "Panama",
+    "awayScore": 0,
+    "date": "2018-06-18",
+    "eloChange": 17
+  },
+  {
+    "gameNumber": 14,
+    "homeTeam": "Tunisia",
+    "homeScore": 1,
+    "awayTeam": "England",
+    "awayScore": 2,
+    "date": "2018-06-18",
+    "eloChange": -9
+  },
+  {
+    "gameNumber": 15,
+    "homeTeam": "Colombia",
+    "homeScore": 1,
+    "awayTeam": "Japan",
+    "awayScore": 2,
+    "date": "2018-06-19",
+    "eloChange": -48
+  },
+  {
+    "gameNumber": 16,
+    "homeTeam": "Poland",
+    "homeScore": 1,
+    "awayTeam": "Senegal",
+    "awayScore": 2,
+    "date": "2018-06-19",
+    "eloChange": -37
+  },
+  {
+    "gameNumber": 17,
+    "homeTeam": "Russia",
+    "homeScore": 3,
+    "awayTeam": "Egypt",
+    "awayScore": 1,
+    "date": "2018-06-19",
+    "eloChange": 24
+  },
+  {
+    "gameNumber": 18,
+    "homeTeam": "Portugal",
+    "homeScore": 1,
+    "awayTeam": "Morocco",
+    "awayScore": 0,
+    "date": "2018-06-20",
+    "eloChange": 11
+  },
+  {
+    "gameNumber": 19,
+    "homeTeam": "Uruguay",
+    "homeScore": 1,
+    "awayTeam": "Saudi Arabia",
+    "awayScore": 0,
+    "date": "2018-06-20",
+    "eloChange": 7
+  },
+  {
+    "gameNumber": 20,
+    "homeTeam": "Iran",
+    "homeScore": 0,
+    "awayTeam": "Spain",
+    "awayScore": 1,
+    "date": "2018-06-20",
+    "eloChange": -13
+  },
+  {
+    "gameNumber": 21,
+    "homeTeam": "Denmark",
+    "homeScore": 1,
+    "awayTeam": "Australia",
+    "awayScore": 1,
+    "date": "2018-06-21",
+    "eloChange": -13
+  },
+  {
+    "gameNumber": 22,
+    "homeTeam": "France",
+    "homeScore": 1,
+    "awayTeam": "Peru",
+    "awayScore": 0,
+    "date": "2018-06-21",
+    "eloChange": 20
+  },
+  {
+    "gameNumber": 23,
+    "homeTeam": "Argentina",
+    "homeScore": 0,
+    "awayTeam": "Croatia",
+    "awayScore": 3,
+    "date": "2018-06-21",
+    "eloChange": -66
+  },
+  {
+    "gameNumber": 24,
+    "homeTeam": "Brazil",
+    "homeScore": 2,
+    "awayTeam": "Costa Rica",
+    "awayScore": 0,
+    "date": "2018-06-22",
+    "eloChange": 8
+  },
+  {
+    "gameNumber": 25,
+    "homeTeam": "Nigeria",
+    "homeScore": 2,
+    "awayTeam": "Iceland",
+    "awayScore": 0,
+    "date": "2018-06-22",
+    "eloChange": 60
+  },
+  {
+    "gameNumber": 26,
+    "homeTeam": "Serbia",
+    "homeScore": 1,
+    "awayTeam": "Switzerland",
+    "awayScore": 2,
+    "date": "2018-06-22",
+    "eloChange": -21
+  },
+  {
+    "gameNumber": 27,
+    "homeTeam": "South Korea",
+    "homeScore": 1,
+    "awayTeam": "Mexico",
+    "awayScore": 2,
+    "date": "2018-06-23",
+    "eloChange": -14
+  },
+  {
+    "gameNumber": 28,
+    "homeTeam": "Germany",
+    "homeScore": 2,
+    "awayTeam": "Sweden",
+    "awayScore": 1,
+    "date": "2018-06-23",
+    "eloChange": 14
+  },
+  {
+    "gameNumber": 29,
+    "homeTeam": "Belgium",
+    "homeScore": 5,
+    "awayTeam": "Tunisia",
+    "awayScore": 2,
+    "date": "2018-06-23",
+    "eloChange": 15
+  },
+  {
+    "gameNumber": 30,
+    "homeTeam": "England",
+    "homeScore": 6,
+    "awayTeam": "Panama",
+    "awayScore": 1,
+    "date": "2018-06-24",
+    "eloChange": 17
+  },
+  {
+    "gameNumber": 31,
+    "homeTeam": "Japan",
+    "homeScore": 2,
+    "awayTeam": "Senegal",
+    "awayScore": 2,
+    "date": "2018-06-24",
+    "eloChange": null
+  },
+  {
+    "gameNumber": 32,
+    "homeTeam": "Poland",
+    "homeScore": 0,
+    "awayTeam": "Colombia",
+    "awayScore": 3,
+    "date": "2018-06-24",
+    "eloChange": -40
+  },
+  {
+    "gameNumber": 33,
+    "homeTeam": "Uruguay",
+    "homeScore": 3,
+    "awayTeam": "Russia",
+    "awayScore": 0,
+    "date": "2018-06-25",
+    "eloChange": 41
+  },
+  {
+    "gameNumber": 34,
+    "homeTeam": "Saudi Arabia",
+    "homeScore": 2,
+    "awayTeam": "Egypt",
+    "awayScore": 1,
+    "date": "2018-06-25",
+    "eloChange": 35
+  },
+  {
+    "gameNumber": 35,
+    "homeTeam": "Spain",
+    "homeScore": 2,
+    "awayTeam": "Morocco",
+    "awayScore": 2,
+    "date": "2018-06-25",
+    "eloChange": -23
+  },
+  {
+    "gameNumber": 36,
+    "homeTeam": "Iran",
+    "homeScore": 1,
+    "awayTeam": "Portugal",
+    "awayScore": 1,
+    "date": "2018-06-25",
+    "eloChange": 15
+  },
+  {
+    "gameNumber": 37,
+    "homeTeam": "Denmark",
+    "homeScore": 0,
+    "awayTeam": "France",
+    "awayScore": 0,
+    "date": "2018-06-26",
+    "eloChange": 12
+  },
+  {
+    "gameNumber": 38,
+    "homeTeam": "Australia",
+    "homeScore": 0,
+    "awayTeam": "Peru",
+    "awayScore": 2,
+    "date": "2018-06-26",
+    "eloChange": -30
+  },
+  {
+    "gameNumber": 39,
+    "homeTeam": "Nigeria",
+    "homeScore": 1,
+    "awayTeam": "Argentina",
+    "awayScore": 2,
+    "date": "2018-06-26",
+    "eloChange": -15
+  },
+  {
+    "gameNumber": 40,
+    "homeTeam": "Iceland",
+    "homeScore": 1,
+    "awayTeam": "Croatia",
+    "awayScore": 2,
+    "date": "2018-06-26",
+    "eloChange": null
+  },
+  {
+    "gameNumber": 41,
+    "homeTeam": "Serbia",
+    "homeScore": 0,
+    "awayTeam": "Brazil",
+    "awayScore": 2,
+    "date": "2018-06-27",
+    "eloChange": -11
+  },
+  {
+    "gameNumber": 42,
+    "homeTeam": "Switzerland",
+    "homeScore": 2,
+    "awayTeam": "Costa Rica",
+    "awayScore": 2,
+    "date": "2018-06-27",
+    "eloChange": -17
+  },
+  {
+    "gameNumber": 43,
+    "homeTeam": "South Korea",
+    "homeScore": 2,
+    "awayTeam": "Germany",
+    "awayScore": 0,
+    "date": "2018-06-27",
+    "eloChange": 80
+  },
+  {
+    "gameNumber": 44,
+    "homeTeam": "Mexico",
+    "homeScore": 0,
+    "awayTeam": "Sweden",
+    "awayScore": 3,
+    "date": "2018-06-27",
+    "eloChange": -68
+  },
+  {
+    "gameNumber": 45,
+    "homeTeam": "England",
+    "homeScore": 0,
+    "awayTeam": "Belgium",
+    "awayScore": 1,
+    "date": "2018-06-28",
+    "eloChange": -30
+  },
+  {
+    "gameNumber": 46,
+    "homeTeam": "Panama",
+    "homeScore": 1,
+    "awayTeam": "Tunisia",
+    "awayScore": 2,
+    "date": "2018-06-28",
+    "eloChange": -29
+  },
+  {
+    "gameNumber": 47,
+    "homeTeam": "Japan",
+    "homeScore": 0,
+    "awayTeam": "Poland",
+    "awayScore": 1,
+    "date": "2018-06-28",
+    "eloChange": -29
+  },
+  {
+    "gameNumber": 48,
+    "homeTeam": "Senegal",
+    "homeScore": 0,
+    "awayTeam": "Colombia",
+    "awayScore": 1,
+    "date": "2018-06-28",
+    "eloChange": -19
+  },
+  {
+    "gameNumber": 49,
+    "homeTeam": "France",
+    "homeScore": 4,
+    "awayTeam": "Argentina",
+    "awayScore": 3,
+    "date": "2018-06-30",
+    "eloChange": 22
+  },
+  {
+    "gameNumber": 50,
+    "homeTeam": "Uruguay",
+    "homeScore": 2,
+    "awayTeam": "Portugal",
+    "awayScore": 1,
+    "date": "2018-06-30",
+    "eloChange": 32
+  },
+  {
+    "gameNumber": 51,
+    "homeTeam": "Spain",
+    "homeScore": 1,
+    "awayTeam": "Russia",
+    "awayScore": 1,
+    "date": "2018-07-01",
+    "eloChange": -18
+  },
+  {
+    "gameNumber": 52,
+    "homeTeam": "Croatia",
+    "homeScore": 1,
+    "awayTeam": "Denmark",
+    "awayScore": 1,
+    "date": "2018-07-01",
+    "eloChange": 6
+  },
+  {
+    "gameNumber": 53,
+    "homeTeam": "Brazil",
+    "homeScore": 2,
+    "awayTeam": "Mexico",
+    "awayScore": 0,
+    "date": "2018-07-02",
+    "eloChange": 14
+  },
+  {
+    "gameNumber": 54,
+    "homeTeam": "Belgium",
+    "homeScore": 3,
+    "awayTeam": "Japan",
+    "awayScore": 2,
+    "date": "2018-07-02",
+    "eloChange": 9
+  },
+  {
+    "gameNumber": 55,
+    "homeTeam": "Sweden",
+    "homeScore": 1,
+    "awayTeam": "Switzerland",
+    "awayScore": 0,
+    "date": "2018-07-03",
+    "eloChange": 34
+  },
+  {
+    "gameNumber": 56,
+    "homeTeam": "Colombia",
+    "homeScore": 1,
+    "awayTeam": "England",
+    "awayScore": 1,
+    "date": "2018-07-03",
+    "eloChange": 0
+  },
+  {
+    "gameNumber": 57,
+    "homeTeam": "Uruguay",
+    "homeScore": 0,
+    "awayTeam": "France",
+    "awayScore": 2,
+    "date": "2018-07-06",
+    "eloChange": -39
+  },
+  {
+    "gameNumber": 58,
+    "homeTeam": "Brazil",
+    "homeScore": 1,
+    "awayTeam": "Belgium",
+    "awayScore": 2,
+    "date": "2018-07-06",
+    "eloChange": -42
+  },
+  {
+    "gameNumber": 59,
+    "homeTeam": "Sweden",
+    "homeScore": 0,
+    "awayTeam": "England",
+    "awayScore": 2,
+    "date": "2018-07-07",
+    "eloChange": -40
+  },
+  {
+    "gameNumber": 60,
+    "homeTeam": "Russia",
+    "homeScore": 2,
+    "awayTeam": "Croatia",
+    "awayScore": 2,
+    "date": "2018-07-07",
+    "eloChange": -11
+  },
+  {
+    "gameNumber": 61,
+    "homeTeam": "France",
+    "homeScore": 1,
+    "awayTeam": "Belgium",
+    "awayScore": 0,
+    "date": "2018-07-10",
+    "eloChange": 29
+  },
+  {
+    "gameNumber": 62,
+    "homeTeam": "Croatia",
+    "homeScore": 2,
+    "awayTeam": "England",
+    "awayScore": 1,
+    "date": "2018-07-11",
+    "eloChange": 34
+  },
+  {
+    "gameNumber": 63,
+    "homeTeam": "Belgium",
+    "homeScore": 2,
+    "awayTeam": "England",
+    "awayScore": 0,
+    "date": "2018-07-14",
+    "eloChange": 36
+  },
+  {
+    "gameNumber": 64,
+    "homeTeam": "France",
+    "homeScore": 4,
+    "awayTeam": "Croatia",
+    "awayScore": 2,
+    "date": "2018-07-15",
+    "eloChange": 30
+  }
+]

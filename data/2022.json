@@ -1,0 +1,578 @@
+[
+  {
+    "gameNumber": 1,
+    "homeTeam": "Qatar",
+    "homeScore": 0,
+    "awayTeam": "Ecuador",
+    "awayScore": 2,
+    "date": "2022-11-20",
+    "eloChange": -38
+  },
+  {
+    "gameNumber": 2,
+    "homeTeam": "England",
+    "homeScore": 6,
+    "awayTeam": "Iran",
+    "awayScore": 2,
+    "date": "2022-11-21",
+    "eloChange": 37
+  },
+  {
+    "gameNumber": 3,
+    "homeTeam": "Senegal",
+    "homeScore": 0,
+    "awayTeam": "Netherlands",
+    "awayScore": 2,
+    "date": "2022-11-21",
+    "eloChange": -10
+  },
+  {
+    "gameNumber": 4,
+    "homeTeam": "USA",
+    "homeScore": 1,
+    "awayTeam": "Wales",
+    "awayScore": 1,
+    "date": "2022-11-21",
+    "eloChange": 1
+  },
+  {
+    "gameNumber": 5,
+    "homeTeam": "Argentina",
+    "homeScore": 1,
+    "awayTeam": "Saudi Arabia",
+    "awayScore": 2,
+    "date": "2022-11-22",
+    "eloChange": -57
+  },
+  {
+    "gameNumber": 6,
+    "homeTeam": "Denmark",
+    "homeScore": 0,
+    "awayTeam": "Tunisia",
+    "awayScore": 0,
+    "date": "2022-11-22",
+    "eloChange": null
+  },
+  {
+    "gameNumber": 7,
+    "homeTeam": "Mexico",
+    "homeScore": 0,
+    "awayTeam": "Poland",
+    "awayScore": 0,
+    "date": "2022-11-22",
+    "eloChange": 0
+  },
+  {
+    "gameNumber": 8,
+    "homeTeam": "France",
+    "homeScore": 4,
+    "awayTeam": "Australia",
+    "awayScore": 1,
+    "date": "2022-11-22",
+    "eloChange": 17
+  },
+  {
+    "gameNumber": 9,
+    "homeTeam": "Germany",
+    "homeScore": 1,
+    "awayTeam": "Japan",
+    "awayScore": 2,
+    "date": "2022-11-23",
+    "eloChange": -44
+  },
+  {
+    "gameNumber": 10,
+    "homeTeam": "Spain",
+    "homeScore": 7,
+    "awayTeam": "Costa Rica",
+    "awayScore": 0,
+    "date": "2022-11-23",
+    "eloChange": 20
+  },
+  {
+    "gameNumber": 11,
+    "homeTeam": "Morocco",
+    "homeScore": 0,
+    "awayTeam": "Croatia",
+    "awayScore": 0,
+    "date": "2022-11-23",
+    "eloChange": null
+  },
+  {
+    "gameNumber": 12,
+    "homeTeam": "Belgium",
+    "homeScore": 1,
+    "awayTeam": "Canada",
+    "awayScore": 0,
+    "date": "2022-11-23",
+    "eloChange": 13
+  },
+  {
+    "gameNumber": 13,
+    "homeTeam": "Switzerland",
+    "homeScore": 1,
+    "awayTeam": "Cameroon",
+    "awayScore": 0,
+    "date": "2022-11-24",
+    "eloChange": 9
+  },
+  {
+    "gameNumber": 14,
+    "homeTeam": "Uruguay",
+    "homeScore": 0,
+    "awayTeam": "South Korea",
+    "awayScore": 0,
+    "date": "2022-11-24",
+    "eloChange": null
+  },
+  {
+    "gameNumber": 15,
+    "homeTeam": "Portugal",
+    "homeScore": 3,
+    "awayTeam": "Ghana",
+    "awayScore": 2,
+    "date": "2022-11-24",
+    "eloChange": 4
+  },
+  {
+    "gameNumber": 16,
+    "homeTeam": "Brazil",
+    "homeScore": 2,
+    "awayTeam": "Serbia",
+    "awayScore": 0,
+    "date": "2022-11-24",
+    "eloChange": 16
+  },
+  {
+    "gameNumber": 17,
+    "homeTeam": "Wales",
+    "homeScore": 0,
+    "awayTeam": "Iran",
+    "awayScore": 2,
+    "date": "2022-11-25",
+    "eloChange": -49
+  },
+  {
+    "gameNumber": 18,
+    "homeTeam": "Qatar",
+    "homeScore": 1,
+    "awayTeam": "Senegal",
+    "awayScore": 3,
+    "date": "2022-11-25",
+    "eloChange": -53
+  },
+  {
+    "gameNumber": 19,
+    "homeTeam": "Netherlands",
+    "homeScore": 1,
+    "awayTeam": "Ecuador",
+    "awayScore": 1,
+    "date": "2022-11-25",
+    "eloChange": null
+  },
+  {
+    "gameNumber": 20,
+    "homeTeam": "England",
+    "homeScore": 0,
+    "awayTeam": "USA",
+    "awayScore": 0,
+    "date": "2022-11-25",
+    "eloChange": null
+  },
+  {
+    "gameNumber": 21,
+    "homeTeam": "Tunisia",
+    "homeScore": 0,
+    "awayTeam": "Australia",
+    "awayScore": 1,
+    "date": "2022-11-26",
+    "eloChange": -32
+  },
+  {
+    "gameNumber": 22,
+    "homeTeam": "Poland",
+    "homeScore": 2,
+    "awayTeam": "Saudi Arabia",
+    "awayScore": 0,
+    "date": "2022-11-26",
+    "eloChange": 30
+  },
+  {
+    "gameNumber": 23,
+    "homeTeam": "France",
+    "homeScore": 2,
+    "awayTeam": "Denmark",
+    "awayScore": 1,
+    "date": "2022-11-26",
+    "eloChange": 24
+  },
+  {
+    "gameNumber": 24,
+    "homeTeam": "Argentina",
+    "homeScore": 2,
+    "awayTeam": "Mexico",
+    "awayScore": 0,
+    "date": "2022-11-26",
+    "eloChange": 15
+  },
+  {
+    "gameNumber": 25,
+    "homeTeam": "Japan",
+    "homeScore": 0,
+    "awayTeam": "Costa Rica",
+    "awayScore": 1,
+    "date": "2022-11-27",
+    "eloChange": -39
+  },
+  {
+    "gameNumber": 26,
+    "homeTeam": "Belgium",
+    "homeScore": 0,
+    "awayTeam": "Morocco",
+    "awayScore": 2,
+    "date": "2022-11-27",
+    "eloChange": -72
+  },
+  {
+    "gameNumber": 27,
+    "homeTeam": "Croatia",
+    "homeScore": 4,
+    "awayTeam": "Canada",
+    "awayScore": 1,
+    "date": "2022-11-27",
+    "eloChange": 31
+  },
+  {
+    "gameNumber": 28,
+    "homeTeam": "Spain",
+    "homeScore": 1,
+    "awayTeam": "Germany",
+    "awayScore": 1,
+    "date": "2022-11-27",
+    "eloChange": null
+  },
+  {
+    "gameNumber": 29,
+    "homeTeam": "Cameroon",
+    "homeScore": 3,
+    "awayTeam": "Serbia",
+    "awayScore": 3,
+    "date": "2022-11-28",
+    "eloChange": null
+  },
+  {
+    "gameNumber": 30,
+    "homeTeam": "South Korea",
+    "homeScore": 2,
+    "awayTeam": "Ghana",
+    "awayScore": 3,
+    "date": "2022-11-28",
+    "eloChange": -48
+  },
+  {
+    "gameNumber": 31,
+    "homeTeam": "Brazil",
+    "homeScore": 1,
+    "awayTeam": "Switzerland",
+    "awayScore": 0,
+    "date": "2022-11-28",
+    "eloChange": 10
+  },
+  {
+    "gameNumber": 32,
+    "homeTeam": "Portugal",
+    "homeScore": 2,
+    "awayTeam": "Uruguay",
+    "awayScore": 0,
+    "date": "2022-11-28",
+    "eloChange": 34
+  },
+  {
+    "gameNumber": 33,
+    "homeTeam": "Ecuador",
+    "homeScore": 1,
+    "awayTeam": "Senegal",
+    "awayScore": 2,
+    "date": "2022-11-29",
+    "eloChange": -43
+  },
+  {
+    "gameNumber": 34,
+    "homeTeam": "Netherlands",
+    "homeScore": 2,
+    "awayTeam": "Qatar",
+    "awayScore": 0,
+    "date": "2022-11-29",
+    "eloChange": 11
+  },
+  {
+    "gameNumber": 35,
+    "homeTeam": "Wales",
+    "homeScore": 0,
+    "awayTeam": "England",
+    "awayScore": 3,
+    "date": "2022-11-29",
+    "eloChange": -25
+  },
+  {
+    "gameNumber": 36,
+    "homeTeam": "Iran",
+    "homeScore": 0,
+    "awayTeam": "USA",
+    "awayScore": 1,
+    "date": "2022-11-29",
+    "eloChange": -30
+  },
+  {
+    "gameNumber": 37,
+    "homeTeam": "Australia",
+    "homeScore": 1,
+    "awayTeam": "Denmark",
+    "awayScore": 0,
+    "date": "2022-11-30",
+    "eloChange": 45
+  },
+  {
+    "gameNumber": 38,
+    "homeTeam": "Tunisia",
+    "homeScore": 1,
+    "awayTeam": "France",
+    "awayScore": 0,
+    "date": "2022-11-30",
+    "eloChange": 53
+  },
+  {
+    "gameNumber": 39,
+    "homeTeam": "Poland",
+    "homeScore": 0,
+    "awayTeam": "Argentina",
+    "awayScore": 2,
+    "date": "2022-11-30",
+    "eloChange": -17
+  },
+  {
+    "gameNumber": 40,
+    "homeTeam": "Saudi Arabia",
+    "homeScore": 1,
+    "awayTeam": "Mexico",
+    "awayScore": 2,
+    "date": "2022-11-30",
+    "eloChange": -19
+  },
+  {
+    "gameNumber": 41,
+    "homeTeam": "Japan",
+    "homeScore": 2,
+    "awayTeam": "Spain",
+    "awayScore": 1,
+    "date": "2022-12-01",
+    "eloChange": 49
+  },
+  {
+    "gameNumber": 42,
+    "homeTeam": "Costa Rica",
+    "homeScore": 2,
+    "awayTeam": "Germany",
+    "awayScore": 4,
+    "date": "2022-12-01",
+    "eloChange": -25
+  },
+  {
+    "gameNumber": 43,
+    "homeTeam": "Croatia",
+    "homeScore": 0,
+    "awayTeam": "Belgium",
+    "awayScore": 0,
+    "date": "2022-12-01",
+    "eloChange": 0
+  },
+  {
+    "gameNumber": 44,
+    "homeTeam": "Canada",
+    "homeScore": 1,
+    "awayTeam": "Morocco",
+    "awayScore": 2,
+    "date": "2022-12-01",
+    "eloChange": -20
+  },
+  {
+    "gameNumber": 45,
+    "homeTeam": "Cameroon",
+    "homeScore": 1,
+    "awayTeam": "Brazil",
+    "awayScore": 0,
+    "date": "2022-12-02",
+    "eloChange": 58
+  },
+  {
+    "gameNumber": 46,
+    "homeTeam": "Serbia",
+    "homeScore": 2,
+    "awayTeam": "Switzerland",
+    "awayScore": 3,
+    "date": "2022-12-02",
+    "eloChange": -27
+  },
+  {
+    "gameNumber": 47,
+    "homeTeam": "South Korea",
+    "homeScore": 2,
+    "awayTeam": "Portugal",
+    "awayScore": 1,
+    "date": "2022-12-02",
+    "eloChange": 51
+  },
+  {
+    "gameNumber": 48,
+    "homeTeam": "Ghana",
+    "homeScore": 0,
+    "awayTeam": "Uruguay",
+    "awayScore": 2,
+    "date": "2022-12-02",
+    "eloChange": -15
+  },
+  {
+    "gameNumber": 49,
+    "homeTeam": "Netherlands",
+    "homeScore": 3,
+    "awayTeam": "USA",
+    "awayScore": 1,
+    "date": "2022-12-03",
+    "eloChange": 21
+  },
+  {
+    "gameNumber": 50,
+    "homeTeam": "Argentina",
+    "homeScore": 2,
+    "awayTeam": "Australia",
+    "awayScore": 1,
+    "date": "2022-12-03",
+    "eloChange": 7
+  },
+  {
+    "gameNumber": 51,
+    "homeTeam": "France",
+    "homeScore": 3,
+    "awayTeam": "Poland",
+    "awayScore": 1,
+    "date": "2022-12-04",
+    "eloChange": 25
+  },
+  {
+    "gameNumber": 52,
+    "homeTeam": "England",
+    "homeScore": 3,
+    "awayTeam": "Senegal",
+    "awayScore": 0,
+    "date": "2022-12-04",
+    "eloChange": 26
+  },
+  {
+    "gameNumber": 53,
+    "homeTeam": "Japan",
+    "homeScore": 1,
+    "awayTeam": "Croatia",
+    "awayScore": 1,
+    "date": "2022-12-05",
+    "eloChange": null
+  },
+  {
+    "gameNumber": 54,
+    "homeTeam": "Brazil",
+    "homeScore": 4,
+    "awayTeam": "South Korea",
+    "awayScore": 1,
+    "date": "2022-12-05",
+    "eloChange": 13
+  },
+  {
+    "gameNumber": 55,
+    "homeTeam": "Morocco",
+    "homeScore": 0,
+    "awayTeam": "Spain",
+    "awayScore": 0,
+    "date": "2022-12-06",
+    "eloChange": null
+  },
+  {
+    "gameNumber": 56,
+    "homeTeam": "Portugal",
+    "homeScore": 6,
+    "awayTeam": "Switzerland",
+    "awayScore": 1,
+    "date": "2022-12-06",
+    "eloChange": 49
+  },
+  {
+    "gameNumber": 57,
+    "homeTeam": "Croatia",
+    "homeScore": 1,
+    "awayTeam": "Brazil",
+    "awayScore": 1,
+    "date": "2022-12-09",
+    "eloChange": null
+  },
+  {
+    "gameNumber": 58,
+    "homeTeam": "Netherlands",
+    "homeScore": 2,
+    "awayTeam": "Argentina",
+    "awayScore": 2,
+    "date": "2022-12-09",
+    "eloChange": null
+  },
+  {
+    "gameNumber": 59,
+    "homeTeam": "Morocco",
+    "homeScore": 1,
+    "awayTeam": "Portugal",
+    "awayScore": 0,
+    "date": "2022-12-10",
+    "eloChange": 43
+  },
+  {
+    "gameNumber": 60,
+    "homeTeam": "England",
+    "homeScore": 1,
+    "awayTeam": "France",
+    "awayScore": 2,
+    "date": "2022-12-10",
+    "eloChange": -28
+  },
+  {
+    "gameNumber": 61,
+    "homeTeam": "Argentina",
+    "homeScore": 3,
+    "awayTeam": "Croatia",
+    "awayScore": 0,
+    "date": "2022-12-13",
+    "eloChange": 29
+  },
+  {
+    "gameNumber": 62,
+    "homeTeam": "France",
+    "homeScore": 2,
+    "awayTeam": "Morocco",
+    "awayScore": 0,
+    "date": "2022-12-14",
+    "eloChange": 30
+  },
+  {
+    "gameNumber": 63,
+    "homeTeam": "Croatia",
+    "homeScore": 2,
+    "awayTeam": "Morocco",
+    "awayScore": 1,
+    "date": "2022-12-17",
+    "eloChange": 28
+  },
+  {
+    "gameNumber": 64,
+    "homeTeam": "Argentina",
+    "homeScore": 3,
+    "awayTeam": "France",
+    "awayScore": 3,
+    "date": "2022-12-18",
+    "eloChange": null
+  }
+]
