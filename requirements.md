@@ -76,7 +76,7 @@ Only confederations with at least one team participating in the selected World C
 - Remaining columns (to fill out to N total) are left blank (empty header, empty cells).
 - Values accumulate row by row; unplayed games (`null` scores) leave the row empty and do not advance the totals.
 
-## Tournament ELO Ranking Table
+## Tournament ELO Rankings
 
 A standalone view — only one page view is visible at a time. The World Cup page has a segmented toggle that switches between **Match List** and **Rankings**; they never appear simultaneously. The navigation bar (links to other years) stays fixed regardless of which view is active. The Rankings view is only available for tournaments that have `teamElos` data (currently 2026 only; the toggle is omitted entirely from 2018 and 2022 pages).
 
@@ -84,7 +84,7 @@ Each view has its own URL via the hash fragment: `2026.html#matches` for the Mat
 
 #### Gamesets
 
-A **gameset** is a named, ordered batch of consecutive games after which the ranking table adds a new snapshot column. Gamesets are defined per tournament by a fixed list of game-count boundaries. They are not stored in the game data — the boundaries are hardcoded per tournament and applied at render time.
+A **gameset** is a batch of games in which each active team plays at most once — it is one "turn" for every team still in the tournament. Gamesets are defined per tournament by a fixed list of game-count boundaries, applied in chronological order. They are not stored in the game data — the boundaries are hardcoded per tournament and applied at render time. A gameset is complete when every team that has a game in its range has a recorded result; teams with no game in the range (already eliminated, or byes) do not count toward completion.
 
 For the 2026 World Cup the gamesets and their column labels are:
 
@@ -100,40 +100,128 @@ For the 2026 World Cup the gamesets and their column labels are:
 | 7 | 4 | Semifinals | 2 |
 | 8 | Final | Third-place game + Final | 2 |
 
-All 9 column headers are always shown. A column whose gameset is not yet complete shows empty cells — no flags, no ELO values.
-
-#### Table structure
-
-- **Rows** — one per rank position (1, 2, 3… up to the number of teams in `teamElos`). Each row represents a rank slot, not a fixed team.
-- **Columns** — one per gameset, always all 9, in order left to right: Initial, Game 1, … Final.
-- **Rank column** — a leftmost column showing the rank number (1, 2, 3…) for that row.
-- **Column widths** — all snapshot columns (Initial through Final) have equal width. The rank column is narrower and sized to its content.
-
-Each cell (row R, column C) shows the team currently occupying rank R in the snapshot for gameset C. As teams' ELOs shift between gamesets, the same team may appear in different rows across columns.
-
-#### Cells
-
-Each cell contains:
-1. The team's **flag** (SVG from `data/flags/`).
-2. The team's **ELO** at that snapshot (integer).
-
-The team name is shown on hover (tooltip). Empty cells (gameset not yet complete) show nothing.
-
-The Initial column uses each team's starting value from `teamElos`. Each subsequent column uses the team's ELO after all games in that gameset are applied.
+All 9 gameset columns are always shown. The Rankings view has a segmented toggle that switches between **Rank** and **Scale** views of the same gameset data. The toggle sits above the ranking area. Switching between Rank and Scale must not shift the gameset column positions — the horizontal layout is identical in both views.
 
 #### Ranking and ties
 
-Teams are ranked by ELO descending within each snapshot. Ties are broken by **stable sort**: if two teams have equal ELO, the one ranked higher in the previous snapshot remains ranked higher. This preserves relative order rather than arbitrarily reordering tied teams.
+Teams are ranked by ELO descending within each gameset snapshot. Ties are broken by **stable sort**: if two teams have equal ELO, the one ranked higher in the previous snapshot remains ranked higher.
+
+#### Live gameset
+
+At any point in the tournament there is exactly one **live gameset column**: the in-progress gameset if any games in its range have been played but it is not yet complete, or the next gameset if the most recent gameset just completed and the next hasn't started.
+
+The live gameset column is always shown populated — it is never empty:
+
+- It is seeded from the previous gameset's final ELOs (or from `teamElos` if it is the first gameset).
+- As results come in, the column updates: each team's ELO and rank reflects all results recorded so far within the live gameset.
+- Teams are always ranked by their current ELO, including mid-gameset. There is no hold on unplayed teams — the live standings shift with every result entered.
+
+Teams that have a game scheduled in the live gameset's range but no result recorded yet are shown with a **"hasn't played" visual**: a muted grey distinct from the greyscale used for eliminated teams. Once their game result is entered, they revert to normal styling.
+
+Only the live gameset column uses this treatment. Completed gameset columns always show final ELOs with no "hasn't played" styling. Future gameset columns (beyond the live one) show nothing.
 
 #### Eliminated teams
 
 A team is considered **eliminated** as of the gameset after their last appearance in a game. Specifically: if a team played in gameset N but does not appear in any game in gameset N+1 or later, they are eliminated after gameset N. (For the group stage this naturally captures teams that don't qualify for the Round of 32; for knockout rounds it captures teams that lost.)
 
-Eliminated teams remain in the rankings table — they are never removed. Their flag is rendered in greyscale to visually distinguish them from still-active teams.
+Eliminated teams remain in both views — they are never removed. Their flag is rendered in greyscale to visually distinguish them from active teams.
+
+#### Rankings shared layout
+
+Both Rank and Scale views share the same canvas structure: one vertical column per gameset, all columns equal width, with a leftmost axis column. Toggling between views causes no horizontal shift.
+
+- *Flag dimensions*: each flag icon has a fixed pixel width and height, consistent across both views.
+- *Column width*: every gameset column has a fixed minimum width of `3 × flag_width + 2 × gap` (where *gap* is a fixed small spacing between side-by-side flags, defined in the Scale view). This applies uniformly across both views. Column separator lines are always fully visible; no flag extends past its column boundary. (The `3 ×` derives from the Scale view cluster constraint — see `scale-algorithm.md`.)
+
+---
+
+#### Flag info panel
+
+Hovering any flag in the Rankings view populates a fixed side panel that sits to the left of the rankings grid, vertically centered on the viewport. The panel never overlaps the grid or its flags.
+
+The panel always shows the same set of fields in the same order, so its height never changes while browsing:
+
+| Field | Content |
+|-------|---------|
+| Flag | The team's flag image (large) |
+| Name | Team name (bold) |
+| ELO | ELO at that gameset snapshot |
+| *(divider)* | |
+| Date | Game date in "Mon D" format (e.g. "Jun 15"), or — if no game |
+| Opponent | Opposing team name, or — |
+| Score | Score from the hovered team's perspective (their goals first), or — |
+| ELO Δ | ELO change, green for gain, red for loss, or — |
+
+When there is no game in the column (Initial snapshot, or a team with no game scheduled in that gameset), the bottom four fields show —. For a pending game (live column, result not yet entered), Date and Opponent are shown but Score and ELO Δ show —.
+
+**Behaviour:**
+- The panel appears immediately when the cursor first lands on a flag.
+- Moving between flags updates the panel content instantly with no flicker — the panel stays visible throughout.
+- The panel hides 300 ms after the cursor leaves the rankings area entirely (same grace period as the highlight).
+
+---
 
 #### Flag hover highlight
 
-When the user hovers over any flag cell in the Rankings table, all flag cells in the table belonging to **other** teams are dimmed (reduced opacity). The hovered team's flag cells across all columns remain at full opacity. This makes it easy to visually trace a single team's ELO evolution across the full tournament. Leaving the table restores all flags to full opacity.
+When the user hovers over any flag in the Rankings view, all flags belonging to **other** teams are dimmed (reduced opacity). The hovered team's flags across all gameset columns remain at full opacity, making it easy to trace a single team's ELO evolution across the tournament. The hovered team's flags are also brought to the front (highest z-index) so they are never obscured by overlapping flags.
+
+The highlight uses debounced activation and deactivation to avoid flicker:
+- **Activate delay (200 ms):** the highlight only appears after the cursor has rested on a flag for 200 ms. Brief passes don't trigger it.
+- **Deactivate grace period (300 ms):** when the cursor moves to empty space or leaves the rankings area, the highlight holds for 300 ms before clearing. This prevents flicker when crossing flag edges.
+- **Instant cancel:** if the cursor returns to the already-highlighted team's flag during the grace period, the deactivation is cancelled immediately with no re-delay.
+
+---
+
+#### Rank view
+
+Flags are **evenly spaced** — each rank position occupies the same vertical height regardless of ELO magnitude. This is a positional ranking, not a proportional one.
+
+Each flag occupies its rank slot for that gameset snapshot: rank 1 at the top, rank N at the bottom. A leftmost axis column shows rank numbers (1, 2, 3…) aligned to each rank slot. No ELO number is shown alongside the flag. Hovering a flag shows the info panel — see *Flag info panel* above.
+
+A dotted horizontal line is drawn between every 4th and 5th rank (i.e. after ranks 4, 8, 12, …), spanning all columns, behind the flags.
+
+---
+
+#### Scale view
+
+Flags are **positioned proportionally to ELO** — a team's vertical position on the axis directly encodes its ELO value. Y position is never altered for any reason. The gameset column X-positions are identical to Rank view so toggling between the two causes no horizontal shift.
+
+**Definitions (Scale view)**
+- *Gap*: a fixed small spacing (a few pixels) between flags placed side by side.
+- *Depth*: at any vertical point on the axis, the number of flags whose pixel intervals simultaneously cover that point. Two flags overlap when their top-to-top pixel distance is less than one flag height.
+
+**Axis range**
+The ELO axis spans from the lowest to the highest ELO of any team across all populated gameset snapshots. A flag's **top edge** sits at its ELO pixel position — not the center. This means a team rated 1998 reads as "just below 2000," matching the natural interpretation that a flag hangs down from its rating. Centering would make the team appear to straddle the line above, which is misleading.
+
+A fixed pixel margin of `RANK_ROW_H / 2` is applied at the top and at the bottom (below the lowest flag's bottom edge), keeping the extreme flags inset from the axis ends symmetrically.
+
+Note: the Scale view's vertical positioning is **independent of the Rank view** — only the horizontal column layout is shared. The Rank view spaces flags evenly by rank; the Scale view spaces them proportionally by ELO. Toggling between views changes flag vertical positions but not column positions.
+
+**Axis height**
+No visual overlap between flags is allowed. The axis height is the **minimum height at which the maximum depth across all gameset columns is ≤ 3** — ensuring every point on the axis is covered by at most 3 flags, which is the column's horizontal dodge capacity. A single height is computed across all gameset columns together so all columns share the same vertical scale and remain aligned. See `scale-algorithm.md` for the constraints, algorithm, and implementation.
+
+Error case: if 4 or more teams share an identical ELO in the same gameset column, no axis height can resolve the cluster. A visible warning is shown in that column and the smallest achievable height is used.
+
+**Y-axis tick marks**
+The tick interval (ELO units between marks) is selected from `[200, 100, 50, 25, 10, 5, 2]`, largest first, choosing the first value whose pixel spacing falls between 150 px and 300 px. If no candidate falls in that range (e.g. the axis is extremely compressed or stretched), the candidate whose spacing is closest to 200 px is used as a fallback. Tick labels are shown at every multiple of the chosen interval within the axis range, once in the leftmost axis column. A dotted horizontal line is drawn at each tick, spanning all columns, behind the flags.
+
+**Horizontal dodge**
+Overlapping flags are placed side by side using a two-pass approach. Y positions are never altered.
+
+*Pass 1 — greedy lane assignment:* flags are sorted by Y position and assigned to one of 3 abstract lanes (0, 1, 2). Each flag takes the lane that is currently free and has been used most recently, leaving the emptiest lane available for future flags. This correctly handles non-transitive overlaps: a flag that only overlaps its immediate neighbour can reuse a lane freed by an earlier flag.
+
+*Pass 2 — visual centering:* flags are grouped into transitive visual clusters (consecutive flags sorted by Y that each overlap the next). Within each cluster, the lane indices actually used are mapped to pixel offsets centered on the column midline: a cluster using 1 lane gets offset 0; 2 lanes get ±`(gap+flag_width)/2`; 3 lanes get `−(flag_width+gap)`, `0`, `+(flag_width+gap)`. This keeps isolated flags centered and small clusters symmetric regardless of which abstract lanes the greedy pass assigned.
+
+**Flag display**
+No ELO number is shown alongside the flag. Hovering a flag shows the info panel — see *Flag info panel* above. Z-index is determined by rank: higher-ranked teams (lower rank number) render on top.
+
+---
+
+## Debug
+
+Debug features are toggled via UI controls that are always visible but clearly labelled as debug. They are off by default and have no effect on normal rendering.
+
+**Show binding clusters** (Scale view only) — a checkbox labelled "debug: show binding clusters". When checked, a red outline is drawn around each depth-4 window that would appear if the axis were 1 pixel shorter — i.e. each set of flags whose vertical intervals would all overlap a common point at `scaleH − 1`. These are the flags forcing the axis to be as tall as it is: at the computed minimum height their depth is ≤ 3, but one pixel shorter it would reach 4 and overflow the column. Off by default.
 
 
 ## Data

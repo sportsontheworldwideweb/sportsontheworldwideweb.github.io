@@ -317,44 +317,44 @@
     {
       "gameNumber": 25,
       "homeTeam": "Czechia",
-      "homeScore": null,
+      "homeScore": 1,
       "awayTeam": "South Africa",
-      "awayScore": null,
+      "awayScore": 1,
       "date": "2026-06-18",
-      "eloChange": null,
+      "eloChange": -16,
       "homeEloPre": 1712,
       "awayEloPre": 1511
     },
     {
       "gameNumber": 26,
       "homeTeam": "Mexico",
-      "homeScore": null,
+      "homeScore": 1,
       "awayTeam": "South Korea",
-      "awayScore": null,
+      "awayScore": 0,
       "date": "2026-06-18",
-      "eloChange": null,
+      "eloChange": 15,
       "homeEloPre": 1881,
       "awayEloPre": 1786
     },
     {
       "gameNumber": 27,
       "homeTeam": "Switzerland",
-      "homeScore": null,
+      "homeScore": 4,
       "awayTeam": "Bosnia",
-      "awayScore": null,
+      "awayScore": 1,
       "date": "2026-06-18",
-      "eloChange": null,
+      "eloChange": 20,
       "homeEloPre": 1865,
       "awayEloPre": 1616
     },
     {
       "gameNumber": 28,
       "homeTeam": "Canada",
-      "homeScore": null,
+      "homeScore": 6,
       "awayTeam": "Qatar",
-      "awayScore": null,
+      "awayScore": 0,
       "date": "2026-06-18",
-      "eloChange": null,
+      "eloChange": 10,
       "homeEloPre": 1767,
       "awayEloPre": 1447
     },
@@ -383,11 +383,11 @@
     {
       "gameNumber": 31,
       "homeTeam": "USA",
-      "homeScore": null,
+      "homeScore": 2,
       "awayTeam": "Australia",
-      "awayScore": null,
+      "awayScore": 0,
       "date": "2026-06-19",
-      "eloChange": null,
+      "eloChange": 40,
       "homeEloPre": 1780,
       "awayEloPre": 1839
     },
@@ -586,8 +586,8 @@
       "awayScore": null,
       "date": "2026-06-24",
       "eloChange": null,
-      "homeEloPre": null,
-      "awayEloPre": null
+      "homeEloPre": 1696,
+      "awayEloPre": 1896
     },
     {
       "gameNumber": 50,
@@ -597,8 +597,8 @@
       "awayScore": null,
       "date": "2026-06-24",
       "eloChange": null,
-      "homeEloPre": null,
-      "awayEloPre": null
+      "homeEloPre": 1527,
+      "awayEloPre": 1771
     },
     {
       "gameNumber": 51,
@@ -608,8 +608,8 @@
       "awayScore": null,
       "date": "2026-06-24",
       "eloChange": null,
-      "homeEloPre": null,
-      "awayEloPre": null
+      "homeEloPre": 1885,
+      "awayEloPre": 1777
     },
     {
       "gameNumber": 52,
@@ -619,8 +619,8 @@
       "awayScore": null,
       "date": "2026-06-24",
       "eloChange": null,
-      "homeEloPre": null,
-      "awayEloPre": null
+      "homeEloPre": 1596,
+      "awayEloPre": 1437
     },
     {
       "gameNumber": 53,
@@ -653,7 +653,7 @@
       "date": "2026-06-25",
       "eloChange": null,
       "homeEloPre": null,
-      "awayEloPre": null
+      "awayEloPre": 1820
     },
     {
       "gameNumber": 56,
@@ -664,7 +664,7 @@
       "date": "2026-06-25",
       "eloChange": null,
       "homeEloPre": null,
-      "awayEloPre": null
+      "awayEloPre": 1799
     },
     {
       "gameNumber": 57,
