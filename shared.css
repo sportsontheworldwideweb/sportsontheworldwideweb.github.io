@@ -1,0 +1,112 @@
+/* Shared styles for all World Cup pages */
+
+body { font-family: sans-serif; max-width: 1100px; margin: 2rem auto; overflow-x: auto; }
+table { border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; white-space: nowrap; }
+.table-wrap { overflow-x: auto; }
+th, td { padding: 0.4rem 0.6rem; text-align: left; border-bottom: 1px solid #ddd; }
+th { background: #f0f0f0; position: sticky; top: 0; }
+.num { text-align: right; }
+.narrow { text-align: center; }
+.spacer { padding: 0 0.3rem; }
+.score-sep { text-align: center; padding: 0 0.2rem; }
+.elo { text-align: left; }
+.flag { text-align: center; }
+.flag .icon { display: inline-block; width: 2.2em; height: 1.5em; background-size: cover; background-position: center; background-repeat: no-repeat; vertical-align: middle; border: 1px solid #ccc; }
+.conf { text-align: center; min-width: 5em; }
+nav { margin-bottom: 1rem; }
+nav a { margin-right: 1rem; }
+
+tbody tr { cursor: pointer; }
+tbody tr:hover { background: #f9f9f9; }
+.expand-row td { background: #f4f8ff; border-top: none; cursor: default; padding: 0.5rem 0.8rem; }
+.expand-row .ur-line { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin: 0.3rem 0; }
+.expand-row label { display: flex; align-items: center; gap: 0.3rem; white-space: nowrap; }
+.expand-row input[type=number] { width: 4.5rem; padding: 0.2rem; }
+.expand-row .ur-cmd { font-family: monospace; flex: 1; min-width: 16rem; padding: 0.2rem; }
+.view-toggle { display: inline-flex; border: 1px solid #bbb; border-radius: 4px; overflow: hidden; }
+.view-toggle button { border: none; border-right: 1px solid #bbb; background: #f0f0f0; padding: 0.2rem 0.7rem; cursor: pointer; font-size: 0.8rem; color: #333; }
+.view-toggle button:last-child { border-right: none; }
+.view-toggle button.active { background: #4a7fcb; color: white; }
+.view-toggle button:hover:not(.active) { background: #e0e0e0; }
+.toggle-cell { text-align: right; background: #f0f0f0; border-bottom: none; padding: 0.25rem 0.5rem; vertical-align: middle; }
+
+/* Page-level view toggle */
+.page-toggle { margin-bottom: 1rem; }
+
+/* Rankings */
+#rankings-view { display: none; }
+.rankings-toggle { margin-bottom: 0.5rem; }
+.rankings-filter-controls { display: inline-flex; gap: 1rem; align-items: center; margin-left: 1rem; font-size: 0.85rem; }
+.rankings-filter-controls label { display: flex; align-items: center; gap: 0.3rem; cursor: pointer; user-select: none; }
+.rankings-cols { font-size: 0.85rem; white-space: nowrap; }
+.rankings-header {
+  display: grid;
+  /* grid-template-columns set dynamically by renderRankings() */
+  position: sticky;
+  top: 0;
+  background: #f0f0f0;
+  border-bottom: 2px solid #ccc;
+  z-index: 10;
+}
+.rankings-header > div { padding: 0.3rem 0.5rem; text-align: center; font-weight: bold; }
+.rankings-header .axis-head { text-align: right; padding-right: 0.6rem; color: #555; }
+.rankings-body { display: grid; /* grid-template-columns set dynamically by renderRankings() */ }
+.scale-error { position: absolute; top: 4px; left: 0; right: 0; text-align: center; font-size: 0.7rem; color: #c00; pointer-events: none; }
+.rankings-axis { position: relative; }
+.axis-label {
+  position: absolute;
+  right: 0.4rem;
+  font-size: 0.72rem;
+  color: #555;
+  font-weight: bold;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.snap-body-col { position: relative; border-left: 1px solid #333; }
+.grid-line { position: absolute; left: 0; right: 0; height: 1px; background: repeating-linear-gradient(to right, #bbb 0, #bbb 4px, transparent 4px, transparent 8px); pointer-events: none; z-index: 0; }
+.debug-cluster { position: absolute; left: 4px; right: 4px; border: 2px solid red; border-radius: 3px; pointer-events: none; z-index: 9999; box-sizing: border-box; }
+.rankings-header > div:not(.axis-head) { border-left: 1px solid #333; }
+.flag-pin {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+.flag-pin .icon {
+  display: block;
+  width: 35px;
+  height: 24px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  cursor: default;
+}
+.flag-pin .elo-val { font-size: 0.72rem; color: #333; line-height: 1; }
+#rankings-outer { position: relative; }
+#rank-info {
+  position: fixed;
+  width: 130px;
+  padding: 8px 10px;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: #eee;
+  background: #1a1a1a;
+  border-radius: 5px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  visibility: hidden;
+  min-height: 48px;
+  pointer-events: none;
+}
+#rank-info .tip-flag { width: 80px; height: 54px; background-size: cover; background-position: center; border: 1px solid #555; margin-bottom: 8px; }
+#rank-info .tip-name { font-weight: bold; font-size: 1rem; margin-bottom: 2px; }
+#rank-info .tip-elo-val { color: #aaa; font-size: 0.8rem; margin-bottom: 8px; }
+#rank-info .tip-sep { border: none; border-top: 1px solid #444; margin: 6px 0; }
+#rank-info .tip-label { font-size: 0.65rem; color: #888; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 1px; }
+#rank-info .tip-val { font-size: 0.85rem; color: #ddd; margin-bottom: 6px; }
+#rank-info .tip-delta-pos { color: #6c6; }
+#rank-info .tip-delta-neg { color: #f77; }

@@ -3,47 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <title>World Cup ELO - 2018</title>
-<style>
-  body { font-family: sans-serif; max-width: 1100px; margin: 2rem auto; overflow-x: auto; }
-  table { border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; white-space: nowrap; }
-  .table-wrap { overflow-x: auto; }
-  th, td { padding: 0.4rem 0.6rem; text-align: left; border-bottom: 1px solid #ddd; }
-  th { background: #f0f0f0; position: sticky; top: 0; }
-  .num { text-align: right; }
-  .narrow { text-align: center; }
-  .spacer { padding: 0 0.3rem; }
-  .score-sep { text-align: center; padding: 0 0.2rem; }
-  .elo { text-align: left; }
-  .flag { text-align: center; }
-  .flag .icon { display: inline-block; width: 2.2em; height: 1.5em; background-size: cover; background-position: center; background-repeat: no-repeat; vertical-align: middle; border: 1px solid #ccc; }
-  .conf { text-align: center; min-width: 5em; }
-  nav { margin-bottom: 1rem; }
-  nav a { margin-right: 1rem; }
-
-  tbody tr { cursor: pointer; }
-  tbody tr:hover { background: #f9f9f9; }
-  .expand-row td { background: #f4f8ff; border-top: none; cursor: default; padding: 0.5rem 0.8rem; }
-  .expand-row .ur-line { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin: 0.3rem 0; }
-  .expand-row label { display: flex; align-items: center; gap: 0.3rem; white-space: nowrap; }
-  .expand-row input[type=number] { width: 4.5rem; padding: 0.2rem; }
-  .expand-row .ur-cmd { font-family: monospace; flex: 1; min-width: 16rem; padding: 0.2rem; }
-  .view-toggle { display: inline-flex; border: 1px solid #bbb; border-radius: 4px; overflow: hidden; }
-  .view-toggle button { border: none; border-right: 1px solid #bbb; background: #f0f0f0; padding: 0.2rem 0.7rem; cursor: pointer; font-size: 0.8rem; color: #333; }
-  .view-toggle button:last-child { border-right: none; }
-  .view-toggle button.active { background: #4a7fcb; color: white; }
-  .view-toggle button:hover:not(.active) { background: #e0e0e0; }
-  .toggle-cell { text-align: right; background: #f0f0f0; border-bottom: none; padding: 0.25rem 0.5rem; vertical-align: middle; }
-</style>
+<link rel="stylesheet" href="shared.css">
 </head>
 <body>
 <nav><strong>2018</strong> | <a href="2022.html">2022</a> | <a href="2026.html">2026</a> | <a href="index.html">Home</a></nav>
 <h1>World Cup ELO - 2018</h1>
+
+<div class="page-toggle view-toggle">
+  <button id="tab-matches" class="active" onclick="setPageView('matches')">Match List</button>
+  <button id="tab-rankings" onclick="setPageView('rankings')">Rankings</button>
+</div>
 
 <div id="matches-view">
   <table>
     <thead></thead>
     <tbody id="games"></tbody>
   </table>
+</div>
+
+<div id="rankings-view">
+  <div class="rankings-toggle view-toggle">
+    <button id="tab-rank" class="active" onclick="setRankView('rank')">Rank</button>
+    <button id="tab-scale" onclick="setRankView('scale')">Scale</button>
+  </div>
+  <div class="rankings-filter-controls">
+    <label><input type="checkbox" id="chk-show-elim" onchange="toggleShowEliminated()"> Show eliminated</label>
+    <label id="true-rank-label" style="opacity:1"><input type="checkbox" id="chk-true-rank" onchange="toggleTrueRank()"> True rank</label>
+  </div>
+  <label style="font-size:0.75rem;color:#c00;margin-left:1rem;user-select:none">
+    <input type="checkbox" id="debug-clusters" onchange="renderRankings()"> debug: show binding clusters
+  </label>
+  <div id="rankings-outer">
+    <div id="rank-info"></div>
+    <div class="rankings-cols" id="rankings-cols">
+      <div class="rankings-header" id="rankings-header"></div>
+      <div class="rankings-body" id="rankings-body"></div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -56,7 +52,9 @@ const games2018 = [
     "awayTeam": "Saudi Arabia",
     "awayScore": 0,
     "date": "2018-06-14",
-    "eloChange": 31
+    "eloChange": 30,
+    "homeEloPre": 1676,
+    "awayEloPre": 1588
   },
   {
     "gameNumber": 2,
@@ -65,7 +63,9 @@ const games2018 = [
     "awayTeam": "Uruguay",
     "awayScore": 1,
     "date": "2018-06-15",
-    "eloChange": -12
+    "eloChange": -11,
+    "homeEloPre": 1639,
+    "awayEloPre": 1893
   },
   {
     "gameNumber": 3,
@@ -74,7 +74,9 @@ const games2018 = [
     "awayTeam": "Iran",
     "awayScore": 1,
     "date": "2018-06-15",
-    "eloChange": -25
+    "eloChange": -25,
+    "homeEloPre": 1731,
+    "awayEloPre": 1790
   },
   {
     "gameNumber": 4,
@@ -83,7 +85,9 @@ const games2018 = [
     "awayTeam": "Spain",
     "awayScore": 3,
     "date": "2018-06-15",
-    "eloChange": 6
+    "eloChange": 6,
+    "homeEloPre": 1968,
+    "awayEloPre": 2043
   },
   {
     "gameNumber": 5,
@@ -92,7 +96,9 @@ const games2018 = [
     "awayTeam": "Australia",
     "awayScore": 1,
     "date": "2018-06-16",
-    "eloChange": 12
+    "eloChange": 12,
+    "homeEloPre": 1986,
+    "awayEloPre": 1743
   },
   {
     "gameNumber": 6,
@@ -101,7 +107,9 @@ const games2018 = [
     "awayTeam": "Iceland",
     "awayScore": 1,
     "date": "2018-06-16",
-    "eloChange": -17
+    "eloChange": -17,
+    "homeEloPre": 1984,
+    "awayEloPre": 1764
   },
   {
     "gameNumber": 7,
@@ -110,7 +118,9 @@ const games2018 = [
     "awayTeam": "Denmark",
     "awayScore": 1,
     "date": "2018-06-16",
-    "eloChange": -35
+    "eloChange": -35,
+    "homeEloPre": 1915,
+    "awayEloPre": 1854
   },
   {
     "gameNumber": 8,
@@ -119,7 +129,9 @@ const games2018 = [
     "awayTeam": "Nigeria",
     "awayScore": 0,
     "date": "2018-06-16",
-    "eloChange": 24
+    "eloChange": 24,
+    "homeEloPre": 1853,
+    "awayEloPre": 1681
   },
   {
     "gameNumber": 9,
@@ -128,7 +140,9 @@ const games2018 = [
     "awayTeam": "Serbia",
     "awayScore": 1,
     "date": "2018-06-17",
-    "eloChange": -27
+    "eloChange": -26,
+    "homeEloPre": 1742,
+    "awayEloPre": 1788
   },
   {
     "gameNumber": 10,
@@ -137,7 +151,9 @@ const games2018 = [
     "awayTeam": "Mexico",
     "awayScore": 1,
     "date": "2018-06-17",
-    "eloChange": -47
+    "eloChange": -47,
+    "homeEloPre": 2076,
+    "awayEloPre": 1849
   },
   {
     "gameNumber": 11,
@@ -146,7 +162,9 @@ const games2018 = [
     "awayTeam": "Switzerland",
     "awayScore": 1,
     "date": "2018-06-17",
-    "eloChange": -19
+    "eloChange": -19,
+    "homeEloPre": 2141,
+    "awayEloPre": 1888
   },
   {
     "gameNumber": 12,
@@ -155,7 +173,9 @@ const games2018 = [
     "awayTeam": "South Korea",
     "awayScore": 0,
     "date": "2018-06-18",
-    "eloChange": 23
+    "eloChange": 23,
+    "homeEloPre": 1793,
+    "awayEloPre": 1713
   },
   {
     "gameNumber": 13,
@@ -164,7 +184,9 @@ const games2018 = [
     "awayTeam": "Panama",
     "awayScore": 0,
     "date": "2018-06-18",
-    "eloChange": 17
+    "eloChange": 18,
+    "homeEloPre": 1935,
+    "awayEloPre": 1657
   },
   {
     "gameNumber": 14,
@@ -173,7 +195,9 @@ const games2018 = [
     "awayTeam": "England",
     "awayScore": 2,
     "date": "2018-06-18",
-    "eloChange": -9
+    "eloChange": -9,
+    "homeEloPre": 1651,
+    "awayEloPre": 1947
   },
   {
     "gameNumber": 15,
@@ -182,7 +206,9 @@ const games2018 = [
     "awayTeam": "Japan",
     "awayScore": 2,
     "date": "2018-06-19",
-    "eloChange": -48
+    "eloChange": -48,
+    "homeEloPre": 1927,
+    "awayEloPre": 1684
   },
   {
     "gameNumber": 16,
@@ -191,7 +217,9 @@ const games2018 = [
     "awayTeam": "Senegal",
     "awayScore": 2,
     "date": "2018-06-19",
-    "eloChange": -37
+    "eloChange": -37,
+    "homeEloPre": 1830,
+    "awayEloPre": 1746
   },
   {
     "gameNumber": 17,
@@ -200,7 +228,9 @@ const games2018 = [
     "awayTeam": "Egypt",
     "awayScore": 1,
     "date": "2018-06-19",
-    "eloChange": 24
+    "eloChange": 24,
+    "homeEloPre": 1706,
+    "awayEloPre": 1628
   },
   {
     "gameNumber": 18,
@@ -209,7 +239,9 @@ const games2018 = [
     "awayTeam": "Morocco",
     "awayScore": 0,
     "date": "2018-06-20",
-    "eloChange": 11
+    "eloChange": 11,
+    "homeEloPre": 1974,
+    "awayEloPre": 1706
   },
   {
     "gameNumber": 19,
@@ -218,7 +250,9 @@ const games2018 = [
     "awayTeam": "Saudi Arabia",
     "awayScore": 0,
     "date": "2018-06-20",
-    "eloChange": 7
+    "eloChange": 7,
+    "homeEloPre": 1904,
+    "awayEloPre": 1558
   },
   {
     "gameNumber": 20,
@@ -227,7 +261,9 @@ const games2018 = [
     "awayTeam": "Spain",
     "awayScore": 1,
     "date": "2018-06-20",
-    "eloChange": -13
+    "eloChange": -13,
+    "homeEloPre": 1815,
+    "awayEloPre": 2037
   },
   {
     "gameNumber": 21,
@@ -236,7 +272,9 @@ const games2018 = [
     "awayTeam": "Australia",
     "awayScore": 1,
     "date": "2018-06-21",
-    "eloChange": -13
+    "eloChange": -13,
+    "homeEloPre": 1889,
+    "awayEloPre": 1731
   },
   {
     "gameNumber": 22,
@@ -245,7 +283,9 @@ const games2018 = [
     "awayTeam": "Peru",
     "awayScore": 0,
     "date": "2018-06-21",
-    "eloChange": 20
+    "eloChange": 20,
+    "homeEloPre": 1998,
+    "awayEloPre": 1880
   },
   {
     "gameNumber": 23,
@@ -254,7 +294,9 @@ const games2018 = [
     "awayTeam": "Croatia",
     "awayScore": 3,
     "date": "2018-06-21",
-    "eloChange": -66
+    "eloChange": -66,
+    "homeEloPre": 1967,
+    "awayEloPre": 1877
   },
   {
     "gameNumber": 24,
@@ -263,7 +305,9 @@ const games2018 = [
     "awayTeam": "Costa Rica",
     "awayScore": 0,
     "date": "2018-06-22",
-    "eloChange": 8
+    "eloChange": 8,
+    "homeEloPre": 2122,
+    "awayEloPre": 1716
   },
   {
     "gameNumber": 25,
@@ -272,7 +316,9 @@ const games2018 = [
     "awayTeam": "Iceland",
     "awayScore": 0,
     "date": "2018-06-22",
-    "eloChange": 60
+    "eloChange": 60,
+    "homeEloPre": 1657,
+    "awayEloPre": 1781
   },
   {
     "gameNumber": 26,
@@ -281,7 +327,9 @@ const games2018 = [
     "awayTeam": "Switzerland",
     "awayScore": 2,
     "date": "2018-06-22",
-    "eloChange": -21
+    "eloChange": -22,
+    "homeEloPre": 1814,
+    "awayEloPre": 1907
   },
   {
     "gameNumber": 27,
@@ -290,7 +338,9 @@ const games2018 = [
     "awayTeam": "Mexico",
     "awayScore": 2,
     "date": "2018-06-23",
-    "eloChange": -14
+    "eloChange": -14,
+    "homeEloPre": 1690,
+    "awayEloPre": 1896
   },
   {
     "gameNumber": 28,
@@ -299,7 +349,9 @@ const games2018 = [
     "awayTeam": "Sweden",
     "awayScore": 1,
     "date": "2018-06-23",
-    "eloChange": 14
+    "eloChange": 14,
+    "homeEloPre": 2029,
+    "awayEloPre": 1816
   },
   {
     "gameNumber": 29,
@@ -308,7 +360,9 @@ const games2018 = [
     "awayTeam": "Tunisia",
     "awayScore": 2,
     "date": "2018-06-23",
-    "eloChange": 15
+    "eloChange": 15,
+    "homeEloPre": 1953,
+    "awayEloPre": 1642
   },
   {
     "gameNumber": 30,
@@ -317,7 +371,9 @@ const games2018 = [
     "awayTeam": "Panama",
     "awayScore": 1,
     "date": "2018-06-24",
-    "eloChange": 17
+    "eloChange": 17,
+    "homeEloPre": 1956,
+    "awayEloPre": 1639
   },
   {
     "gameNumber": 31,
@@ -326,7 +382,9 @@ const games2018 = [
     "awayTeam": "Senegal",
     "awayScore": 2,
     "date": "2018-06-24",
-    "eloChange": null
+    "eloChange": 4,
+    "homeEloPre": 1732,
+    "awayEloPre": 1783
   },
   {
     "gameNumber": 32,
@@ -335,7 +393,9 @@ const games2018 = [
     "awayTeam": "Colombia",
     "awayScore": 3,
     "date": "2018-06-24",
-    "eloChange": -40
+    "eloChange": -40,
+    "homeEloPre": 1793,
+    "awayEloPre": 1879
   },
   {
     "gameNumber": 33,
@@ -344,7 +404,9 @@ const games2018 = [
     "awayTeam": "Russia",
     "awayScore": 0,
     "date": "2018-06-25",
-    "eloChange": 41
+    "eloChange": 40,
+    "homeEloPre": 1911,
+    "awayEloPre": 1730
   },
   {
     "gameNumber": 34,
@@ -353,7 +415,9 @@ const games2018 = [
     "awayTeam": "Egypt",
     "awayScore": 1,
     "date": "2018-06-25",
-    "eloChange": 35
+    "eloChange": 35,
+    "homeEloPre": 1551,
+    "awayEloPre": 1604
   },
   {
     "gameNumber": 35,
@@ -362,7 +426,9 @@ const games2018 = [
     "awayTeam": "Morocco",
     "awayScore": 2,
     "date": "2018-06-25",
-    "eloChange": -23
+    "eloChange": -23,
+    "homeEloPre": 2050,
+    "awayEloPre": 1695
   },
   {
     "gameNumber": 36,
@@ -371,7 +437,9 @@ const games2018 = [
     "awayTeam": "Portugal",
     "awayScore": 1,
     "date": "2018-06-25",
-    "eloChange": 15
+    "eloChange": 14,
+    "homeEloPre": 1802,
+    "awayEloPre": 1985
   },
   {
     "gameNumber": 37,
@@ -380,7 +448,9 @@ const games2018 = [
     "awayTeam": "France",
     "awayScore": 0,
     "date": "2018-06-26",
-    "eloChange": 12
+    "eloChange": 12,
+    "homeEloPre": 1876,
+    "awayEloPre": 2018
   },
   {
     "gameNumber": 38,
@@ -389,7 +459,9 @@ const games2018 = [
     "awayTeam": "Peru",
     "awayScore": 2,
     "date": "2018-06-26",
-    "eloChange": -30
+    "eloChange": -31,
+    "homeEloPre": 1744,
+    "awayEloPre": 1860
   },
   {
     "gameNumber": 39,
@@ -398,7 +470,9 @@ const games2018 = [
     "awayTeam": "Argentina",
     "awayScore": 2,
     "date": "2018-06-26",
-    "eloChange": -15
+    "eloChange": -15,
+    "homeEloPre": 1717,
+    "awayEloPre": 1901
   },
   {
     "gameNumber": 40,
@@ -407,7 +481,9 @@ const games2018 = [
     "awayTeam": "Croatia",
     "awayScore": 2,
     "date": "2018-06-26",
-    "eloChange": null
+    "eloChange": -13,
+    "homeEloPre": 1721,
+    "awayEloPre": 1943
   },
   {
     "gameNumber": 41,
@@ -416,7 +492,9 @@ const games2018 = [
     "awayTeam": "Brazil",
     "awayScore": 2,
     "date": "2018-06-27",
-    "eloChange": -11
+    "eloChange": -11,
+    "homeEloPre": 1792,
+    "awayEloPre": 2130
   },
   {
     "gameNumber": 42,
@@ -425,7 +503,9 @@ const games2018 = [
     "awayTeam": "Costa Rica",
     "awayScore": 2,
     "date": "2018-06-27",
-    "eloChange": -17
+    "eloChange": -17,
+    "homeEloPre": 1929,
+    "awayEloPre": 1708
   },
   {
     "gameNumber": 43,
@@ -434,7 +514,9 @@ const games2018 = [
     "awayTeam": "Germany",
     "awayScore": 0,
     "date": "2018-06-27",
-    "eloChange": 80
+    "eloChange": 80,
+    "homeEloPre": 1676,
+    "awayEloPre": 2043
   },
   {
     "gameNumber": 44,
@@ -443,7 +525,9 @@ const games2018 = [
     "awayTeam": "Sweden",
     "awayScore": 3,
     "date": "2018-06-27",
-    "eloChange": -68
+    "eloChange": -68,
+    "homeEloPre": 1910,
+    "awayEloPre": 1802
   },
   {
     "gameNumber": 45,
@@ -452,7 +536,9 @@ const games2018 = [
     "awayTeam": "Belgium",
     "awayScore": 1,
     "date": "2018-06-28",
-    "eloChange": -30
+    "eloChange": -30,
+    "homeEloPre": 1973,
+    "awayEloPre": 1968
   },
   {
     "gameNumber": 46,
@@ -461,7 +547,9 @@ const games2018 = [
     "awayTeam": "Tunisia",
     "awayScore": 2,
     "date": "2018-06-28",
-    "eloChange": -29
+    "eloChange": -30,
+    "homeEloPre": 1622,
+    "awayEloPre": 1627
   },
   {
     "gameNumber": 47,
@@ -470,7 +558,9 @@ const games2018 = [
     "awayTeam": "Poland",
     "awayScore": 1,
     "date": "2018-06-28",
-    "eloChange": -29
+    "eloChange": -29,
+    "homeEloPre": 1736,
+    "awayEloPre": 1753
   },
   {
     "gameNumber": 48,
@@ -479,7 +569,9 @@ const games2018 = [
     "awayTeam": "Colombia",
     "awayScore": 1,
     "date": "2018-06-28",
-    "eloChange": -19
+    "eloChange": -19,
+    "homeEloPre": 1779,
+    "awayEloPre": 1919
   },
   {
     "gameNumber": 49,
@@ -488,7 +580,9 @@ const games2018 = [
     "awayTeam": "Argentina",
     "awayScore": 3,
     "date": "2018-06-30",
-    "eloChange": 22
+    "eloChange": 22,
+    "homeEloPre": 2006,
+    "awayEloPre": 1916
   },
   {
     "gameNumber": 50,
@@ -497,7 +591,9 @@ const games2018 = [
     "awayTeam": "Portugal",
     "awayScore": 1,
     "date": "2018-06-30",
-    "eloChange": 32
+    "eloChange": 32,
+    "homeEloPre": 1951,
+    "awayEloPre": 1971
   },
   {
     "gameNumber": 51,
@@ -506,7 +602,9 @@ const games2018 = [
     "awayTeam": "Russia",
     "awayScore": 1,
     "date": "2018-07-01",
-    "eloChange": -18
+    "eloChange": -18,
+    "homeEloPre": 2027,
+    "awayEloPre": 1690
   },
   {
     "gameNumber": 52,
@@ -515,7 +613,9 @@ const games2018 = [
     "awayTeam": "Denmark",
     "awayScore": 1,
     "date": "2018-07-01",
-    "eloChange": 6
+    "eloChange": 6,
+    "homeEloPre": 1956,
+    "awayEloPre": 1888
   },
   {
     "gameNumber": 53,
@@ -524,7 +624,9 @@ const games2018 = [
     "awayTeam": "Mexico",
     "awayScore": 0,
     "date": "2018-07-02",
-    "eloChange": 14
+    "eloChange": 14,
+    "homeEloPre": 2141,
+    "awayEloPre": 1842
   },
   {
     "gameNumber": 54,
@@ -533,7 +635,9 @@ const games2018 = [
     "awayTeam": "Japan",
     "awayScore": 2,
     "date": "2018-07-02",
-    "eloChange": 9
+    "eloChange": 9,
+    "homeEloPre": 1998,
+    "awayEloPre": 1707
   },
   {
     "gameNumber": 55,
@@ -542,7 +646,9 @@ const games2018 = [
     "awayTeam": "Switzerland",
     "awayScore": 0,
     "date": "2018-07-03",
-    "eloChange": 34
+    "eloChange": 34,
+    "homeEloPre": 1870,
+    "awayEloPre": 1912
   },
   {
     "gameNumber": 56,
@@ -551,7 +657,9 @@ const games2018 = [
     "awayTeam": "England",
     "awayScore": 1,
     "date": "2018-07-03",
-    "eloChange": 0
+    "eloChange": 0,
+    "homeEloPre": 1938,
+    "awayEloPre": 1943
   },
   {
     "gameNumber": 57,
@@ -560,7 +668,9 @@ const games2018 = [
     "awayTeam": "France",
     "awayScore": 2,
     "date": "2018-07-06",
-    "eloChange": -39
+    "eloChange": -39,
+    "homeEloPre": 1983,
+    "awayEloPre": 2028
   },
   {
     "gameNumber": 58,
@@ -569,7 +679,9 @@ const games2018 = [
     "awayTeam": "Belgium",
     "awayScore": 2,
     "date": "2018-07-06",
-    "eloChange": -42
+    "eloChange": -42,
+    "homeEloPre": 2155,
+    "awayEloPre": 2007
   },
   {
     "gameNumber": 59,
@@ -578,7 +690,9 @@ const games2018 = [
     "awayTeam": "England",
     "awayScore": 2,
     "date": "2018-07-07",
-    "eloChange": -40
+    "eloChange": -40,
+    "homeEloPre": 1904,
+    "awayEloPre": 1943
   },
   {
     "gameNumber": 60,
@@ -587,7 +701,9 @@ const games2018 = [
     "awayTeam": "Croatia",
     "awayScore": 2,
     "date": "2018-07-07",
-    "eloChange": -11
+    "eloChange": 12,
+    "homeEloPre": 1708,
+    "awayEloPre": 1962
   },
   {
     "gameNumber": 61,
@@ -596,7 +712,9 @@ const games2018 = [
     "awayTeam": "Belgium",
     "awayScore": 0,
     "date": "2018-07-10",
-    "eloChange": 29
+    "eloChange": 28,
+    "homeEloPre": 2067,
+    "awayEloPre": 2049
   },
   {
     "gameNumber": 62,
@@ -605,7 +723,9 @@ const games2018 = [
     "awayTeam": "England",
     "awayScore": 1,
     "date": "2018-07-11",
-    "eloChange": 34
+    "eloChange": 34,
+    "homeEloPre": 1950,
+    "awayEloPre": 1983
   },
   {
     "gameNumber": 63,
@@ -614,7 +734,9 @@ const games2018 = [
     "awayTeam": "England",
     "awayScore": 0,
     "date": "2018-07-14",
-    "eloChange": 36
+    "eloChange": 36,
+    "homeEloPre": 2021,
+    "awayEloPre": 1949
   },
   {
     "gameNumber": 64,
@@ -623,7 +745,9 @@ const games2018 = [
     "awayTeam": "Croatia",
     "awayScore": 2,
     "date": "2018-07-15",
-    "eloChange": 30
+    "eloChange": 30,
+    "homeEloPre": 2095,
+    "awayEloPre": 1984
   }
 ];
 // END:games2018
@@ -691,15 +815,31 @@ const teams = [
 ];
 // END:teams
 
+// BEGIN:teamElos2018
+const teamElos2018 = {"Russia":1676,"Saudi Arabia":1588,"Iran":1790,"Morocco":1731,"Uruguay":1893,"Egypt":1639,"Portugal":1968,"Spain":2043,"France":1986,"Australia":1743,"Argentina":1984,"Iceland":1764,"Peru":1915,"Denmark":1854,"Croatia":1853,"Nigeria":1681,"Serbia":1788,"Costa Rica":1742,"Mexico":1849,"Germany":2076,"Brazil":2141,"Switzerland":1888,"Sweden":1793,"South Korea":1713,"Belgium":1935,"Panama":1657,"England":1947,"Tunisia":1651,"Japan":1684,"Colombia":1927,"Poland":1830,"Senegal":1746};
+// END:teamElos2018
+
 const GAMES = games2018;
 const YEAR = 2018;
+const TEAM_ELOS = teamElos2018;
 const CONFEDERATIONS = ["Europe", "Asia", "Africa", "South America", "North America", "Oceania"];
+// Gameset boundaries: [label, lastGameNumber]. 32-team format: 3 group-stage matchdays + knockout.
+const GAMESETS = [
+  ['Initial',  0],
+  ['MD1',     16],
+  ['MD2',     32],
+  ['MD3',     48],
+  ['16',      56],
+  ['8',       60],
+  ['4',       62],
+  ['Final',   64],
+];
 const tbody = document.getElementById('games');
 const thead = document.querySelector('#matches-view thead');
 </script>
 <script src="shared.js"></script>
 <script>
-render();
+// (init handled by shared.js)
 </script>
 
 </body>

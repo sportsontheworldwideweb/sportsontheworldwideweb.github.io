@@ -4,6 +4,14 @@
 
 A tool for soccer fans to follow and compare how different continental confederations perform across FIFA World Cups — who's gaining rating ground, who's losing it, and how each tournament's results play out game by game. It does this by tracking ELO rating transfers between confederations as matches are played, across the 2018, 2022, and 2026 World Cups.
 
+## Data Sources
+
+ELO ratings and match results come from [eloratings.net](https://www.eloratings.net):
+
+- 2018: https://www.eloratings.net/2018_World_Cup_results
+- 2022: https://www.eloratings.net/2022_World_Cup_results
+- 2026 (live): https://www.eloratings.net/latest — the dedicated tournament page is created only after the tournament ends
+
 ## Match List
 
 #### Pages & navigation
@@ -78,7 +86,7 @@ Only confederations with at least one team participating in the selected World C
 
 ## Tournament ELO Rankings
 
-A standalone view — only one page view is visible at a time. The World Cup page has a segmented toggle that switches between **Match List** and **Rankings**; they never appear simultaneously. The navigation bar (links to other years) stays fixed regardless of which view is active. The Rankings view is only available for tournaments that have `teamElos` data (currently 2026 only; the toggle is omitted entirely from 2018 and 2022 pages).
+A standalone view — only one page view is visible at a time. The World Cup page has a segmented toggle that switches between **Match List** and **Rankings**; they never appear simultaneously. The navigation bar (links to other years) stays fixed regardless of which view is active. All three World Cup pages (2018, 2022, 2026) have the Rankings view, since all have `teamElos` data.
 
 Each view has its own URL via the hash fragment: `2026.html#matches` for the Match List and `2026.html#rankings` for the Rankings view. Switching views updates the hash; loading the page with a hash pre-selects that view. The default (no hash) is Match List.
 
@@ -86,21 +94,38 @@ Each view has its own URL via the hash fragment: `2026.html#matches` for the Mat
 
 A **gameset** is a batch of games in which each active team plays at most once — it is one "turn" for every team still in the tournament. Gamesets are defined per tournament by a fixed list of game-count boundaries, applied in chronological order. They are not stored in the game data — the boundaries are hardcoded per tournament and applied at render time. A gameset is complete when every team that has a game in its range has a recorded result; teams with no game in the range (already eliminated, or byes) do not count toward completion.
 
-For the 2026 World Cup the gamesets and their column labels are:
+Gamesets are defined per tournament. The boundary for each gameset is `lastGameNumber` — games up to and including that number belong to the gameset.
 
-| Gameset | Column label | Description | Game count |
-|---------|--------------|-------------|------------|
-| 0 | Initial | Pre-tournament (starting `teamElos`) | — |
-| 1 | Game 1 | Group stage, matchday 1 | 24 |
-| 2 | Game 2 | Group stage, matchday 2 | 24 |
-| 3 | Game 3 | Group stage, matchday 3 | 24 |
-| 4 | 32 | Round of 32 | 16 |
-| 5 | 16 | Round of 16 | 8 |
-| 6 | 8 | Quarterfinals | 4 |
-| 7 | 4 | Semifinals | 2 |
-| 8 | Final | Third-place game + Final | 2 |
+**2018 and 2022** (32 teams, 64 games total):
 
-All 9 gameset columns are always shown. The Rankings view has a segmented toggle that switches between **Rank** and **Scale** views of the same gameset data. The toggle sits above the ranking area. Switching between Rank and Scale must not shift the gameset column positions — the horizontal layout is identical in both views.
+| Gameset | Column label | Description | Game count | Last game # |
+|---------|--------------|-------------|------------|-------------|
+| 0 | Initial | Pre-tournament (starting `teamElos`) | — | 0 |
+| 1 | MD1 | Group stage, matchday 1 | 16 | 16 |
+| 2 | MD2 | Group stage, matchday 2 | 16 | 32 |
+| 3 | MD3 | Group stage, matchday 3 | 16 | 48 |
+| 4 | 16 | Round of 16 | 8 | 56 |
+| 5 | 8 | Quarterfinals | 4 | 60 |
+| 6 | 4 | Semifinals | 2 | 62 |
+| 7 | Final | Third-place game + Final | 2 | 64 |
+
+All 8 gameset columns are always shown for 2018 and 2022.
+
+**2026** (48 teams, 104 games total):
+
+| Gameset | Column label | Description | Game count | Last game # |
+|---------|--------------|-------------|------------|-------------|
+| 0 | Initial | Pre-tournament (starting `teamElos`) | — | 0 |
+| 1 | Game 1 | Group stage, matchday 1 | 24 | 24 |
+| 2 | Game 2 | Group stage, matchday 2 | 24 | 48 |
+| 3 | Game 3 | Group stage, matchday 3 | 24 | 72 |
+| 4 | 32 | Round of 32 | 16 | 88 |
+| 5 | 16 | Round of 16 | 8 | 96 |
+| 6 | 8 | Quarterfinals | 4 | 100 |
+| 7 | 4 | Semifinals | 2 | 102 |
+| 8 | Final | Third-place game + Final | 2 | 104 |
+
+All 9 gameset columns are always shown for 2026. The Rankings view has a segmented toggle that switches between **Rank** and **Scale** views of the same gameset data. The toggle sits above the ranking area. Switching between Rank and Scale must not shift the gameset column positions — the horizontal layout is identical in both views.
 
 #### Ranking and ties
 
@@ -124,7 +149,24 @@ Only the live gameset column uses this treatment. Completed gameset columns alwa
 
 A team is considered **eliminated** as of the gameset after their last appearance in a game. Specifically: if a team played in gameset N but does not appear in any game in gameset N+1 or later, they are eliminated after gameset N. (For the group stage this naturally captures teams that don't qualify for the Round of 32; for knockout rounds it captures teams that lost.)
 
-Eliminated teams remain in both views — they are never removed. Their flag is rendered in greyscale to visually distinguish them from active teams.
+Eliminated teams are hidden by default in knockout columns (see *Show eliminated toggle* below). When shown, their flag is rendered in greyscale to visually distinguish them from active teams.
+
+#### Show eliminated toggle
+
+A toggle labelled **"Show eliminated"** is available in both the Rank view and the Scale view. By default (off), eliminated teams are hidden in knockout columns. When on, all teams are always shown.
+
+- **Group stage columns** (gamesets covering MD1–MD3): all teams are always shown regardless of this toggle, since every team participates in the group stage.
+- **Knockout round columns** (gamesets from Round of 32 onward): when the toggle is off (default), eliminated teams' flags are hidden in any column where they are not participating. A team is considered eliminated for a given column if they have no game in that gameset and no game in any later gameset.
+- **Layout is unchanged**: the column structure, ELO axis, column widths, and spacing are identical regardless of the toggle state. Only the flag elements are hidden — no reflow, no gaps closing.
+
+#### True rank toggle (Rank view only)
+
+A toggle labelled **"True rank"** is available in the Rank view only. It is not shown at all in the Scale view, since the concept doesn't apply there.
+
+- **Off (default)**: surviving teams are re-numbered starting from 1 in ELO order, and their flags are packed to fill the gaps.
+- **On**: surviving teams keep their original rank numbers. A surviving team ranked #5 still appears at rank slot #5; slots for hidden eliminated teams appear empty.
+
+Checking **"Show eliminated"** automatically checks "True rank" as well, since showing all teams in their packed positions would be misleading — the true rank slots are needed to make the eliminated flags readable. The user can uncheck "True rank" independently after.
 
 #### Rankings shared layout
 
@@ -236,6 +278,7 @@ Debug features are toggled via UI controls that are always visible but clearly l
 
 Entering the result of a played game is done via a command-line script, not the web UI and not by asking the AI to hand-edit files. The row-click panel in the match list (see `## Match List > ##### Row click`) generates the command for you.
 
+- `scripts/set_team_elo.py YEAR TEAM_SHORTHAND ELO` sets a team's initial ELO in the `teamElos` dict of `data/YEAR.json`, then runs `build.py`. If the data file is a plain list (legacy format), it is automatically upgraded to the `{"teamElos": {}, "games": [...]}` dict format. Use this for 2018 and 2022 data entry before entering game results.
 - `scripts/set_result.py YEAR GAME_NUMBER HOME_SCORE AWAY_SCORE [ELO_CHANGE --gains {home|away}]` finds the game with that `gameNumber` in `data/YEAR.json`, sets its `homeScore`/`awayScore` (and `eloChange` if provided), then runs `build.py` to regenerate derived fields and embedded data.
 - When supplying an ELO change, two things are required: the magnitude as a positive number, and which team gains it (`--gains home` or `--gains away`). The script applies the sign and stores the result.
 - `scripts/set_result.py --list-teams` prints the index of every team's shorthand, full name, and confederation, sourced from `data/teams.json`.

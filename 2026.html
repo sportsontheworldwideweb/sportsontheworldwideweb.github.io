@@ -3,116 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>World Cup ELO - 2026</title>
-<style>
-  body { font-family: sans-serif; max-width: 1100px; margin: 2rem auto; overflow-x: auto; }
-  table { border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; white-space: nowrap; }
-  .table-wrap { overflow-x: auto; }
-  th, td { padding: 0.4rem 0.6rem; text-align: left; border-bottom: 1px solid #ddd; }
-  th { background: #f0f0f0; position: sticky; top: 0; }
-  .num { text-align: right; }
-  .narrow { text-align: center; }
-  .spacer { padding: 0 0.3rem; }
-  .score-sep { text-align: center; padding: 0 0.2rem; }
-  .elo { text-align: left; }
-  .flag { text-align: center; }
-  .flag .icon { display: inline-block; width: 2.2em; height: 1.5em; background-size: cover; background-position: center; background-repeat: no-repeat; vertical-align: middle; border: 1px solid #ccc; }
-  .conf { text-align: center; min-width: 5em; }
-  nav { margin-bottom: 1rem; }
-  nav a { margin-right: 1rem; }
-
-  tbody tr { cursor: pointer; }
-  tbody tr:hover { background: #f9f9f9; }
-  .expand-row td { background: #f4f8ff; border-top: none; cursor: default; padding: 0.5rem 0.8rem; }
-  .expand-row .ur-line { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin: 0.3rem 0; }
-  .expand-row label { display: flex; align-items: center; gap: 0.3rem; white-space: nowrap; }
-  .expand-row input[type=number] { width: 4.5rem; padding: 0.2rem; }
-  .expand-row .ur-cmd { font-family: monospace; flex: 1; min-width: 16rem; padding: 0.2rem; }
-  .view-toggle { display: inline-flex; border: 1px solid #bbb; border-radius: 4px; overflow: hidden; }
-  .view-toggle button { border: none; border-right: 1px solid #bbb; background: #f0f0f0; padding: 0.2rem 0.7rem; cursor: pointer; font-size: 0.8rem; color: #333; }
-  .view-toggle button:last-child { border-right: none; }
-  .view-toggle button.active { background: #4a7fcb; color: white; }
-  .view-toggle button:hover:not(.active) { background: #e0e0e0; }
-  .toggle-cell { text-align: right; background: #f0f0f0; border-bottom: none; padding: 0.25rem 0.5rem; vertical-align: middle; }
-
-  /* Page-level view toggle */
-  .page-toggle { margin-bottom: 1rem; }
-
-  /* Rankings */
-  #rankings-view { display: none; }
-  .rankings-toggle { margin-bottom: 0.5rem; }
-  .rankings-cols { font-size: 0.85rem; white-space: nowrap; }
-  .rankings-header {
-    display: grid;
-    grid-template-columns: 4rem repeat(9, minmax(111px, 1fr));
-    position: sticky;
-    top: 0;
-    background: #f0f0f0;
-    border-bottom: 2px solid #ccc;
-    z-index: 10;
-  }
-  .rankings-header > div { padding: 0.3rem 0.5rem; text-align: center; font-weight: bold; }
-  .rankings-header .axis-head { text-align: right; padding-right: 0.6rem; color: #555; }
-  .rankings-body { display: grid; grid-template-columns: 4rem repeat(9, minmax(111px, 1fr)); }
-  .scale-error { position: absolute; top: 4px; left: 0; right: 0; text-align: center; font-size: 0.7rem; color: #c00; pointer-events: none; }
-  .rankings-axis { position: relative; }
-  .axis-label {
-    position: absolute;
-    right: 0.4rem;
-    font-size: 0.72rem;
-    color: #555;
-    font-weight: bold;
-    transform: translateY(-50%);
-    pointer-events: none;
-  }
-  .snap-body-col { position: relative; border-left: 1px solid #333; }
-  .grid-line { position: absolute; left: 0; right: 0; height: 1px; background: repeating-linear-gradient(to right, #bbb 0, #bbb 4px, transparent 4px, transparent 8px); pointer-events: none; z-index: 0; }
-  .debug-cluster { position: absolute; left: 4px; right: 4px; border: 2px solid red; border-radius: 3px; pointer-events: none; z-index: 9999; box-sizing: border-box; }
-  .rankings-header > div:not(.axis-head) { border-left: 1px solid #333; }
-  .flag-pin {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1px;
-  }
-  .flag-pin .icon {
-    display: block;
-    width: 35px;
-    height: 24px;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-    cursor: default;
-  }
-  .flag-pin .elo-val { font-size: 0.72rem; color: #333; line-height: 1; }
-  #rankings-outer { position: relative; }
-  #rank-info {
-    position: fixed;
-    width: 130px;
-    padding: 8px 10px;
-    font-size: 0.75rem;
-    line-height: 1.5;
-    color: #eee;
-    background: #1a1a1a;
-    border-radius: 5px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    visibility: hidden;
-    min-height: 48px;
-    pointer-events: none;
-  }
-  #rank-info .tip-flag { width: 80px; height: 54px; background-size: cover; background-position: center; border: 1px solid #555; margin-bottom: 8px; }
-  #rank-info .tip-name { font-weight: bold; font-size: 1rem; margin-bottom: 2px; }
-  #rank-info .tip-elo-val { color: #aaa; font-size: 0.8rem; margin-bottom: 8px; }
-  #rank-info .tip-sep { border: none; border-top: 1px solid #444; margin: 6px 0; }
-  #rank-info .tip-label { font-size: 0.65rem; color: #888; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 1px; }
-  #rank-info .tip-val { font-size: 0.85rem; color: #ddd; margin-bottom: 6px; }
-  #rank-info .tip-delta-pos { color: #6c6; }
-  #rank-info .tip-delta-neg { color: #f77; }
-</style>
+<link rel="stylesheet" href="shared.css">
 </head>
 <body>
 <nav><a href="2018.html">2018</a> | <a href="2022.html">2022</a> | <strong>2026</strong> | <a href="index.html">Home</a></nav>
@@ -134,6 +25,10 @@
   <div class="rankings-toggle view-toggle">
     <button id="tab-rank" class="active" onclick="setRankView('rank')">Rank</button>
     <button id="tab-scale" onclick="setRankView('scale')">Scale</button>
+  </div>
+  <div class="rankings-filter-controls">
+    <label><input type="checkbox" id="chk-show-elim" onchange="toggleShowEliminated()"> Show eliminated</label>
+    <label id="true-rank-label" style="opacity:1"><input type="checkbox" id="chk-true-rank" onchange="toggleTrueRank()"> True rank</label>
   </div>
   <label style="font-size:0.75rem;color:#c00;margin-left:1rem;user-select:none">
     <input type="checkbox" id="debug-clusters" onchange="renderRankings()"> debug: show binding clusters
@@ -462,22 +357,22 @@ const games2026 = [
   {
     "gameNumber": 29,
     "homeTeam": "Scotland",
-    "homeScore": null,
+    "homeScore": 0,
     "awayTeam": "Morocco",
-    "awayScore": null,
+    "awayScore": 1,
     "date": "2026-06-19",
-    "eloChange": null,
+    "eloChange": -26,
     "homeEloPre": 1794,
     "awayEloPre": 1840
   },
   {
     "gameNumber": 30,
     "homeTeam": "Brazil",
-    "homeScore": null,
+    "homeScore": 3,
     "awayTeam": "Haiti",
-    "awayScore": null,
+    "awayScore": 0,
     "date": "2026-06-19",
-    "eloChange": null,
+    "eloChange": 8,
     "homeEloPre": 1978,
     "awayEloPre": 1536
   },
@@ -495,11 +390,11 @@ const games2026 = [
   {
     "gameNumber": 32,
     "homeTeam": "Turkey",
-    "homeScore": null,
+    "homeScore": 0,
     "awayTeam": "Paraguay",
-    "awayScore": null,
+    "awayScore": 1,
     "date": "2026-06-19",
-    "eloChange": null,
+    "eloChange": -36,
     "homeEloPre": 1849,
     "awayEloPre": 1780
   },
@@ -528,11 +423,11 @@ const games2026 = [
   {
     "gameNumber": 35,
     "homeTeam": "Netherlands",
-    "homeScore": null,
+    "homeScore": 5,
     "awayTeam": "Sweden",
-    "awayScore": null,
+    "awayScore": 1,
     "date": "2026-06-20",
-    "eloChange": null,
+    "eloChange": 28,
     "homeEloPre": 1944,
     "awayEloPre": 1755
   },
@@ -731,8 +626,8 @@ const games2026 = [
     "awayScore": null,
     "date": "2026-06-24",
     "eloChange": null,
-    "homeEloPre": null,
-    "awayEloPre": null
+    "homeEloPre": 1768,
+    "awayEloPre": 1986
   },
   {
     "gameNumber": 54,
@@ -742,8 +637,8 @@ const games2026 = [
     "awayScore": null,
     "date": "2026-06-24",
     "eloChange": null,
-    "homeEloPre": null,
-    "awayEloPre": null
+    "homeEloPre": 1866,
+    "awayEloPre": 1528
   },
   {
     "gameNumber": 55,
@@ -753,7 +648,7 @@ const games2026 = [
     "awayScore": null,
     "date": "2026-06-25",
     "eloChange": null,
-    "homeEloPre": null,
+    "homeEloPre": 1813,
     "awayEloPre": 1820
   },
   {
@@ -764,7 +659,7 @@ const games2026 = [
     "awayScore": null,
     "date": "2026-06-25",
     "eloChange": null,
-    "homeEloPre": null,
+    "homeEloPre": 1816,
     "awayEloPre": 1799
   },
   {
@@ -798,7 +693,7 @@ const games2026 = [
     "date": "2026-06-25",
     "eloChange": null,
     "homeEloPre": null,
-    "awayEloPre": null
+    "awayEloPre": 1727
   },
   {
     "gameNumber": 60,
@@ -809,7 +704,7 @@ const games2026 = [
     "date": "2026-06-25",
     "eloChange": null,
     "homeEloPre": null,
-    "awayEloPre": null
+    "awayEloPre": 1972
   },
   {
     "gameNumber": 61,
@@ -1017,14 +912,8 @@ const GAMES = games2026;
 const YEAR = 2026;
 const TEAM_ELOS = teamElos2026;
 const CONFEDERATIONS = ["Europe", "Asia", "Africa", "South America", "North America", "Oceania"];
-const tbody = document.getElementById('games');
-const thead = document.querySelector('#matches-view thead');
-</script>
-<script src="shared.js"></script>
-<script>
-// Gameset boundaries for 2026: [label, lastGameNumber]
-// lastGameNumber=0 means pre-tournament (no games)
-const GAMESETS_2026 = [
+// Gameset boundaries: [label, lastGameNumber]. lastGameNumber=0 means pre-tournament.
+const GAMESETS = [
   ['Initial',  0],
   ['Game 1',  24],
   ['Game 2',  48],
@@ -1035,511 +924,12 @@ const GAMESETS_2026 = [
   ['4',      102],
   ['Final',  104],
 ];
-
-function buildEloSnapshots() {
-  // Returns array of snapshots, one per gameset (always all 9).
-  // complete=true if all games done; live=true for the first incomplete gameset (shown with partial ELOs).
-  const gamesByNumber = {};
-  for (const g of GAMES) gamesByNumber[g.gameNumber] = g;
-
-  // Determine which teams appear in each gameset (for elimination detection)
-  const teamsInGameset = GAMESETS_2026.map((_, i) => {
-    if (i === 0) return null;
-    const prevLast = GAMESETS_2026[i - 1][1];
-    const lastGame = GAMESETS_2026[i][1];
-    const s = new Set();
-    for (let gn = prevLast + 1; gn <= lastGame; gn++) {
-      const g = gamesByNumber[gn];
-      if (g) { s.add(g.homeTeam); s.add(g.awayTeam); }
-    }
-    return s;
-  });
-
-  // A team is eliminated after gameset N if it doesn't appear in any gameset > N.
-  const eliminatedAfter = {};
-  const allTeams = Object.keys(TEAM_ELOS);
-  for (const team of allTeams) {
-    let lastSeen = 0;
-    for (let i = 1; i < GAMESETS_2026.length; i++) {
-      if (teamsInGameset[i] && teamsInGameset[i].has(team)) lastSeen = i;
-    }
-    eliminatedAfter[team] = lastSeen;
-  }
-
-  const snapshots = [];
-  let current = { ...TEAM_ELOS };
-  let completedUpTo = 0;
-  let liveFound = false;
-
-  for (let i = 0; i < GAMESETS_2026.length; i++) {
-    if (i === 0) {
-      snapshots.push({ label: 'Initial', complete: true, live: false, eloByTeam: { ...current } });
-      continue;
-    }
-    const prevLast = GAMESETS_2026[i - 1][1];
-    const lastGame = GAMESETS_2026[i][1];
-    let allDone = true;
-    for (let gn = prevLast + 1; gn <= lastGame; gn++) {
-      const g = gamesByNumber[gn];
-      if (!g || g.eloChange === null) { allDone = false; break; }
-    }
-    if (allDone) {
-      for (let gn = prevLast + 1; gn <= lastGame; gn++) {
-        const g = gamesByNumber[gn];
-        if (g && typeof g.eloChange === 'number') {
-          if (g.homeTeam in current) current[g.homeTeam] += g.eloChange;
-          if (g.awayTeam in current) current[g.awayTeam] -= g.eloChange;
-        }
-      }
-      completedUpTo = i;
-      snapshots.push({ label: GAMESETS_2026[i][0], complete: true, live: false, eloByTeam: { ...current } });
-    } else if (!liveFound) {
-      // First incomplete gameset: compute partial ELOs and track pending teams.
-      liveFound = true;
-      const liveElo = { ...current };
-      const pendingTeams = new Set();
-      for (let gn = prevLast + 1; gn <= lastGame; gn++) {
-        const g = gamesByNumber[gn];
-        if (!g) continue;
-        if (g.eloChange !== null) {
-          if (g.homeTeam in liveElo) liveElo[g.homeTeam] += g.eloChange;
-          if (g.awayTeam in liveElo) liveElo[g.awayTeam] -= g.eloChange;
-        } else {
-          pendingTeams.add(g.homeTeam);
-          pendingTeams.add(g.awayTeam);
-        }
-      }
-      snapshots.push({ label: GAMESETS_2026[i][0], complete: false, live: true, eloByTeam: liveElo, pendingTeams });
-    } else {
-      snapshots.push({ label: GAMESETS_2026[i][0], complete: false, live: false, eloByTeam: null });
-    }
-  }
-
-  return { snapshots, eliminatedAfter, completedUpTo };
-}
-
-function rankTeams(eloByTeam, prevRank) {
-  const names = Object.keys(eloByTeam);
-  names.sort((a, b) => {
-    const diff = eloByTeam[b] - eloByTeam[a];
-    if (diff !== 0) return diff;
-    const pa = prevRank ? prevRank.indexOf(a) : -1;
-    const pb = prevRank ? prevRank.indexOf(b) : -1;
-    if (pa === -1 && pb === -1) return 0;
-    if (pa === -1) return 1;
-    if (pb === -1) return -1;
-    return pa - pb;
-  });
-  return names;
-}
-
-const FLAG_PX_W = 35;
-const FLAG_PX_H = 24;
-const SCALE_GAP = 3;     // px between side-by-side flags in a cluster
-const RANK_ROW_H = 36;   // px per rank slot
-
-// Y position (top of flag) for a given ELO. The flag's top edge sits at the ELO pixel position
-// so a team reads as "at or below" its value. drawH excludes FLAG_PX_H so the lowest flag's
-// bottom stays within the margin at the bottom edge.
-function scaleTopPx(elo, rawMin, rawMax, height) {
-  const margin = RANK_ROW_H / 2;
-  const drawH = height - 2 * margin - FLAG_PX_H;
-  return Math.round(margin + drawH * (1 - (elo - rawMin) / (rawMax - rawMin)));
-}
-
-// Maximum cluster size across all populated snapshots for a given axis height.
-function maxClusterSizeForHeight(snapshots, ranked, rawMin, rawMax, height) {
-  let maxSize = 1;
-  snapshots.forEach((snap, si) => {
-    if (!(snap.complete || snap.live) || !snap.eloByTeam || !ranked[si]) return;
-    const tops = ranked[si]
-      .map(team => scaleTopPx(snap.eloByTeam[team], rawMin, rawMax, height))
-      .sort((a, b) => a - b);
-    let lo = 0;
-    for (let hi = 0; hi < tops.length; hi++) {
-      while (tops[hi] - tops[lo] >= FLAG_PX_H) lo++;
-      if (hi - lo + 1 > maxSize) maxSize = hi - lo + 1;
-    }
-  });
-  return maxSize;
-}
-
-// Minimum axis height such that no cluster exceeds 3 flags.
-// Returns { height, hasError } where hasError=true if 4 identical ELOs exist (unsolvable).
-function computeScaleHeight(snapshots, ranked, rawMin, rawMax) {
-  const MAX_H = 80000;
-  if (maxClusterSizeForHeight(snapshots, ranked, rawMin, rawMax, MAX_H) >= 4) {
-    return { height: MAX_H, hasError: true };
-  }
-  let lo = 100, hi = MAX_H;
-  while (hi - lo > 1) {
-    const mid = (lo + hi) >> 1;
-    if (maxClusterSizeForHeight(snapshots, ranked, rawMin, rawMax, mid) >= 4) lo = mid;
-    else hi = mid;
-  }
-  return { height: hi, hasError: false };
-}
-
-// Tick interval from [200,100,50,25,10,5,2] such that pixel spacing is 150–300px.
-// Falls back to the candidate producing spacing closest to 200px if none fits.
-function computeTickStep(rawMin, rawMax, height) {
-  const drawH = height - RANK_ROW_H;
-  const pxPerElo = drawH / (rawMax - rawMin);
-  const candidates = [200, 100, 50, 25, 10, 5, 2];
-  for (const c of candidates) {
-    const px = c * pxPerElo;
-    if (px >= 150 && px <= 300) return c;
-  }
-  // Fallback: pick candidate whose spacing is closest to 200px
-  return candidates.reduce((best, c) =>
-    Math.abs(c * pxPerElo - 200) < Math.abs(best * pxPerElo - 200) ? c : best
-  );
-}
-
-let currentRankView = 'rank';
-
-function setRankView(v) {
-  currentRankView = v;
-  document.getElementById('tab-rank').classList.toggle('active', v === 'rank');
-  document.getElementById('tab-scale').classList.toggle('active', v === 'scale');
-  renderRankings();
-}
-
-function renderRankings() {
-  const { snapshots, eliminatedAfter } = buildEloSnapshots();
-
-  // Build per-gameset game lookup: gamesByTeamInSnap[si][team] = game object or undefined
-  const _gnMap = {};
-  for (const g of GAMES) _gnMap[g.gameNumber] = g;
-  const gamesByTeamInSnap = snapshots.map((snap, si) => {
-    if (si === 0) return {};
-    const prevLast = GAMESETS_2026[si - 1][1];
-    const lastGame = GAMESETS_2026[si][1];
-    const map = {};
-    for (let gn = prevLast + 1; gn <= lastGame; gn++) {
-      const g = _gnMap[gn];
-      if (g) { map[g.homeTeam] = g; map[g.awayTeam] = g; }
-    }
-    return map;
-  });
-
-  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  function fmtDate(iso) {
-    if (!iso) return '';
-    const [, m, d] = iso.split('-');
-    return `${MONTHS[+m - 1]} ${+d}`;
-  }
-
-  function buildTipHtml(team, elo, si) {
-    const flag = flagByTeam[team] || '';
-    const flagStyle = flag ? `background-image:url('data/flags/${flag}.svg')` : '';
-    let html = `<div class="tip-flag" style="${flagStyle}"></div>`;
-    html += `<div class="tip-name">${team}</div>`;
-    html += `<div class="tip-elo-val">${elo !== null ? Math.round(elo) : '—'}</div>`;
-    html += `<hr class="tip-sep">`;
-    const g = si > 0 ? gamesByTeamInSnap[si][team] : null;
-    const isHome = g && g.homeTeam === team;
-    const opponent = g ? (isHome ? g.awayTeam : g.homeTeam) : null;
-    html += `<div class="tip-label">Date</div><div class="tip-val">${g && g.date ? fmtDate(g.date) : '—'}</div>`;
-    html += `<div class="tip-label">Opponent</div><div class="tip-val">${opponent ? opponent : '—'}</div>`;
-    if (g && typeof g.eloChange === 'number') {
-      const score = isHome ? `${g.homeScore}–${g.awayScore}` : `${g.awayScore}–${g.homeScore}`;
-      const delta = isHome ? g.eloChange : -g.eloChange;
-      const cls = delta >= 0 ? 'tip-delta-pos' : 'tip-delta-neg';
-      const sign = delta >= 0 ? '+' : '';
-      html += `<div class="tip-label">Score</div><div class="tip-val">${score}</div>`;
-      html += `<div class="tip-label">ELO</div><div class="tip-val"><span class="${cls}">${sign}${delta}</span></div>`;
-    } else {
-      html += `<div class="tip-label">Score</div><div class="tip-val">—</div>`;
-      html += `<div class="tip-label">ELO</div><div class="tip-val">—</div>`;
-    }
-    return html;
-  }
-
-  // Build ranked order for each snapshot; carry forward for future empty ones.
-  const ranked = [];
-  let prevRank = null;
-  for (const snap of snapshots) {
-    if (snap.complete || snap.live) {
-      const order = rankTeams(snap.eloByTeam, prevRank);
-      ranked.push(order);
-      prevRank = order;
-    } else {
-      ranked.push(prevRank);
-    }
-  }
-
-  const numTeams = ranked[0].length;
-  const isScale = currentRankView === 'scale';
-
-  // Compute dynamic ELO range and axis height for scale view
-  let rawMin, rawMax, scaleH, scaleHasError;
-  if (isScale) {
-    rawMin = Infinity; rawMax = -Infinity;
-    for (const snap of snapshots) {
-      if (snap.eloByTeam) {
-        for (const elo of Object.values(snap.eloByTeam)) {
-          if (elo < rawMin) rawMin = elo;
-          if (elo > rawMax) rawMax = elo;
-        }
-      }
-    }
-    ({ height: scaleH, hasError: scaleHasError } = computeScaleHeight(snapshots, ranked, rawMin, rawMax));
-  }
-
-  const bodyH = isScale ? scaleH : numTeams * RANK_ROW_H;
-
-  // Header
-  const header = document.getElementById('rankings-header');
-  header.innerHTML =
-    `<div class="axis-head">${isScale ? '' : '#'}</div>` +
-    snapshots.map(s => `<div>${s.label}</div>`).join('');
-
-  // Body
-  const body = document.getElementById('rankings-body');
-  body.innerHTML = '';
-
-  // Axis column
-  const axisCol = document.createElement('div');
-  axisCol.className = 'rankings-axis';
-  axisCol.style.height = bodyH + 'px';
-
-  const gridLineYs = []; // shared Y positions for horizontal grid lines
-  if (isScale) {
-    const step = computeTickStep(rawMin, rawMax, scaleH);
-    const firstTick = Math.ceil(rawMin / step) * step;
-    for (let tick = firstTick; tick <= rawMax; tick += step) {
-      const y = scaleTopPx(tick, rawMin, rawMax, scaleH);
-      gridLineYs.push(y);
-      const lbl = document.createElement('div');
-      lbl.className = 'axis-label';
-      lbl.style.top = y + 'px';
-      lbl.textContent = tick;
-      axisCol.appendChild(lbl);
-    }
-  } else {
-    for (let i = 0; i < numTeams; i++) {
-      const lbl = document.createElement('div');
-      lbl.className = 'axis-label';
-      lbl.style.top = (i * RANK_ROW_H + RANK_ROW_H / 2) + 'px';
-      lbl.textContent = i + 1;
-      axisCol.appendChild(lbl);
-    }
-    // Lines between every 4th rank (after rank 4, 8, 12, ...)
-    for (let n = 4; n < numTeams; n += 4) {
-      gridLineYs.push(n * RANK_ROW_H);
-    }
-  }
-
-  function addGridLines(el) {
-    gridLineYs.forEach(y => {
-      const line = document.createElement('div');
-      line.className = 'grid-line';
-      line.style.top = y + 'px';
-      el.appendChild(line);
-    });
-  }
-  addGridLines(axisCol);
-  body.appendChild(axisCol);
-
-  // Gameset columns
-  snapshots.forEach((snap, si) => {
-    const col = document.createElement('div');
-    col.className = 'snap-body-col';
-
-    if ((snap.complete || snap.live) && ranked[si]) {
-      const pinData = []; // collect {el, topPx} for dodge pass
-
-      ranked[si].forEach((team, rankIdx) => {
-        const elo = snap.eloByTeam ? snap.eloByTeam[team] : null;
-        const flag = flagByTeam[team] || '';
-        const elim = eliminatedAfter[team] > 0 && si > eliminatedAfter[team];
-        const pending = snap.live && snap.pendingTeams && snap.pendingTeams.has(team);
-
-        const zIndex = isScale ? (numTeams - rankIdx) : 1;
-        let topPx;
-        if (isScale) {
-          topPx = scaleTopPx(elo, rawMin, rawMax, scaleH);
-        } else {
-          topPx = rankIdx * RANK_ROW_H + (RANK_ROW_H - FLAG_PX_H) / 2;
-        }
-
-        const pin = document.createElement('div');
-        pin.className = 'flag-pin';
-        pin.dataset.team = team;
-        pin.dataset.baseZ = zIndex;
-        pin.dataset.tipHtml = buildTipHtml(team, elo, si);
-        pin.style.top = topPx + 'px';
-        pin.style.zIndex = zIndex;
-
-        const iconStyle = `background-image:url('data/flags/${flag}.svg')` +
-          (elim ? ';filter:grayscale(100%);opacity:0.4'
-                : pending ? ';filter:grayscale(80%);opacity:0.35' : '');
-        const icon = document.createElement('span');
-        icon.className = 'icon';
-        icon.style.cssText = iconStyle;
-        pin.appendChild(icon);
-
-        col.appendChild(pin);
-        if (isScale) pinData.push({ el: pin, topPx });
-      });
-
-      // Horizontal dodge: greedy lane assignment + centered offsets per visual cluster
-      if (isScale && pinData.length) {
-        const STEP = FLAG_PX_W + SCALE_GAP;
-        const sorted = [...pinData].sort((a, b) => a.topPx - b.topPx);
-
-        // Pass 1: greedy lane assignment (0/1/2) for correct packing
-        const nextFreeY = [-Infinity, -Infinity, -Infinity];
-        const laneOf = new Map();
-        sorted.forEach(p => {
-          let best = -1;
-          for (let l = 0; l < 3; l++) {
-            if (nextFreeY[l] <= p.topPx) {
-              if (best === -1 || nextFreeY[l] > nextFreeY[best]) best = l;
-            }
-          }
-          if (best === -1) best = 1; // fallback (shouldn't happen at computed height)
-          laneOf.set(p, best);
-          nextFreeY[best] = p.topPx + FLAG_PX_H;
-        });
-
-        // Pass 2: transitive cluster grouping for visual centering only
-        let gi = 0;
-        while (gi < sorted.length) {
-          let gj = gi + 1;
-          while (gj < sorted.length && sorted[gj].topPx - sorted[gj - 1].topPx < FLAG_PX_H) gj++;
-          const group = sorted.slice(gi, gj);
-          // Sort lanes by their topmost flag so higher-ELO lane gets the leftmost offset.
-          const lanes = [...new Set(group.map(p => laneOf.get(p)))];
-          const spread = (lanes.length - 1) * STEP;
-          const laneMinTop = Object.fromEntries(lanes.map(l => [l, Math.min(...group.filter(p => laneOf.get(p) === l).map(p => p.topPx))]));
-          const laneOffset = {};
-          [...lanes].sort((a, b) => laneMinTop[a] - laneMinTop[b]).forEach((l, k) => { laneOffset[l] = -spread / 2 + k * STEP; });
-          group.forEach(p => {
-            p.el.style.left = `calc(50% + ${laneOffset[laneOf.get(p)]}px)`;
-          });
-          gi = gj;
-        }
-      }
-
-      // Debug: red outline around the group of 4 flags that would cluster at height-1.
-      // These are the flags forcing the axis to be this tall — at scaleH they just separate
-      // into ≤3, but one pixel shorter they'd merge into a forbidden cluster of 4.
-      if (isScale && document.getElementById('debug-clusters').checked && pinData.length) {
-        // Find windows where depth reaches 4 at scaleH-1 (sliding window, not transitive chain)
-        const atOneLess = pinData
-          .map(p => ({ el: p.el, topPx: scaleTopPx(snap.eloByTeam[p.el.dataset.team], rawMin, rawMax, scaleH - 1) }))
-          .sort((a, b) => a.topPx - b.topPx);
-        let lo = 0;
-        for (let hi = 0; hi < atOneLess.length; hi++) {
-          while (atOneLess[hi].topPx - atOneLess[lo].topPx >= FLAG_PX_H) lo++;
-          if (hi - lo + 1 >= 4) {
-            // Draw box around the window [lo..hi] at actual (scaleH) positions
-            const actualTops = atOneLess.slice(lo, hi + 1).map(p => pinData.find(q => q.el === p.el).topPx);
-            const top = Math.min(...actualTops);
-            const bottom = Math.max(...actualTops) + FLAG_PX_H;
-            const box = document.createElement('div');
-            box.className = 'debug-cluster';
-            box.style.top = (top - 2) + 'px';
-            box.style.height = (bottom - top + 4) + 'px';
-            col.appendChild(box);
-          }
-        }
-      }
-    }
-
-    addGridLines(col);
-
-    // Error warning: 4+ teams with identical ELO — unsolvable by axis stretching
-    if (isScale && scaleHasError && (snap.complete || snap.live) && snap.eloByTeam) {
-      const warn = document.createElement('div');
-      warn.className = 'scale-error';
-      warn.textContent = '⚠ 4+ equal ELOs';
-      col.appendChild(warn);
-    }
-
-    body.appendChild(col);
-  });
-
-  // Hover highlight + info panel
-  const container = document.getElementById('rankings-cols');
-  const infoPanel = document.getElementById('rank-info');
-  let activeTeam = null;
-  let activateTimer = null;
-  let resetTimer = null;
-
-  const updateInfoPosition = () => {
-    const gridRect = container.getBoundingClientRect();
-    const panelW = 150;
-    const x = Math.max(8, gridRect.left - panelW);
-    const panelH = infoPanel.offsetHeight;
-    const y = Math.max(8, (window.innerHeight - panelH) / 2);
-    infoPanel.style.left = x + 'px';
-    infoPanel.style.top = y + 'px';
-  };
-
-  const showInfo = pin => {
-    infoPanel.innerHTML = pin.dataset.tipHtml || '';
-    updateInfoPosition();
-    infoPanel.style.visibility = 'visible';
-  };
-
-  const hideInfo = () => { infoPanel.style.visibility = 'hidden'; };
-
-  const applyHighlight = team => {
-    activeTeam = team;
-    container.querySelectorAll('[data-team]').forEach(el => {
-      const isHovered = el.dataset.team === team;
-      el.style.opacity = isHovered ? '1' : '0.15';
-      el.style.zIndex = isHovered ? '9999' : (el.dataset.baseZ || '');
-    });
-  };
-
-  const applyReset = () => {
-    activeTeam = null;
-    container.querySelectorAll('[data-team]').forEach(el => {
-      el.style.opacity = '';
-      el.style.zIndex = el.dataset.baseZ || '';
-    });
-  };
-
-  const scheduleReset = () => {
-    clearTimeout(activateTimer); activateTimer = null;
-    if (!resetTimer) resetTimer = setTimeout(() => { resetTimer = null; applyReset(); hideInfo(); }, 300);
-  };
-
-  container.onmouseover = e => {
-    const pin = e.target.closest('[data-team]');
-    if (!pin) { scheduleReset(); return; }
-    const team = pin.dataset.team;
-    clearTimeout(resetTimer); resetTimer = null;
-    showInfo(pin);
-    if (team === activeTeam) return;
-    clearTimeout(activateTimer);
-    activateTimer = setTimeout(() => { activateTimer = null; applyHighlight(team); }, 200);
-  };
-
-  container.onmouseleave = scheduleReset;
-}
-
-let currentPageView = null;
-
-function setPageView(view) {
-  if (view !== 'matches' && view !== 'rankings') view = 'matches';
-  if (view === currentPageView) return;
-  currentPageView = view;
-  document.getElementById('matches-view').style.display = view === 'matches' ? 'block' : 'none';
-  document.getElementById('rankings-view').style.display = view === 'rankings' ? 'block' : 'none';
-  document.getElementById('tab-matches').classList.toggle('active', view === 'matches');
-  document.getElementById('tab-rankings').classList.toggle('active', view === 'rankings');
-  if (view === 'matches') render();
-  if (view === 'rankings') renderRankings();
-  if (location.hash.slice(1) !== view) history.replaceState(null, '', '#' + view);
-}
-
-window.addEventListener('hashchange', () => setPageView(location.hash.slice(1)));
-setPageView(location.hash.slice(1) || 'matches');
+const tbody = document.getElementById('games');
+const thead = document.querySelector('#matches-view thead');
+</script>
+<script src="shared.js"></script>
+<script>
+// (rankings logic and init are in shared.js)
 </script>
 
 </body>

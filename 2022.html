@@ -3,47 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <title>World Cup ELO - 2022</title>
-<style>
-  body { font-family: sans-serif; max-width: 1100px; margin: 2rem auto; overflow-x: auto; }
-  table { border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; white-space: nowrap; }
-  .table-wrap { overflow-x: auto; }
-  th, td { padding: 0.4rem 0.6rem; text-align: left; border-bottom: 1px solid #ddd; }
-  th { background: #f0f0f0; position: sticky; top: 0; }
-  .num { text-align: right; }
-  .narrow { text-align: center; }
-  .spacer { padding: 0 0.3rem; }
-  .score-sep { text-align: center; padding: 0 0.2rem; }
-  .elo { text-align: left; }
-  .flag { text-align: center; }
-  .flag .icon { display: inline-block; width: 2.2em; height: 1.5em; background-size: cover; background-position: center; background-repeat: no-repeat; vertical-align: middle; border: 1px solid #ccc; }
-  .conf { text-align: center; min-width: 5em; }
-  nav { margin-bottom: 1rem; }
-  nav a { margin-right: 1rem; }
-
-  tbody tr { cursor: pointer; }
-  tbody tr:hover { background: #f9f9f9; }
-  .expand-row td { background: #f4f8ff; border-top: none; cursor: default; padding: 0.5rem 0.8rem; }
-  .expand-row .ur-line { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin: 0.3rem 0; }
-  .expand-row label { display: flex; align-items: center; gap: 0.3rem; white-space: nowrap; }
-  .expand-row input[type=number] { width: 4.5rem; padding: 0.2rem; }
-  .expand-row .ur-cmd { font-family: monospace; flex: 1; min-width: 16rem; padding: 0.2rem; }
-  .view-toggle { display: inline-flex; border: 1px solid #bbb; border-radius: 4px; overflow: hidden; }
-  .view-toggle button { border: none; border-right: 1px solid #bbb; background: #f0f0f0; padding: 0.2rem 0.7rem; cursor: pointer; font-size: 0.8rem; color: #333; }
-  .view-toggle button:last-child { border-right: none; }
-  .view-toggle button.active { background: #4a7fcb; color: white; }
-  .view-toggle button:hover:not(.active) { background: #e0e0e0; }
-  .toggle-cell { text-align: right; background: #f0f0f0; border-bottom: none; padding: 0.25rem 0.5rem; vertical-align: middle; }
-</style>
+<link rel="stylesheet" href="shared.css">
 </head>
 <body>
 <nav><a href="2018.html">2018</a> | <strong>2022</strong> | <a href="2026.html">2026</a> | <a href="index.html">Home</a></nav>
 <h1>World Cup ELO - 2022</h1>
+
+<div class="page-toggle view-toggle">
+  <button id="tab-matches" class="active" onclick="setPageView('matches')">Match List</button>
+  <button id="tab-rankings" onclick="setPageView('rankings')">Rankings</button>
+</div>
 
 <div id="matches-view">
   <table>
     <thead></thead>
     <tbody id="games"></tbody>
   </table>
+</div>
+
+<div id="rankings-view">
+  <div class="rankings-toggle view-toggle">
+    <button id="tab-rank" class="active" onclick="setRankView('rank')">Rank</button>
+    <button id="tab-scale" onclick="setRankView('scale')">Scale</button>
+  </div>
+  <div class="rankings-filter-controls">
+    <label><input type="checkbox" id="chk-show-elim" onchange="toggleShowEliminated()"> Show eliminated</label>
+    <label id="true-rank-label" style="opacity:1"><input type="checkbox" id="chk-true-rank" onchange="toggleTrueRank()"> True rank</label>
+  </div>
+  <label style="font-size:0.75rem;color:#c00;margin-left:1rem;user-select:none">
+    <input type="checkbox" id="debug-clusters" onchange="renderRankings()"> debug: show binding clusters
+  </label>
+  <div id="rankings-outer">
+    <div id="rank-info"></div>
+    <div class="rankings-cols" id="rankings-cols">
+      <div class="rankings-header" id="rankings-header"></div>
+      <div class="rankings-body" id="rankings-body"></div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -56,7 +52,9 @@ const games2022 = [
     "awayTeam": "Ecuador",
     "awayScore": 2,
     "date": "2022-11-20",
-    "eloChange": -38
+    "eloChange": -38,
+    "homeEloPre": 1680,
+    "awayEloPre": 1832
   },
   {
     "gameNumber": 2,
@@ -65,7 +63,9 @@ const games2022 = [
     "awayTeam": "Iran",
     "awayScore": 2,
     "date": "2022-11-21",
-    "eloChange": 37
+    "eloChange": 37,
+    "homeEloPre": 1919,
+    "awayEloPre": 1798
   },
   {
     "gameNumber": 3,
@@ -74,7 +74,9 @@ const games2022 = [
     "awayTeam": "Netherlands",
     "awayScore": 2,
     "date": "2022-11-21",
-    "eloChange": -10
+    "eloChange": -10,
+    "homeEloPre": 1684,
+    "awayEloPre": 2040
   },
   {
     "gameNumber": 4,
@@ -83,7 +85,9 @@ const games2022 = [
     "awayTeam": "Wales",
     "awayScore": 1,
     "date": "2022-11-21",
-    "eloChange": 1
+    "eloChange": -1,
+    "homeEloPre": 1796,
+    "awayEloPre": 1789
   },
   {
     "gameNumber": 5,
@@ -92,7 +96,9 @@ const games2022 = [
     "awayTeam": "Saudi Arabia",
     "awayScore": 2,
     "date": "2022-11-22",
-    "eloChange": -57
+    "eloChange": -57,
+    "homeEloPre": 2143,
+    "awayEloPre": 1636
   },
   {
     "gameNumber": 6,
@@ -101,7 +107,9 @@ const games2022 = [
     "awayTeam": "Tunisia",
     "awayScore": 0,
     "date": "2022-11-22",
-    "eloChange": null
+    "eloChange": -19,
+    "homeEloPre": 1971,
+    "awayEloPre": 1705
   },
   {
     "gameNumber": 7,
@@ -110,7 +118,9 @@ const games2022 = [
     "awayTeam": "Poland",
     "awayScore": 0,
     "date": "2022-11-22",
-    "eloChange": 0
+    "eloChange": 0,
+    "homeEloPre": 1808,
+    "awayEloPre": 1813
   },
   {
     "gameNumber": 8,
@@ -119,7 +129,9 @@ const games2022 = [
     "awayTeam": "Australia",
     "awayScore": 1,
     "date": "2022-11-22",
-    "eloChange": 17
+    "eloChange": 17,
+    "homeEloPre": 2004,
+    "awayEloPre": 1720
   },
   {
     "gameNumber": 9,
@@ -128,7 +140,9 @@ const games2022 = [
     "awayTeam": "Japan",
     "awayScore": 2,
     "date": "2022-11-23",
-    "eloChange": -44
+    "eloChange": -44,
+    "homeEloPre": 1962,
+    "awayEloPre": 1788
   },
   {
     "gameNumber": 10,
@@ -137,7 +151,9 @@ const games2022 = [
     "awayTeam": "Costa Rica",
     "awayScore": 0,
     "date": "2022-11-23",
-    "eloChange": 20
+    "eloChange": 20,
+    "homeEloPre": 2049,
+    "awayEloPre": 1743
   },
   {
     "gameNumber": 11,
@@ -146,7 +162,9 @@ const games2022 = [
     "awayTeam": "Croatia",
     "awayScore": 0,
     "date": "2022-11-23",
-    "eloChange": null
+    "eloChange": 13,
+    "homeEloPre": 1764,
+    "awayEloPre": 1926
   },
   {
     "gameNumber": 12,
@@ -155,7 +173,9 @@ const games2022 = [
     "awayTeam": "Canada",
     "awayScore": 0,
     "date": "2022-11-23",
-    "eloChange": 13
+    "eloChange": 13,
+    "homeEloPre": 2006,
+    "awayEloPre": 1775
   },
   {
     "gameNumber": 13,
@@ -164,7 +184,9 @@ const games2022 = [
     "awayTeam": "Cameroon",
     "awayScore": 0,
     "date": "2022-11-24",
-    "eloChange": 9
+    "eloChange": 9,
+    "homeEloPre": 1901,
+    "awayEloPre": 1607
   },
   {
     "gameNumber": 14,
@@ -173,7 +195,9 @@ const games2022 = [
     "awayTeam": "South Korea",
     "awayScore": 0,
     "date": "2022-11-24",
-    "eloChange": null
+    "eloChange": -12,
+    "homeEloPre": 1935,
+    "awayEloPre": 1786
   },
   {
     "gameNumber": 15,
@@ -182,7 +206,9 @@ const games2022 = [
     "awayTeam": "Ghana",
     "awayScore": 2,
     "date": "2022-11-24",
-    "eloChange": 4
+    "eloChange": 4,
+    "homeEloPre": 2005,
+    "awayEloPre": 1564
   },
   {
     "gameNumber": 16,
@@ -191,7 +217,9 @@ const games2022 = [
     "awayTeam": "Serbia",
     "awayScore": 0,
     "date": "2022-11-24",
-    "eloChange": 16
+    "eloChange": 16,
+    "homeEloPre": 2169,
+    "awayEloPre": 1899
   },
   {
     "gameNumber": 17,
@@ -200,7 +228,9 @@ const games2022 = [
     "awayTeam": "Iran",
     "awayScore": 2,
     "date": "2022-11-25",
-    "eloChange": -49
+    "eloChange": -49,
+    "homeEloPre": 1790,
+    "awayEloPre": 1761
   },
   {
     "gameNumber": 18,
@@ -209,7 +239,9 @@ const games2022 = [
     "awayTeam": "Senegal",
     "awayScore": 3,
     "date": "2022-11-25",
-    "eloChange": -53
+    "eloChange": -54,
+    "homeEloPre": 1642,
+    "awayEloPre": 1674
   },
   {
     "gameNumber": 19,
@@ -218,7 +250,9 @@ const games2022 = [
     "awayTeam": "Ecuador",
     "awayScore": 1,
     "date": "2022-11-25",
-    "eloChange": null
+    "eloChange": -14,
+    "homeEloPre": 2050,
+    "awayEloPre": 1870
   },
   {
     "gameNumber": 20,
@@ -227,7 +261,9 @@ const games2022 = [
     "awayTeam": "USA",
     "awayScore": 0,
     "date": "2022-11-25",
-    "eloChange": null
+    "eloChange": -13,
+    "homeEloPre": 1956,
+    "awayEloPre": 1795
   },
   {
     "gameNumber": 21,
@@ -236,7 +272,9 @@ const games2022 = [
     "awayTeam": "Australia",
     "awayScore": 1,
     "date": "2022-11-26",
-    "eloChange": -32
+    "eloChange": -32,
+    "homeEloPre": 1724,
+    "awayEloPre": 1703
   },
   {
     "gameNumber": 22,
@@ -245,7 +283,9 @@ const games2022 = [
     "awayTeam": "Saudi Arabia",
     "awayScore": 0,
     "date": "2022-11-26",
-    "eloChange": 30
+    "eloChange": 30,
+    "homeEloPre": 1813,
+    "awayEloPre": 1693
   },
   {
     "gameNumber": 23,
@@ -254,7 +294,9 @@ const games2022 = [
     "awayTeam": "Denmark",
     "awayScore": 1,
     "date": "2022-11-26",
-    "eloChange": 24
+    "eloChange": 24,
+    "homeEloPre": 2021,
+    "awayEloPre": 1952
   },
   {
     "gameNumber": 24,
@@ -263,7 +305,9 @@ const games2022 = [
     "awayTeam": "Mexico",
     "awayScore": 0,
     "date": "2022-11-26",
-    "eloChange": 15
+    "eloChange": 15,
+    "homeEloPre": 2086,
+    "awayEloPre": 1808
   },
   {
     "gameNumber": 25,
@@ -272,7 +316,9 @@ const games2022 = [
     "awayTeam": "Costa Rica",
     "awayScore": 1,
     "date": "2022-11-27",
-    "eloChange": -39
+    "eloChange": -39,
+    "homeEloPre": 1832,
+    "awayEloPre": 1723
   },
   {
     "gameNumber": 26,
@@ -281,7 +327,9 @@ const games2022 = [
     "awayTeam": "Morocco",
     "awayScore": 2,
     "date": "2022-11-27",
-    "eloChange": -72
+    "eloChange": -72,
+    "homeEloPre": 2019,
+    "awayEloPre": 1777
   },
   {
     "gameNumber": 27,
@@ -290,7 +338,9 @@ const games2022 = [
     "awayTeam": "Canada",
     "awayScore": 1,
     "date": "2022-11-27",
-    "eloChange": 31
+    "eloChange": 31,
+    "homeEloPre": 1913,
+    "awayEloPre": 1762
   },
   {
     "gameNumber": 28,
@@ -299,7 +349,9 @@ const games2022 = [
     "awayTeam": "Germany",
     "awayScore": 1,
     "date": "2022-11-27",
-    "eloChange": null
+    "eloChange": -12,
+    "homeEloPre": 2069,
+    "awayEloPre": 1918
   },
   {
     "gameNumber": 29,
@@ -308,7 +360,9 @@ const games2022 = [
     "awayTeam": "Serbia",
     "awayScore": 3,
     "date": "2022-11-28",
-    "eloChange": null
+    "eloChange": 20,
+    "homeEloPre": 1598,
+    "awayEloPre": 1883
   },
   {
     "gameNumber": 30,
@@ -317,7 +371,9 @@ const games2022 = [
     "awayTeam": "Ghana",
     "awayScore": 3,
     "date": "2022-11-28",
-    "eloChange": -48
+    "eloChange": -48,
+    "homeEloPre": 1798,
+    "awayEloPre": 1560
   },
   {
     "gameNumber": 31,
@@ -326,7 +382,9 @@ const games2022 = [
     "awayTeam": "Switzerland",
     "awayScore": 0,
     "date": "2022-11-28",
-    "eloChange": 10
+    "eloChange": 10,
+    "homeEloPre": 2185,
+    "awayEloPre": 1910
   },
   {
     "gameNumber": 32,
@@ -335,7 +393,9 @@ const games2022 = [
     "awayTeam": "Uruguay",
     "awayScore": 0,
     "date": "2022-11-28",
-    "eloChange": 34
+    "eloChange": 34,
+    "homeEloPre": 2009,
+    "awayEloPre": 1923
   },
   {
     "gameNumber": 33,
@@ -344,7 +404,9 @@ const games2022 = [
     "awayTeam": "Senegal",
     "awayScore": 2,
     "date": "2022-11-29",
-    "eloChange": -43
+    "eloChange": -43,
+    "homeEloPre": 1884,
+    "awayEloPre": 1728
   },
   {
     "gameNumber": 34,
@@ -353,7 +415,9 @@ const games2022 = [
     "awayTeam": "Qatar",
     "awayScore": 0,
     "date": "2022-11-29",
-    "eloChange": 11
+    "eloChange": 11,
+    "homeEloPre": 2036,
+    "awayEloPre": 1588
   },
   {
     "gameNumber": 35,
@@ -362,7 +426,9 @@ const games2022 = [
     "awayTeam": "England",
     "awayScore": 3,
     "date": "2022-11-29",
-    "eloChange": -25
+    "eloChange": -25,
+    "homeEloPre": 1741,
+    "awayEloPre": 1943
   },
   {
     "gameNumber": 36,
@@ -371,7 +437,9 @@ const games2022 = [
     "awayTeam": "USA",
     "awayScore": 1,
     "date": "2022-11-29",
-    "eloChange": -30
+    "eloChange": -30,
+    "homeEloPre": 1810,
+    "awayEloPre": 1808
   },
   {
     "gameNumber": 37,
@@ -380,7 +448,9 @@ const games2022 = [
     "awayTeam": "Denmark",
     "awayScore": 0,
     "date": "2022-11-30",
-    "eloChange": 45
+    "eloChange": 45,
+    "homeEloPre": 1735,
+    "awayEloPre": 1928
   },
   {
     "gameNumber": 38,
@@ -389,7 +459,9 @@ const games2022 = [
     "awayTeam": "France",
     "awayScore": 0,
     "date": "2022-11-30",
-    "eloChange": 53
+    "eloChange": 53,
+    "homeEloPre": 1692,
+    "awayEloPre": 2045
   },
   {
     "gameNumber": 39,
@@ -398,7 +470,9 @@ const games2022 = [
     "awayTeam": "Argentina",
     "awayScore": 2,
     "date": "2022-11-30",
-    "eloChange": -17
+    "eloChange": -17,
+    "homeEloPre": 1843,
+    "awayEloPre": 2101
   },
   {
     "gameNumber": 40,
@@ -407,7 +481,9 @@ const games2022 = [
     "awayTeam": "Mexico",
     "awayScore": 2,
     "date": "2022-11-30",
-    "eloChange": -19
+    "eloChange": -19,
+    "homeEloPre": 1663,
+    "awayEloPre": 1793
   },
   {
     "gameNumber": 41,
@@ -416,7 +492,9 @@ const games2022 = [
     "awayTeam": "Spain",
     "awayScore": 1,
     "date": "2022-12-01",
-    "eloChange": 49
+    "eloChange": 49,
+    "homeEloPre": 1793,
+    "awayEloPre": 2057
   },
   {
     "gameNumber": 42,
@@ -425,7 +503,9 @@ const games2022 = [
     "awayTeam": "Germany",
     "awayScore": 4,
     "date": "2022-12-01",
-    "eloChange": -25
+    "eloChange": -25,
+    "homeEloPre": 1762,
+    "awayEloPre": 1930
   },
   {
     "gameNumber": 43,
@@ -434,7 +514,9 @@ const games2022 = [
     "awayTeam": "Belgium",
     "awayScore": 0,
     "date": "2022-12-01",
-    "eloChange": 0
+    "eloChange": 0,
+    "homeEloPre": 1944,
+    "awayEloPre": 1947
   },
   {
     "gameNumber": 44,
@@ -443,7 +525,9 @@ const games2022 = [
     "awayTeam": "Morocco",
     "awayScore": 2,
     "date": "2022-12-01",
-    "eloChange": -20
+    "eloChange": -20,
+    "homeEloPre": 1731,
+    "awayEloPre": 1849
   },
   {
     "gameNumber": 45,
@@ -452,7 +536,9 @@ const games2022 = [
     "awayTeam": "Brazil",
     "awayScore": 0,
     "date": "2022-12-02",
-    "eloChange": 58
+    "eloChange": 58,
+    "homeEloPre": 1618,
+    "awayEloPre": 2195
   },
   {
     "gameNumber": 46,
@@ -461,7 +547,9 @@ const games2022 = [
     "awayTeam": "Switzerland",
     "awayScore": 3,
     "date": "2022-12-02",
-    "eloChange": -27
+    "eloChange": -27,
+    "homeEloPre": 1863,
+    "awayEloPre": 1900
   },
   {
     "gameNumber": 47,
@@ -470,7 +558,9 @@ const games2022 = [
     "awayTeam": "Portugal",
     "awayScore": 1,
     "date": "2022-12-02",
-    "eloChange": 51
+    "eloChange": 51,
+    "homeEloPre": 1750,
+    "awayEloPre": 2043
   },
   {
     "gameNumber": 48,
@@ -479,7 +569,9 @@ const games2022 = [
     "awayTeam": "Uruguay",
     "awayScore": 2,
     "date": "2022-12-02",
-    "eloChange": -15
+    "eloChange": -15,
+    "homeEloPre": 1608,
+    "awayEloPre": 1889
   },
   {
     "gameNumber": 49,
@@ -488,7 +580,9 @@ const games2022 = [
     "awayTeam": "USA",
     "awayScore": 1,
     "date": "2022-12-03",
-    "eloChange": 21
+    "eloChange": 21,
+    "homeEloPre": 2047,
+    "awayEloPre": 1838
   },
   {
     "gameNumber": 50,
@@ -497,7 +591,9 @@ const games2022 = [
     "awayTeam": "Australia",
     "awayScore": 1,
     "date": "2022-12-03",
-    "eloChange": 7
+    "eloChange": 8,
+    "homeEloPre": 2118,
+    "awayEloPre": 1780
   },
   {
     "gameNumber": 51,
@@ -506,7 +602,9 @@ const games2022 = [
     "awayTeam": "Poland",
     "awayScore": 1,
     "date": "2022-12-04",
-    "eloChange": 25
+    "eloChange": 25,
+    "homeEloPre": 1992,
+    "awayEloPre": 1826
   },
   {
     "gameNumber": 52,
@@ -515,7 +613,9 @@ const games2022 = [
     "awayTeam": "Senegal",
     "awayScore": 0,
     "date": "2022-12-04",
-    "eloChange": 26
+    "eloChange": 26,
+    "homeEloPre": 1968,
+    "awayEloPre": 1771
   },
   {
     "gameNumber": 53,
@@ -524,7 +624,9 @@ const games2022 = [
     "awayTeam": "Croatia",
     "awayScore": 1,
     "date": "2022-12-05",
-    "eloChange": null
+    "eloChange": 9,
+    "homeEloPre": 1842,
+    "awayEloPre": 1944
   },
   {
     "gameNumber": 54,
@@ -533,7 +635,9 @@ const games2022 = [
     "awayTeam": "South Korea",
     "awayScore": 1,
     "date": "2022-12-05",
-    "eloChange": 13
+    "eloChange": 13,
+    "homeEloPre": 2137,
+    "awayEloPre": 1801
   },
   {
     "gameNumber": 55,
@@ -542,7 +646,9 @@ const games2022 = [
     "awayTeam": "Spain",
     "awayScore": 0,
     "date": "2022-12-06",
-    "eloChange": null
+    "eloChange": 11,
+    "homeEloPre": 1869,
+    "awayEloPre": 2008
   },
   {
     "gameNumber": 56,
@@ -551,7 +657,9 @@ const games2022 = [
     "awayTeam": "Switzerland",
     "awayScore": 1,
     "date": "2022-12-06",
-    "eloChange": 49
+    "eloChange": 49,
+    "homeEloPre": 1992,
+    "awayEloPre": 1927
   },
   {
     "gameNumber": 57,
@@ -560,7 +668,9 @@ const games2022 = [
     "awayTeam": "Brazil",
     "awayScore": 1,
     "date": "2022-12-09",
-    "eloChange": null
+    "eloChange": 17,
+    "homeEloPre": 1935,
+    "awayEloPre": 2150
   },
   {
     "gameNumber": 58,
@@ -569,7 +679,9 @@ const games2022 = [
     "awayTeam": "Argentina",
     "awayScore": 2,
     "date": "2022-12-09",
-    "eloChange": null
+    "eloChange": 5,
+    "homeEloPre": 2068,
+    "awayEloPre": 2126
   },
   {
     "gameNumber": 59,
@@ -578,7 +690,9 @@ const games2022 = [
     "awayTeam": "Portugal",
     "awayScore": 0,
     "date": "2022-12-10",
-    "eloChange": 43
+    "eloChange": 43,
+    "homeEloPre": 1880,
+    "awayEloPre": 2041
   },
   {
     "gameNumber": 60,
@@ -587,7 +701,9 @@ const games2022 = [
     "awayTeam": "France",
     "awayScore": 2,
     "date": "2022-12-10",
-    "eloChange": -28
+    "eloChange": -28,
+    "homeEloPre": 1994,
+    "awayEloPre": 2017
   },
   {
     "gameNumber": 61,
@@ -596,7 +712,9 @@ const games2022 = [
     "awayTeam": "Croatia",
     "awayScore": 0,
     "date": "2022-12-13",
-    "eloChange": 29
+    "eloChange": 29,
+    "homeEloPre": 2121,
+    "awayEloPre": 1952
   },
   {
     "gameNumber": 62,
@@ -605,7 +723,9 @@ const games2022 = [
     "awayTeam": "Morocco",
     "awayScore": 0,
     "date": "2022-12-14",
-    "eloChange": 30
+    "eloChange": 30,
+    "homeEloPre": 2045,
+    "awayEloPre": 1923
   },
   {
     "gameNumber": 63,
@@ -614,7 +734,9 @@ const games2022 = [
     "awayTeam": "Morocco",
     "awayScore": 1,
     "date": "2022-12-17",
-    "eloChange": 28
+    "eloChange": 27,
+    "homeEloPre": 1923,
+    "awayEloPre": 1893
   },
   {
     "gameNumber": 64,
@@ -623,7 +745,9 @@ const games2022 = [
     "awayTeam": "France",
     "awayScore": 3,
     "date": "2022-12-18",
-    "eloChange": null
+    "eloChange": -6,
+    "homeEloPre": 2150,
+    "awayEloPre": 2075
   }
 ];
 // END:games2022
@@ -691,15 +815,31 @@ const teams = [
 ];
 // END:teams
 
+// BEGIN:teamElos2022
+const teamElos2022 = {"Qatar":1680,"Ecuador":1832,"England":1919,"Iran":1798,"Senegal":1684,"Netherlands":2040,"USA":1796,"Wales":1789,"Saudi Arabia":1636,"Argentina":2143,"Tunisia":1705,"Denmark":1971,"Mexico":1808,"Poland":1813,"France":2004,"Australia":1720,"Japan":1788,"Germany":1962,"Spain":2049,"Costa Rica":1743,"Croatia":1926,"Morocco":1764,"Belgium":2006,"Canada":1775,"Switzerland":1901,"Cameroon":1607,"South Korea":1786,"Uruguay":1935,"Portugal":2005,"Ghana":1564,"Brazil":2169,"Serbia":1899};
+// END:teamElos2022
+
 const GAMES = games2022;
 const YEAR = 2022;
+const TEAM_ELOS = teamElos2022;
 const CONFEDERATIONS = ["Europe", "Asia", "Africa", "South America", "North America", "Oceania"];
+// Gameset boundaries: [label, lastGameNumber]. 32-team format: 3 group-stage matchdays + knockout.
+const GAMESETS = [
+  ['Initial',  0],
+  ['MD1',     16],
+  ['MD2',     32],
+  ['MD3',     48],
+  ['16',      56],
+  ['8',       60],
+  ['4',       62],
+  ['Final',   64],
+];
 const tbody = document.getElementById('games');
 const thead = document.querySelector('#matches-view thead');
 </script>
 <script src="shared.js"></script>
 <script>
-render();
+// (init handled by shared.js)
 </script>
 
 </body>
