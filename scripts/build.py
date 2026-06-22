@@ -178,7 +178,7 @@ def build_nav(current_year):
     parts = []
     for y in YEARS:
         parts.append(f'<strong>{y}</strong>' if y == current_year else f'<a href="{y}.html">{y}</a>')
-    parts.append('<a href="index.html">Home</a>')
+    parts.append('<a href="../../index.html">Home</a>')
     return '<nav>' + ' | '.join(parts) + '</nav>'
 
 
@@ -234,7 +234,7 @@ def build_script_block(year, games_js, teams_js, team_elos_js, config):
     return '\n'.join(parts)
 
 
-def page_html(year, script_block):
+def page_html(year, script_block, shared_css, shared_js):
     nav = build_nav(year)
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -242,7 +242,9 @@ def page_html(year, script_block):
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>World Cup ELO - {year}</title>
-<link rel="stylesheet" href="shared.css">
+<style>
+{shared_css}
+</style>
 </head>
 <body>
 {nav}
@@ -284,9 +286,8 @@ def page_html(year, script_block):
 <script>
 {script_block}
 </script>
-<script src="shared.js"></script>
 <script>
-// (init handled by shared.js)
+{shared_js}
 </script>
 
 </body>
@@ -298,6 +299,9 @@ def main():
     if len(sys.argv) == 2 and sys.argv[1] in ("-h", "--help"):
         print(__doc__)
         sys.exit(0)
+
+    shared_css = (ROOT / "shared.css").read_text()
+    shared_js = (ROOT / "shared.js").read_text()
 
     teams = load("teams.json")
     team_names = {t["name"] for t in teams}
@@ -330,11 +334,12 @@ def main():
 
         config = PER_YEAR_CONFIG[year]
         script_block = build_script_block(year, games_js, teams_js, team_elos_js, config)
-        html = page_html(year, script_block)
+        html = page_html(year, script_block, shared_css, shared_js)
 
-        path = ROOT / f"{year}.html"
+        path = ROOT / "site" / "football" / "worldcup" / f"{year}.html"
+        path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(html)
-        print(f"Updated {year}.html")
+        print(f"Updated site/football/worldcup/{year}.html")
 
 
 if __name__ == "__main__":
