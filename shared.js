@@ -9,12 +9,22 @@
 //   tbody          — document.getElementById('games')
 //   thead          — document.querySelector('#matches-view thead')
 
+// Early guards — must run before confByTeam/flagByTeam are built from these globals.
+// Full structural validation (GAMESETS ordering, team-name coverage, etc.) runs at the
+// bottom of this file once all functions are defined.
+if (typeof teams === 'undefined') throw new Error('shared.js: page must define "teams" before loading this script');
+if (typeof GAMES === 'undefined') throw new Error('shared.js: page must define "GAMES" before loading this script');
+
 const confByTeam = {};
 for (const t of teams) confByTeam[t.name] = t.confederation;
 const flagByTeam = {};
 for (const t of teams) flagByTeam[t.name] = t.flag;
 
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
 
 function formatDate(dateStr) {
   if (!dateStr) return '';
@@ -39,10 +49,9 @@ function eloColor(value) {
   return `rgb(255, ${255 + ratio * 105}, ${255 + ratio * 105})`;
 }
 
-let currentView = 'elo';
-let currentColCount = 10;
-let openExpandRow = null;
-let openGameRow = null;
+// Date, #, spacer, homeElo, homeFlag, homeScore, sep, awayScore, awayFlag, awayElo
+const GAME_COL_COUNT = 10;
+const matchState = { view: 'elo', colCount: GAME_COL_COUNT, expandRow: null, gameRow: null };
 
 function gameColsHeader() {
   return (
@@ -58,9 +67,9 @@ function gameColsHeader() {
 function toggleCellHtml(colspan) {
   return `<th colspan="${colspan}" class="toggle-cell">` +
     `<div class="view-toggle">` +
-    `<button data-view="elo"${currentView === 'elo' ? ' class="active"' : ''}>ELO Shift</button>` +
-    `<button data-view="wld"${currentView === 'wld' ? ' class="active"' : ''}>W / L / D</button>` +
-    `<button data-view="stats"${currentView === 'stats' ? ' class="active"' : ''}>Stats</button>` +
+    `<button data-view="elo"${matchState.view === 'elo' ? ' class="active"' : ''}>ELO Shift</button>` +
+    `<button data-view="wld"${matchState.view === 'wld' ? ' class="active"' : ''}>W / D / L</button>` +
+    `<button data-view="stats"${matchState.view === 'stats' ? ' class="active"' : ''}>Stats</button>` +
     `</div></th>`;
 }
 
@@ -75,18 +84,62 @@ function gameRowCells(game) {
     `<td class="narrow">#${game.gameNumber}</td>` +
     `<td class="spacer"></td>` +
     `<td class="elo">${eloCell(game.homeEloPre, homeEloDelta)}</td>` +
-    `<td class="flag"><span class="icon" style="background-image:url('data/flags/${flagByTeam[game.homeTeam]}.svg')" title="${game.homeTeam}"></span></td>` +
+    `<td class="flag"><span class="icon" style="background-image:url('data/flags/${flagByTeam[game.homeTeam]}.svg')" title="${esc(game.homeTeam)}"></span></td>` +
     `<td class="narrow">${homeScore}</td>` +
     `<td class="score-sep">-</td>` +
     `<td class="narrow">${awayScore}</td>` +
-    `<td class="flag"><span class="icon" style="background-image:url('data/flags/${flagByTeam[game.awayTeam]}.svg')" title="${game.awayTeam}"></span></td>` +
+    `<td class="flag"><span class="icon" style="background-image:url('data/flags/${flagByTeam[game.awayTeam]}.svg')" title="${esc(game.awayTeam)}"></span></td>` +
     `<td class="elo">${eloCell(game.awayEloPre, awayEloDelta)}</td>`
   );
 }
 
+// eloChange sign convention (matches data schema): positive = home team gained ELO, negative = away team gained.
+// Every place that reads eloChange must apply this same sign: home += eloChange, away -= eloChange.
+function computeEloRowTotals(games, confederations) {
+  const totals = {};
+  for (const c of confederations) totals[c] = 0;
+  const rowTotals = [];
+  for (const game of games) {
+    if (typeof game.eloChange === 'number') {
+      const hc = confByTeam[game.homeTeam];
+      const ac = confByTeam[game.awayTeam];
+      if (hc) totals[hc] += game.eloChange;
+      if (ac) totals[ac] -= game.eloChange;
+    }
+    rowTotals.push({ ...totals });
+  }
+  return rowTotals;
+}
+
+function computeWldRowTotals(games, confederations) {
+  const totals = {};
+  for (const c of confederations) totals[c] = { w: 0, d: 0, l: 0 };
+  const rowTotals = [];
+  for (const game of games) {
+    const hs = game.homeScore;
+    const as_ = game.awayScore;
+    if (hs !== null && as_ !== null) {
+      const hc = confByTeam[game.homeTeam];
+      const ac = confByTeam[game.awayTeam];
+      if (hs > as_) {
+        if (hc) totals[hc].w++;
+        if (ac) totals[ac].l++;
+      } else if (as_ > hs) {
+        if (ac) totals[ac].w++;
+        if (hc) totals[hc].l++;
+      } else {
+        if (hc) totals[hc].d++;
+        if (ac) totals[ac].d++;
+      }
+    }
+    rowTotals.push(Object.fromEntries(confederations.map(c => [c, { ...totals[c] }])));
+  }
+  return rowTotals;
+}
+
 function wireToggle() {
   thead.querySelectorAll('.view-toggle button').forEach(btn => {
-    btn.addEventListener('click', () => { currentView = btn.dataset.view; render(); });
+    btn.addEventListener('click', () => { matchState.view = btn.dataset.view; render(); });
   });
 }
 
@@ -102,8 +155,8 @@ function render() {
   const confederations = CONFEDERATIONS.filter(c => participating.has(c));
 
   tbody.innerHTML = '';
-  openExpandRow = null;
-  openGameRow = null;
+  matchState.expandRow = null;
+  matchState.gameRow = null;
 
   if (games.length === 0) {
     thead.innerHTML = `<tr><th>No games</th></tr><tr></tr>`;
@@ -111,40 +164,22 @@ function render() {
     return;
   }
 
-  const eloTotals = {};
-  for (const c of confederations) eloTotals[c] = 0;
-  for (const game of games) {
-    if (typeof game.eloChange === 'number') {
-      const hc = confByTeam[game.homeTeam];
-      const ac = confByTeam[game.awayTeam];
-      if (hc) eloTotals[hc] += game.eloChange;
-      if (ac) eloTotals[ac] -= game.eloChange;
-    }
-  }
-  const ordered = [...confederations].sort((a, b) => eloTotals[b] - eloTotals[a]);
+  // Build row-by-row ELO running totals once; derive column ordering from the last row.
+  // Passing rowTotals into renderElo avoids a second identical walk over all games.
+  const eloRowTotals = computeEloRowTotals(games, confederations);
+  const finalTotals = eloRowTotals[eloRowTotals.length - 1];
+  const ordered = [...confederations].sort((a, b) => (finalTotals[b] || 0) - (finalTotals[a] || 0));
 
-  if (currentView === 'elo') renderElo(games, ordered);
-  else if (currentView === 'wld') renderWld(games, ordered);
+  if (matchState.view === 'elo') renderElo(games, ordered, eloRowTotals);
+  else if (matchState.view === 'wld') renderWld(games, ordered);
   else renderStats(games, ordered);
 
   wireToggle();
 }
 
-function renderElo(games, ordered) {
-  const totals = {};
-  for (const c of ordered) totals[c] = 0;
-  const rowTotals = [];
-  for (const game of games) {
-    if (typeof game.eloChange === 'number') {
-      const hc = confByTeam[game.homeTeam];
-      const ac = confByTeam[game.awayTeam];
-      if (hc) totals[hc] += game.eloChange;
-      if (ac) totals[ac] -= game.eloChange;
-    }
-    rowTotals.push({ ...totals });
-  }
+function renderElo(games, ordered, rowTotals) {
   const N = ordered.length;
-  currentColCount = 10 + N;
+  matchState.colCount = GAME_COL_COUNT + N;
 
   thead.innerHTML =
     `<tr>${gameColsHeader()}${toggleCellHtml(N)}</tr>` +
@@ -164,32 +199,9 @@ function renderElo(games, ordered) {
 }
 
 function renderWld(games, ordered) {
-  const totals = {};
-  for (const c of ordered) totals[c] = { w: 0, l: 0, d: 0 };
-  const rowTotals = [];
-  for (const game of games) {
-    const hs = game.homeScore;
-    const as_ = game.awayScore;
-    if (hs !== null && as_ !== null) {
-      const hc = confByTeam[game.homeTeam];
-      const ac = confByTeam[game.awayTeam];
-      if (hs > as_) {
-        if (hc) totals[hc].w++;
-        if (ac) totals[ac].l++;
-      } else if (as_ > hs) {
-        if (ac) totals[ac].w++;
-        if (hc) totals[hc].l++;
-      } else {
-        if (hc) totals[hc].d++;
-        if (ac) totals[ac].d++;
-      }
-    }
-    const snap = {};
-    for (const c of ordered) snap[c] = { ...totals[c] };
-    rowTotals.push(snap);
-  }
+  const rowTotals = computeWldRowTotals(games, ordered);
   const N = ordered.length;
-  currentColCount = 10 + N;
+  matchState.colCount = GAME_COL_COUNT + N;
 
   thead.innerHTML =
     `<tr>${gameColsHeader()}${toggleCellHtml(N)}</tr>` +
@@ -211,14 +223,24 @@ function renderWld(games, ordered) {
 
 function renderStats(games, ordered) {
   const N = ordered.length;
-  currentColCount = 10 + N;
-  const extra = Math.max(0, N - 3);
+  matchState.colCount = GAME_COL_COUNT + N;
+
+  // Stat column definitions — trimmed to N if fewer than 3 confederations.
+  const statDefs = [
+    { label: 'Wins',  key: 'wins' },
+    { label: 'Draws', key: 'draws' },
+    { label: 'Win%',  key: 'pct'  },
+  ].slice(0, N);
+  const nStats = statDefs.length;
+  const extra = N - nStats; // padding columns to reach N total
+
   const emptyTh = Array(extra).fill('<th class="conf"></th>').join('');
   thead.innerHTML =
     `<tr>${gameColsHeader()}${toggleCellHtml(N)}</tr>` +
-    `<tr><th class="conf">Wins</th><th class="conf">Draws</th><th class="conf">Win%</th>${emptyTh}</tr>`;
+    `<tr>${statDefs.map(d => `<th class="conf">${d.label}</th>`).join('')}${emptyTh}</tr>`;
 
   const emptyTd = Array(N).fill('<td class="num conf"></td>').join('');
+  const extraTd = Array(extra).fill('<td class="num conf"></td>').join('');
   let wins = 0, draws = 0;
   games.forEach(game => {
     const hs = game.homeScore;
@@ -230,9 +252,9 @@ function renderStats(games, ordered) {
       else draws++;
       const total = wins + draws;
       const pct = Math.round(wins / total * 100) + '%';
-      const extraTd = Array(extra).fill('<td class="num conf"></td>').join('');
+      const vals = { wins, draws, pct };
       tr.innerHTML = gameRowCells(game) +
-        `<td class="num conf">${wins}</td><td class="num conf">${draws}</td><td class="num conf">${pct}</td>${extraTd}`;
+        statDefs.map(d => `<td class="num conf">${vals[d.key]}</td>`).join('') + extraTd;
     } else {
       tr.innerHTML = gameRowCells(game) + emptyTd;
     }
@@ -242,13 +264,13 @@ function renderStats(games, ordered) {
 }
 
 function toggleExpand(game, tr) {
-  const colCount = currentColCount;
-  if (openExpandRow) {
-    openExpandRow.remove();
-    openExpandRow = null;
-    if (openGameRow === tr) { openGameRow = null; return; }
+  const colCount = matchState.colCount;
+  if (matchState.expandRow) {
+    matchState.expandRow.remove();
+    matchState.expandRow = null;
+    if (matchState.gameRow === tr) { matchState.gameRow = null; return; }
   }
-  openGameRow = tr;
+  matchState.gameRow = tr;
   const expandTr = document.createElement('tr');
   expandTr.className = 'expand-row';
   const td = document.createElement('td');
@@ -261,7 +283,7 @@ function toggleExpand(game, tr) {
   const isDraw = hsVal !== '' && asVal !== '' && hsVal === asVal;
 
   td.innerHTML = `
-    <div class="ur-line"><strong>#${game.gameNumber}: ${game.homeTeam} vs ${game.awayTeam}</strong></div>
+    <div class="ur-line"><strong>#${game.gameNumber}: ${esc(game.homeTeam)} vs ${esc(game.awayTeam)}</strong></div>
     <div class="ur-line">
       <label>Home score: <input class="ur-hs" type="number" min="0" value="${hsVal}"></label>
       <label>Away score: <input class="ur-as" type="number" min="0" value="${asVal}"></label>
@@ -269,8 +291,8 @@ function toggleExpand(game, tr) {
       <label class="ur-gains-wrap" style="display:${isDraw ? 'flex' : 'none'}">Who gains ELO:
         <select class="ur-gains">
           <option value="" ${gainsVal === '' ? 'selected' : ''}>—</option>
-          <option value="home" ${gainsVal === 'home' ? 'selected' : ''}>${game.homeTeam}</option>
-          <option value="away" ${gainsVal === 'away' ? 'selected' : ''}>${game.awayTeam}</option>
+          <option value="home" ${gainsVal === 'home' ? 'selected' : ''}>${esc(game.homeTeam)}</option>
+          <option value="away" ${gainsVal === 'away' ? 'selected' : ''}>${esc(game.awayTeam)}</option>
         </select>
       </label>
     </div>
@@ -310,7 +332,7 @@ function toggleExpand(game, tr) {
 
   expandTr.appendChild(td);
   tr.after(expandTr);
-  openExpandRow = expandTr;
+  matchState.expandRow = expandTr;
 }
 
 // ── Rankings view ──────────────────────────────────────────────────────────
@@ -341,45 +363,56 @@ function buildEloSnapshots() {
     eliminatedAfter[team] = lastSeen;
   }
 
+  // ELO snapshots are derived from the pre-game ELOs written by build.py:
+  //   post-game ELO for home team = homeEloPre + eloChange
+  //   post-game ELO for away team = awayEloPre - eloChange
+  // This makes the JS a reader of build.py's output rather than a parallel
+  // reimplementation of the same chain, eliminating any risk of the two diverging.
+  // Builds post-gameset ELO state by reading pre-game ELOs written by build.py.
+  function applyGames(base, fromGn, toGn) {
+    const next = { ...base };
+    for (let gn = fromGn; gn <= toGn; gn++) {
+      const g = gamesByNumber[gn];
+      if (!g) continue;
+      if (typeof g.eloChange === 'number') {
+        if (g.homeEloPre !== null) next[g.homeTeam] = g.homeEloPre + g.eloChange;
+        if (g.awayEloPre !== null) next[g.awayTeam] = g.awayEloPre - g.eloChange;
+      }
+    }
+    return next;
+  }
+
   const snapshots = [];
-  let current = { ...TEAM_ELOS };
+  // `baseline` is the ELO state after all completed gamesets; it carries forward
+  // to teams that don't play in a given gameset.
+  let baseline = { ...TEAM_ELOS };
   let liveFound = false;
 
   for (let i = 0; i < GAMESETS.length; i++) {
     if (i === 0) {
-      snapshots.push({ label: 'Initial', complete: true, live: false, eloByTeam: { ...current } });
+      snapshots.push({ label: 'Initial', complete: true, live: false, eloByTeam: { ...baseline } });
       continue;
     }
     const prevLast = GAMESETS[i - 1][1];
     const lastGame = GAMESETS[i][1];
+
     let allDone = true;
     for (let gn = prevLast + 1; gn <= lastGame; gn++) {
       const g = gamesByNumber[gn];
-      if (!g || g.eloChange === null) { allDone = false; break; }
+      if (!g) { console.warn(`shared.js: game #${gn} missing from data — treating gameset "${GAMESETS[i][0]}" as incomplete`); allDone = false; break; }
+      if (g.eloChange === null) { allDone = false; break; }
     }
+
     if (allDone) {
-      for (let gn = prevLast + 1; gn <= lastGame; gn++) {
-        const g = gamesByNumber[gn];
-        if (g && typeof g.eloChange === 'number') {
-          if (g.homeTeam in current) current[g.homeTeam] += g.eloChange;
-          if (g.awayTeam in current) current[g.awayTeam] -= g.eloChange;
-        }
-      }
-      snapshots.push({ label: GAMESETS[i][0], complete: true, live: false, eloByTeam: { ...current } });
+      baseline = applyGames(baseline, prevLast + 1, lastGame);
+      snapshots.push({ label: GAMESETS[i][0], complete: true, live: false, eloByTeam: { ...baseline } });
     } else if (!liveFound) {
       liveFound = true;
-      const liveElo = { ...current };
+      const liveElo = applyGames(baseline, prevLast + 1, lastGame);
       const pendingTeams = new Set();
       for (let gn = prevLast + 1; gn <= lastGame; gn++) {
         const g = gamesByNumber[gn];
-        if (!g) continue;
-        if (g.eloChange !== null) {
-          if (g.homeTeam in liveElo) liveElo[g.homeTeam] += g.eloChange;
-          if (g.awayTeam in liveElo) liveElo[g.awayTeam] -= g.eloChange;
-        } else {
-          pendingTeams.add(g.homeTeam);
-          pendingTeams.add(g.awayTeam);
-        }
+        if (g && g.eloChange === null) { pendingTeams.add(g.homeTeam); pendingTeams.add(g.awayTeam); }
       }
       snapshots.push({ label: GAMESETS[i][0], complete: false, live: true, eloByTeam: liveElo, pendingTeams });
     } else {
@@ -459,12 +492,10 @@ function computeTickStep(rawMin, rawMax, height) {
   );
 }
 
-let currentRankView = 'rank';
-let showEliminated = false;
-let trueRank = false;
+const rankState = { view: 'rank', showElim: false, trueRank: false, model: null };
 
 function setRankView(v) {
-  currentRankView = v;
+  rankState.view = v;
   document.getElementById('tab-rank').classList.toggle('active', v === 'rank');
   document.getElementById('tab-scale').classList.toggle('active', v === 'scale');
   updateRankingControls();
@@ -472,9 +503,9 @@ function setRankView(v) {
 }
 
 function toggleShowEliminated() {
-  showEliminated = document.getElementById('chk-show-elim').checked;
-  if (showEliminated) {
-    trueRank = true;
+  rankState.showElim = document.getElementById('chk-show-elim').checked;
+  if (rankState.showElim) {
+    rankState.trueRank = true;
     const chk = document.getElementById('chk-true-rank');
     if (chk) chk.checked = true;
   }
@@ -483,7 +514,7 @@ function toggleShowEliminated() {
 }
 
 function toggleTrueRank() {
-  trueRank = document.getElementById('chk-true-rank').checked;
+  rankState.trueRank = document.getElementById('chk-true-rank').checked;
   renderRankings();
 }
 
@@ -491,46 +522,72 @@ function updateRankingControls() {
   const trueRankLabel = document.getElementById('true-rank-label');
   const trueRankChk = document.getElementById('chk-true-rank');
   if (!trueRankLabel || !trueRankChk) return;
-  const isRank = currentRankView === 'rank';
+  const isRank = rankState.view === 'rank';
   trueRankLabel.style.display = isRank ? '' : 'none';
 }
 
-function renderRankings() {
+// rankState.model is cached for the page lifetime — data is static (embedded at build time), so no invalidation needed.
+
+function buildRankingsModel() {
   const { snapshots, eliminatedAfter } = buildEloSnapshots();
 
-  const _gnMap = {};
-  for (const g of GAMES) _gnMap[g.gameNumber] = g;
+  const gnMap = {};
+  for (const g of GAMES) gnMap[g.gameNumber] = g;
   const gamesByTeamInSnap = snapshots.map((snap, si) => {
     if (si === 0) return {};
     const prevLast = GAMESETS[si - 1][1];
     const lastGame = GAMESETS[si][1];
     const map = {};
     for (let gn = prevLast + 1; gn <= lastGame; gn++) {
-      const g = _gnMap[gn];
+      const g = gnMap[gn];
       if (g) { map[g.homeTeam] = g; map[g.awayTeam] = g; }
     }
     return map;
   });
 
-  const _MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  function fmtDate(iso) {
-    if (!iso) return '';
-    const [, m, d] = iso.split('-');
-    return `${_MONTHS[+m - 1]} ${+d}`;
+  const ranked = [];
+  let prevRank = null;
+  for (const snap of snapshots) {
+    if (snap.complete || snap.live) {
+      const order = rankTeams(snap.eloByTeam, prevRank);
+      ranked.push(order);
+      prevRank = order;
+    } else {
+      ranked.push(prevRank);
+    }
   }
+
+  let rawMin = Infinity, rawMax = -Infinity;
+  for (const snap of snapshots) {
+    if (snap.eloByTeam) {
+      for (const elo of Object.values(snap.eloByTeam)) {
+        if (elo < rawMin) rawMin = elo;
+        if (elo > rawMax) rawMax = elo;
+      }
+    }
+  }
+
+  const { height: scaleH, hasError: scaleHasError } = computeScaleHeight(snapshots, ranked, rawMin, rawMax);
+
+  return { snapshots, eliminatedAfter, gamesByTeamInSnap, ranked, rawMin, rawMax, scaleH, scaleHasError };
+}
+
+function renderRankings() {
+  if (!rankState.model) rankState.model = buildRankingsModel();
+  const { snapshots, eliminatedAfter, gamesByTeamInSnap, ranked, rawMin, rawMax, scaleH, scaleHasError } = rankState.model;
 
   function buildTipHtml(team, elo, si) {
     const flag = flagByTeam[team] || '';
     const flagStyle = flag ? `background-image:url('data/flags/${flag}.svg')` : '';
     let html = `<div class="tip-flag" style="${flagStyle}"></div>`;
-    html += `<div class="tip-name">${team}</div>`;
+    html += `<div class="tip-name">${esc(team)}</div>`;
     html += `<div class="tip-elo-val">${elo !== null ? Math.round(elo) : '—'}</div>`;
     html += `<hr class="tip-sep">`;
     const g = si > 0 ? gamesByTeamInSnap[si][team] : null;
     const isHome = g && g.homeTeam === team;
     const opponent = g ? (isHome ? g.awayTeam : g.homeTeam) : null;
-    html += `<div class="tip-label">Date</div><div class="tip-val">${g && g.date ? fmtDate(g.date) : '—'}</div>`;
-    html += `<div class="tip-label">Opponent</div><div class="tip-val">${opponent ? opponent : '—'}</div>`;
+    html += `<div class="tip-label">Date</div><div class="tip-val">${g && g.date ? formatDate(g.date) : '—'}</div>`;
+    html += `<div class="tip-label">Opponent</div><div class="tip-val">${opponent ? esc(opponent) : '—'}</div>`;
     if (g && typeof g.eloChange === 'number') {
       const score = isHome ? `${g.homeScore}–${g.awayScore}` : `${g.awayScore}–${g.homeScore}`;
       const delta = isHome ? g.eloChange : -g.eloChange;
@@ -545,36 +602,31 @@ function renderRankings() {
     return html;
   }
 
-  const ranked = [];
-  let prevRank = null;
-  for (const snap of snapshots) {
-    if (snap.complete || snap.live) {
-      const order = rankTeams(snap.eloByTeam, prevRank);
-      ranked.push(order);
-      prevRank = order;
-    } else {
-      ranked.push(prevRank);
-    }
-  }
-
   const numTeams = ranked[0].length;
-  const isScale = currentRankView === 'scale';
+  const isScale = rankState.view === 'scale';
 
-  let rawMin, rawMax, scaleH, scaleHasError;
-  if (isScale) {
-    rawMin = Infinity; rawMax = -Infinity;
-    for (const snap of snapshots) {
-      if (snap.eloByTeam) {
-        for (const elo of Object.values(snap.eloByTeam)) {
-          if (elo < rawMin) rawMin = elo;
-          if (elo > rawMax) rawMax = elo;
-        }
+  // In compact rank mode (trueRank=off, showElim=off), the axis height is the
+  // maximum number of visible teams in any single column. Group-stage columns
+  // always show all teams, so for normal tournaments this equals numTeams.
+  // Using an explicit max makes the code correct even if TEAM_ELOS ever
+  // includes teams that appear in no game (they'd be in ranked[0] but never
+  // assigned to a gameset, inflating numTeams beyond what the axis needs).
+  const rankSlots = (() => {
+    if (isScale || rankState.showElim || rankState.trueRank) return numTeams;
+    let max = 0;
+    snapshots.forEach((snap, si) => {
+      if (!(snap.complete || snap.live) || !ranked[si]) return;
+      let count = 0;
+      for (const team of ranked[si]) {
+        const elim = eliminatedAfter[team] > 0 && si > eliminatedAfter[team];
+        if (!elim) count++;
       }
-    }
-    ({ height: scaleH, hasError: scaleHasError } = computeScaleHeight(snapshots, ranked, rawMin, rawMax));
-  }
+      if (count > max) max = count;
+    });
+    return max || numTeams;
+  })();
 
-  const bodyH = isScale ? scaleH : numTeams * RANK_ROW_H;
+  const bodyH = isScale ? scaleH : rankSlots * RANK_ROW_H;
 
   const header = document.getElementById('rankings-header');
   const body = document.getElementById('rankings-body');
@@ -608,14 +660,14 @@ function renderRankings() {
       axisCol.appendChild(lbl);
     }
   } else {
-    for (let i = 0; i < numTeams; i++) {
+    for (let i = 0; i < rankSlots; i++) {
       const lbl = document.createElement('div');
       lbl.className = 'axis-label';
       lbl.style.top = (i * RANK_ROW_H + RANK_ROW_H / 2) + 'px';
       lbl.textContent = i + 1;
       axisCol.appendChild(lbl);
     }
-    for (let n = 4; n < numTeams; n += 4) {
+    for (let n = 4; n < rankSlots; n += 4) {
       gridLineYs.push(n * RANK_ROW_H);
     }
   }
@@ -631,6 +683,7 @@ function renderRankings() {
   addGridLines(axisCol);
   body.appendChild(axisCol);
 
+  const debugClustersCb = document.getElementById('debug-clusters');
   snapshots.forEach((snap, si) => {
     const col = document.createElement('div');
     col.className = 'snap-body-col';
@@ -643,7 +696,7 @@ function renderRankings() {
         const elo = snap.eloByTeam ? snap.eloByTeam[team] : null;
         const flag = flagByTeam[team] || '';
         const elim = eliminatedAfter[team] > 0 && si > eliminatedAfter[team];
-        const hidden = !showEliminated && elim;
+        const hidden = !rankState.showElim && elim;
         const pending = snap.live && snap.pendingTeams && snap.pendingTeams.has(team);
 
         if (hidden) return;
@@ -652,7 +705,7 @@ function renderRankings() {
         let topPx;
         if (isScale) {
           topPx = scaleTopPx(elo, rawMin, rawMax, scaleH);
-        } else if (!trueRank) {
+        } else if (!rankState.trueRank) {
           topPx = compactSlot * RANK_ROW_H + (RANK_ROW_H - FLAG_PX_H) / 2;
         } else {
           topPx = rankIdx * RANK_ROW_H + (RANK_ROW_H - FLAG_PX_H) / 2;
@@ -716,7 +769,7 @@ function renderRankings() {
         }
       }
 
-      const debugCb = document.getElementById('debug-clusters');
+      const debugCb = debugClustersCb;
       if (isScale && debugCb && debugCb.checked && pinData.length) {
         const atOneLess = pinData
           .map(p => ({ el: p.el, topPx: scaleTopPx(snap.eloByTeam[p.el.dataset.team], rawMin, rawMax, scaleH - 1) }))
@@ -750,7 +803,11 @@ function renderRankings() {
     body.appendChild(col);
   });
 
-  // Hover highlight + info panel
+}
+
+// ── Rankings hover & info panel ───────────────────────────────────────────
+
+function initRankingsHover() {
   const container = document.getElementById('rankings-cols');
   const infoPanel = document.getElementById('rank-info');
   let activeTeam = null;
@@ -759,7 +816,7 @@ function renderRankings() {
 
   const updateInfoPosition = () => {
     const gridRect = container.getBoundingClientRect();
-    const panelW = 150;
+    const panelW = infoPanel.offsetWidth;
     const x = Math.max(8, gridRect.left - panelW);
     const panelH = infoPanel.offsetHeight;
     const y = Math.max(8, (window.innerHeight - panelH) / 2);
@@ -797,7 +854,7 @@ function renderRankings() {
     if (!resetTimer) resetTimer = setTimeout(() => { resetTimer = null; applyReset(); hideInfo(); }, 300);
   };
 
-  container.onmouseover = e => {
+  container.addEventListener('mouseover', e => {
     const pin = e.target.closest('[data-team]');
     if (!pin) { scheduleReset(); return; }
     const team = pin.dataset.team;
@@ -806,9 +863,9 @@ function renderRankings() {
     if (team === activeTeam) return;
     clearTimeout(activateTimer);
     activateTimer = setTimeout(() => { activateTimer = null; applyHighlight(team); }, 200);
-  };
+  });
 
-  container.onmouseleave = scheduleReset;
+  container.addEventListener('mouseleave', scheduleReset);
 }
 
 // ── Page view (Match List ↔ Rankings) ────────────────────────────────────
@@ -828,5 +885,52 @@ function setPageView(view) {
   if (location.hash.slice(1) !== view) history.replaceState(null, '', '#' + view);
 }
 
+function validateContract() {
+  const required = { teams, GAMES, YEAR, TEAM_ELOS, GAMESETS, CONFEDERATIONS, tbody, thead };
+  for (const [k, v] of Object.entries(required)) {
+    if (typeof v === 'undefined') throw new Error(`shared.js: page must define "${k}" before loading this script`);
+  }
+  if (!(tbody instanceof Element)) throw new Error('shared.js: "tbody" must be a DOM element — check that id="games" exists in the page');
+  if (!(thead instanceof Element)) throw new Error('shared.js: "thead" must be a DOM element — check that #matches-view thead exists in the page');
+  if (!Array.isArray(GAMESETS) || GAMESETS.length < 1 || GAMESETS[0][1] !== 0) {
+    throw new Error('GAMESETS must be an array whose first entry has lastGameNumber = 0 (the pre-tournament snapshot)');
+  }
+  for (let i = 1; i < GAMESETS.length; i++) {
+    if (GAMESETS[i][1] <= GAMESETS[i - 1][1]) {
+      throw new Error(`GAMESETS[${i}] lastGameNumber (${GAMESETS[i][1]}) must be greater than GAMESETS[${i-1}] (${GAMESETS[i-1][1]})`);
+    }
+  }
+  if (!Array.isArray(CONFEDERATIONS) || CONFEDERATIONS.length === 0) {
+    throw new Error('CONFEDERATIONS must be a non-empty array');
+  }
+  const teamNames = new Set(teams.map(t => t.name));
+  for (const g of GAMES) {
+    if (!teamNames.has(g.homeTeam)) console.warn(`shared.js: game #${g.gameNumber} homeTeam "${g.homeTeam}" not found in teams — flag and confederation will be missing`);
+    if (!teamNames.has(g.awayTeam)) console.warn(`shared.js: game #${g.gameNumber} awayTeam "${g.awayTeam}" not found in teams — flag and confederation will be missing`);
+  }
+  // Spot-check ELO chain sync: each team's first game pre-ELO must equal TEAM_ELOS,
+  // since build.py seeds the chain from there. Catches hand-edits to teamElos that
+  // weren't followed by a build.py run, and the most common class of chain bugs.
+  if (Object.keys(TEAM_ELOS).length > 0) {
+    const firstGameSeen = new Set();
+    for (const g of GAMES) {
+      if (!firstGameSeen.has(g.homeTeam) && g.homeTeam in TEAM_ELOS) {
+        if (g.homeEloPre !== null && g.homeEloPre !== TEAM_ELOS[g.homeTeam]) {
+          throw new Error(`shared.js: homeEloPre mismatch for "${g.homeTeam}" in game #${g.gameNumber}: embedded ${g.homeEloPre} ≠ TEAM_ELOS ${TEAM_ELOS[g.homeTeam]} — run scripts/build.py to resync`);
+        }
+        firstGameSeen.add(g.homeTeam);
+      }
+      if (!firstGameSeen.has(g.awayTeam) && g.awayTeam in TEAM_ELOS) {
+        if (g.awayEloPre !== null && g.awayEloPre !== TEAM_ELOS[g.awayTeam]) {
+          throw new Error(`shared.js: awayEloPre mismatch for "${g.awayTeam}" in game #${g.gameNumber}: embedded ${g.awayEloPre} ≠ TEAM_ELOS ${TEAM_ELOS[g.awayTeam]} — run scripts/build.py to resync`);
+        }
+        firstGameSeen.add(g.awayTeam);
+      }
+    }
+  }
+}
+validateContract();
+
 window.addEventListener('hashchange', () => setPageView(location.hash.slice(1)));
 setPageView(location.hash.slice(1) || 'matches');
+initRankingsHover();

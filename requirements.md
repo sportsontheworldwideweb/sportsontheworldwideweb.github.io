@@ -14,17 +14,17 @@ ELO ratings and match results come from [eloratings.net](https://www.eloratings.
 
 ## Match List
 
-#### Pages & navigation
+### Pages & navigation
 
 - Each World Cup (2018, 2022, 2026) has its own page with its own URL (`2018.html`, `2022.html`, `2026.html`), so it can be linked/bookmarked directly.
 - `index.html` is a minimal landing page with a short summary and links to each World Cup's page.
 - Each World Cup page has simple navigation to switch between the three World Cup pages and back to the landing page.
 
-#### Match list
+### Match list
 
 The table has two groups of columns: **Game columns** and **Confederation columns**.
 
-##### Game columns
+#### Game columns
 
 - For the selected World Cup, list all games in chronological order.
 - The game columns use a single header row: Date and # have their own header cells; Home and Away are super-headers spanning their respective columns; no sub-header row with individual column labels is shown.
@@ -40,7 +40,7 @@ The table has two groups of columns: **Game columns** and **Confederation column
 - The table header row stays fixed/visible at the top of the viewport when scrolling down the match list.
 - Each column is sized to fit its content — no fixed widths are set. If the table is wider than the viewport, it scrolls horizontally.
 
-##### Row click — data entry panel
+#### Row click — data entry panel
 
 Each game row in the match list is clickable. Clicking a row expands an inline panel directly below that row (spanning the full table width). The panel has four lines:
 
@@ -50,7 +50,7 @@ Each game row in the match list is clickable. Clicking a row expands an inline p
 
 All inputs are pre-filled with the game's existing values if already set. The "Who gains" selector is pre-selected based on the sign of the existing `eloChange`. Clicking the same row again (or clicking a different row) collapses the open panel. Only one panel is open at a time. There is no separate bottom-of-page widget.
 
-##### Confederation panel (right side, toggleable)
+#### Confederation panel (right side, toggleable)
 
 The right side of the table is a panel of confederation columns that can be toggled between three views. The toggle is a segmented button control sitting above the panel in the header area, visually associated with the right panel only. Switching views must not cause the game columns on the left to shift or resize — the game section width is fixed regardless of which view is active. The transition between views is a simple instant swap (no animation required).
 
@@ -90,7 +90,7 @@ A standalone view — only one page view is visible at a time. The World Cup pag
 
 Each view has its own URL via the hash fragment: `2026.html#matches` for the Match List and `2026.html#rankings` for the Rankings view. Switching views updates the hash; loading the page with a hash pre-selects that view. The default (no hash) is Match List.
 
-#### Gamesets
+### Gamesets
 
 A **gameset** is a batch of games in which each active team plays at most once — it is one "turn" for every team still in the tournament. Gamesets are defined per tournament by a fixed list of game-count boundaries, applied in chronological order. They are not stored in the game data — the boundaries are hardcoded per tournament and applied at render time. A gameset is complete when every team that has a game in its range has a recorded result; teams with no game in the range (already eliminated, or byes) do not count toward completion.
 
@@ -127,11 +127,11 @@ All 8 gameset columns are always shown for 2018 and 2022.
 
 All 9 gameset columns are always shown for 2026. The Rankings view has a segmented toggle that switches between **Rank** and **Scale** views of the same gameset data. The toggle sits above the ranking area. Switching between Rank and Scale must not shift the gameset column positions — the horizontal layout is identical in both views.
 
-#### Ranking and ties
+### Ranking and ties
 
 Teams are ranked by ELO descending within each gameset snapshot. Ties are broken by **stable sort**: if two teams have equal ELO, the one ranked higher in the previous snapshot remains ranked higher.
 
-#### Live gameset
+### Live gameset
 
 At any point in the tournament there is exactly one **live gameset column**: the in-progress gameset if any games in its range have been played but it is not yet complete, or the next gameset if the most recent gameset just completed and the next hasn't started.
 
@@ -145,13 +145,13 @@ Teams that have a game scheduled in the live gameset's range but no result recor
 
 Only the live gameset column uses this treatment. Completed gameset columns always show final ELOs with no "hasn't played" styling. Future gameset columns (beyond the live one) show nothing.
 
-#### Eliminated teams
+### Eliminated teams
 
 A team is considered **eliminated** as of the gameset after their last appearance in a game. Specifically: if a team played in gameset N but does not appear in any game in gameset N+1 or later, they are eliminated after gameset N. (For the group stage this naturally captures teams that don't qualify for the Round of 32; for knockout rounds it captures teams that lost.)
 
 Eliminated teams are hidden by default in knockout columns (see *Show eliminated toggle* below). When shown, their flag is rendered in greyscale to visually distinguish them from active teams.
 
-#### Show eliminated toggle
+### Show eliminated toggle
 
 A toggle labelled **"Show eliminated"** is available in both the Rank view and the Scale view. By default (off), eliminated teams are hidden in knockout columns. When on, all teams are always shown.
 
@@ -159,7 +159,7 @@ A toggle labelled **"Show eliminated"** is available in both the Rank view and t
 - **Knockout round columns** (gamesets from Round of 32 onward): when the toggle is off (default), eliminated teams' flags are hidden in any column where they are not participating. A team is considered eliminated for a given column if they have no game in that gameset and no game in any later gameset.
 - **Layout is unchanged**: the column structure, ELO axis, column widths, and spacing are identical regardless of the toggle state. Only the flag elements are hidden — no reflow, no gaps closing.
 
-#### True rank toggle (Rank view only)
+### True rank toggle (Rank view only)
 
 A toggle labelled **"True rank"** is available in the Rank view only. It is not shown at all in the Scale view, since the concept doesn't apply there.
 
@@ -168,7 +168,7 @@ A toggle labelled **"True rank"** is available in the Rank view only. It is not 
 
 Checking **"Show eliminated"** automatically checks "True rank" as well, since showing all teams in their packed positions would be misleading — the true rank slots are needed to make the eliminated flags readable. The user can uncheck "True rank" independently after.
 
-#### Rankings shared layout
+### Rankings shared layout
 
 Both Rank and Scale views share the same canvas structure: one vertical column per gameset, all columns equal width, with a leftmost axis column. Toggling between views causes no horizontal shift.
 
@@ -177,7 +177,7 @@ Both Rank and Scale views share the same canvas structure: one vertical column p
 
 ---
 
-#### Flag info panel
+### Flag info panel
 
 Hovering any flag in the Rankings view populates a fixed side panel that sits to the left of the rankings grid, vertically centered on the viewport. The panel never overlaps the grid or its flags.
 
@@ -203,7 +203,7 @@ When there is no game in the column (Initial snapshot, or a team with no game sc
 
 ---
 
-#### Flag hover highlight
+### Flag hover highlight
 
 When the user hovers over any flag in the Rankings view, all flags belonging to **other** teams are dimmed (reduced opacity). The hovered team's flags across all gameset columns remain at full opacity, making it easy to trace a single team's ELO evolution across the tournament. The hovered team's flags are also brought to the front (highest z-index) so they are never obscured by overlapping flags.
 
@@ -214,7 +214,7 @@ The highlight uses debounced activation and deactivation to avoid flicker:
 
 ---
 
-#### Rank view
+### Rank view
 
 Flags are **evenly spaced** — each rank position occupies the same vertical height regardless of ELO magnitude. This is a positional ranking, not a proportional one.
 
@@ -224,7 +224,7 @@ A dotted horizontal line is drawn between every 4th and 5th rank (i.e. after ran
 
 ---
 
-#### Scale view
+### Scale view
 
 Flags are **positioned proportionally to ELO** — a team's vertical position on the axis directly encodes its ELO value. Y position is never altered for any reason. The gameset column X-positions are identical to Rank view so toggling between the two causes no horizontal shift.
 
@@ -248,11 +248,7 @@ Error case: if 4 or more teams share an identical ELO in the same gameset column
 The tick interval (ELO units between marks) is selected from `[200, 100, 50, 25, 10, 5, 2]`, largest first, choosing the first value whose pixel spacing falls between 150 px and 300 px. If no candidate falls in that range (e.g. the axis is extremely compressed or stretched), the candidate whose spacing is closest to 200 px is used as a fallback. Tick labels are shown at every multiple of the chosen interval within the axis range, once in the leftmost axis column. A dotted horizontal line is drawn at each tick, spanning all columns, behind the flags.
 
 **Horizontal dodge**
-Overlapping flags are placed side by side using a two-pass approach. Y positions are never altered.
-
-*Pass 1 — greedy lane assignment:* flags are sorted by Y position and assigned to one of 3 abstract lanes (0, 1, 2). Each flag takes the lane that is currently free and has been used most recently, leaving the emptiest lane available for future flags. This correctly handles non-transitive overlaps: a flag that only overlaps its immediate neighbour can reuse a lane freed by an earlier flag.
-
-*Pass 2 — visual centering:* flags are grouped into transitive visual clusters (consecutive flags sorted by Y that each overlap the next). Within each cluster, the lane indices actually used are mapped to pixel offsets centered on the column midline: a cluster using 1 lane gets offset 0; 2 lanes get ±`(gap+flag_width)/2`; 3 lanes get `−(flag_width+gap)`, `0`, `+(flag_width+gap)`. This keeps isolated flags centered and small clusters symmetric regardless of which abstract lanes the greedy pass assigned.
+Overlapping flags are fanned out into up to 3 horizontal lanes; Y positions are never altered. Isolated flags are centered; pairs are symmetric; full 3-flag clusters span left-centre-right. See `scale-algorithm.md` for the full algorithm.
 
 **Flag display**
 No ELO number is shown alongside the flag. Hovering a flag shows the info panel — see *Flag info panel* above. Z-index is determined by rank: higher-ranked teams (lower rank number) render on top.

@@ -101,7 +101,7 @@ Pass 1's greedy algorithm assigns lane indices based on packing order, not ELO r
 
 ## Implementation
 
-**Constants** (in `2026.html`):
+**Constants** (in `shared.js`):
 | Constant | Value | Meaning |
 |----------|-------|---------|
 | `FLAG_PX_W` | 35 | Flag icon width in px (border drawn inside via `box-sizing: border-box`) |
@@ -110,7 +110,7 @@ Pass 1's greedy algorithm assigns lane indices based on packing order, not ELO r
 | `MAX_H` | 80000 | Binary search upper bound / error-case fallback |
 | `lo` (binary search) | 100 | Safe lower bound — always has 4+ clusters at this height given the number of teams |
 
-**Functions** (in `2026.html`):
+**Functions** (in `shared.js`):
 - `scaleTopPx(elo, scaleMin, scaleMax, height)` — converts an ELO to a pixel Y position. Return value is **rounded to the nearest integer**. This is essential: floating-point arithmetic can produce results like `1188.0000000000002` instead of `1188`, making a gap of exactly `FLAG_PX_H` appear as `23.9999...`. Without rounding, the transitive cluster grouping in Pass 2 incorrectly chains flags that are visually touching-but-not-overlapping into the same cluster, producing unexpected horizontal offsets. Rounding ensures all gap comparisons against `FLAG_PX_H` behave as intended.
 - `maxClusterSizeForHeight(snapshots, ranked, scaleMin, scaleMax, height)` — returns the max depth (sliding window) across all snapshots at a given height.
 - `computeScaleHeight(snapshots, ranked, scaleMin, scaleMax)` — runs the binary search; returns `{ height, hasError }`.

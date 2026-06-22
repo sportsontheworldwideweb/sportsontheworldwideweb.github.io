@@ -1,6 +1,6 @@
 # Index of Docs
 
-This project has 4 documents, each with one job. Don't blur these responsibilities.
+This project has the following documents, each with one job. Don't blur these responsibilities.
 
 | # | Doc | Responsibility |
 |---|-----|-----------------|
