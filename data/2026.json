@@ -493,22 +493,22 @@
     {
       "gameNumber": 41,
       "homeTeam": "France",
-      "homeScore": null,
+      "homeScore": 3,
       "awayTeam": "Iraq",
-      "awayScore": null,
+      "awayScore": 0,
       "date": "2026-06-22",
-      "eloChange": null,
+      "eloChange": 6,
       "homeEloPre": 2084,
       "awayEloPre": 1593
     },
     {
       "gameNumber": 42,
       "homeTeam": "Norway",
-      "homeScore": null,
+      "homeScore": 3,
       "awayTeam": "Senegal",
-      "awayScore": null,
+      "awayScore": 2,
       "date": "2026-06-22",
-      "eloChange": null,
+      "eloChange": 22,
       "homeEloPre": 1929,
       "awayEloPre": 1839
     },
@@ -526,11 +526,11 @@
     {
       "gameNumber": 44,
       "homeTeam": "Jordan",
-      "homeScore": null,
+      "homeScore": 1,
       "awayTeam": "Algeria",
-      "awayScore": null,
+      "awayScore": 2,
       "date": "2026-06-22",
-      "eloChange": null,
+      "eloChange": -21,
       "homeEloPre": 1653,
       "awayEloPre": 1759
     },
@@ -762,8 +762,8 @@
       "awayScore": null,
       "date": "2026-06-26",
       "eloChange": null,
-      "homeEloPre": null,
-      "awayEloPre": null
+      "homeEloPre": 1951,
+      "awayEloPre": 2090
     },
     {
       "gameNumber": 66,
@@ -773,8 +773,8 @@
       "awayScore": null,
       "date": "2026-06-26",
       "eloChange": null,
-      "homeEloPre": null,
-      "awayEloPre": null
+      "homeEloPre": 1817,
+      "awayEloPre": 1587
     },
     {
       "gameNumber": 67,
@@ -784,7 +784,7 @@
       "awayScore": null,
       "date": "2026-06-27",
       "eloChange": null,
-      "homeEloPre": null,
+      "homeEloPre": 1780,
       "awayEloPre": 1841
     },
     {
@@ -795,7 +795,7 @@
       "awayScore": null,
       "date": "2026-06-27",
       "eloChange": null,
-      "homeEloPre": null,
+      "homeEloPre": 1632,
       "awayEloPre": 2144
     },
     {
