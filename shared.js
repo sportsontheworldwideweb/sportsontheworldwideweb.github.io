@@ -9,9 +9,25 @@
 //   tbody          — document.getElementById('games')
 //   thead          — document.querySelector('#matches-view thead')
 
-// Data-entry panel is only available in admin mode (?admin in the URL).
-const IS_ADMIN = location.search.includes('admin');
+// Data-entry panel is only available in admin mode (?admin in the URL) or via the toggle button.
+let IS_ADMIN = location.search.includes('admin');
 if (IS_ADMIN) document.title = '[ADMIN] ' + document.title;
+
+function toggleDataEntry() {
+  IS_ADMIN = !IS_ADMIN;
+  const btn = document.getElementById('btn-data-entry');
+  if (IS_ADMIN) {
+    btn.style.color = '#C0392B';
+    btn.style.borderColor = '#C0392B';
+    btn.style.fontWeight = 'bold';
+  } else {
+    btn.style.color = '#888';
+    btn.style.borderColor = '#aaa';
+    btn.style.fontWeight = '';
+    if (matchState.expandRow) { matchState.expandRow.remove(); matchState.expandRow = null; }
+  }
+  render();
+}
 
 // Early guards — must run before confByTeam/flagByTeam are built from these globals.
 // Full structural validation (GAMESETS ordering, team-name coverage, etc.) runs at the
@@ -57,8 +73,20 @@ function eloCell(preElo, delta) {
 const ELO_GRADIENT_MAX = 400;
 function eloColor(value) {
   const ratio = Math.max(-1, Math.min(1, value / ELO_GRADIENT_MAX));
-  if (ratio >= 0) return `rgb(${255 - ratio * 105}, 255, ${255 - ratio * 105})`;
-  return `rgb(255, ${255 + ratio * 105}, ${255 + ratio * 105})`;
+  // Neutral: page beige #F5F0E8 = rgb(245,240,232)
+  // Max positive: brand green #27AE60 = rgb(39,174,96)
+  // Max negative: brand red #C0392B = rgb(192,57,43)
+  if (ratio >= 0) {
+    const r = Math.round(245 + ratio * (39  - 245));
+    const g = Math.round(240 + ratio * (174 - 240));
+    const b = Math.round(232 + ratio * (96  - 232));
+    return `rgb(${r},${g},${b})`;
+  } else {
+    const r = Math.round(245 + ratio * (245 - 192));
+    const g = Math.round(240 + ratio * (240 - 57));
+    const b = Math.round(232 + ratio * (232 - 43));
+    return `rgb(${r},${g},${b})`;
+  }
 }
 
 // Date, #, spacer, homeElo, homeFlag, homeScore, sep, awayScore, awayFlag, awayElo
@@ -155,6 +183,13 @@ function wireToggle() {
   });
 }
 
+function fixStickyHeader() {
+  const rows = thead.querySelectorAll('tr');
+  if (rows.length < 2) return;
+  const row1H = rows[0].getBoundingClientRect().height;
+  rows[1].querySelectorAll('th').forEach(th => { th.style.top = row1H + 'px'; });
+}
+
 function render() {
   const games = GAMES;
   const participating = new Set();
@@ -183,10 +218,11 @@ function render() {
   const ordered = [...confederations].sort((a, b) => (finalTotals[b] || 0) - (finalTotals[a] || 0));
 
   if (matchState.view === 'elo') renderElo(games, ordered, eloRowTotals);
-  else if (matchState.view === 'wld') renderWld(games, ordered);
-  else renderStats(games, ordered);
+  else if (matchState.view === 'wld') renderWld(games, ordered, eloRowTotals);
+  else renderStats(games, ordered, eloRowTotals);
 
   wireToggle();
+  fixStickyHeader();
 }
 
 function renderElo(games, ordered, rowTotals) {
@@ -210,7 +246,7 @@ function renderElo(games, ordered, rowTotals) {
   });
 }
 
-function renderWld(games, ordered) {
+function renderWld(games, ordered, eloRowTotals) {
   const rowTotals = computeWldRowTotals(games, ordered);
   const N = ordered.length;
   matchState.colCount = GAME_COL_COUNT + N;
@@ -219,21 +255,31 @@ function renderWld(games, ordered) {
     `<tr>${gameColsHeader()}${toggleCellHtml(N)}</tr>` +
     `<tr>${ordered.map(c => `<th class="conf">${c}</th>`).join('')}</tr>`;
 
+  const STICKY = '#FAD7A0';
   games.forEach((game, i) => {
     const played = game.homeScore !== null && game.awayScore !== null;
     const tr = document.createElement('tr');
     tr.innerHTML = gameRowCells(game) +
       ordered.map(c => {
-        if (!played) return `<td class="num conf"></td>`;
+        const bg = `background-color:${eloColor(eloRowTotals[i][c])}`;
+        if (!played) return `<td class="num conf" style="${bg}"></td>`;
         const { w, l, d } = rowTotals[i][c];
-        return `<td class="num conf">${w}-${d}-${l}</td>`;
+        const prev = i > 0 ? rowTotals[i - 1][c] : { w: 0, d: 0, l: 0 };
+        const hi = (val, key) => {
+          if (rowTotals[i][c][key] !== prev[key]) {
+            const tilt = (Math.random() * 10 - 5).toFixed(1);
+            return `<span style="position:relative;display:inline-block">${val}<span style="position:absolute;width:1.05em;height:1.05em;top:50%;left:50%;transform:translate(-50%,-50%) rotate(${tilt}deg);background:${STICKY};display:flex;align-items:center;justify-content:center">${val}</span></span>`;
+          }
+          return val;
+        };
+        return `<td class="num conf" style="${bg}">${hi(w,'w')}-${hi(d,'d')}-${hi(l,'l')}</td>`;
       }).join('');
     if (IS_ADMIN) tr.addEventListener('click', () => toggleExpand(game, tr));
     tbody.appendChild(tr);
   });
 }
 
-function renderStats(games, ordered) {
+function renderStats(games, ordered, _eloRowTotals) {
   const N = ordered.length;
   matchState.colCount = GAME_COL_COUNT + N;
 

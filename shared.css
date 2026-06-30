@@ -6,7 +6,7 @@ a { color: #1A5276; }
 table { border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; white-space: nowrap; }
 .table-wrap { overflow-x: auto; }
 th, td { padding: 0.4rem 0.6rem; text-align: left; border-bottom: 1px solid #ddd; }
-th { font-family: 'Permanent Marker', cursive; background: #C0392B; color: #FFFFFF; position: sticky; top: 0; }
+th { font-family: 'Permanent Marker', cursive; background: #C0392B; color: #FFFFFF; position: sticky; top: 0; z-index: 2; }
 .num { text-align: right; }
 .narrow { text-align: center; }
 .spacer { padding: 0 0.3rem; }
@@ -25,12 +25,12 @@ tbody tr:hover { background: #EDE8DC; }
 .expand-row label { display: flex; align-items: center; gap: 0.3rem; white-space: nowrap; }
 .expand-row input[type=number] { width: 4.5rem; padding: 0.2rem; }
 .expand-row .ur-cmd { font-family: monospace; flex: 1; min-width: 16rem; padding: 0.2rem; }
-.view-toggle { display: inline-flex; border: 1px solid #bbb; border-radius: 4px; overflow: hidden; }
-.view-toggle button { border: none; border-right: 1px solid #bbb; background: #f0f0f0; padding: 0.2rem 0.7rem; cursor: pointer; font-size: 0.8rem; color: #333; }
+.view-toggle { display: inline-flex; border: 1px solid rgba(255,255,255,0.6); border-radius: 4px; overflow: hidden; }
+.view-toggle button { border: none; border-right: 1px solid rgba(255,255,255,0.4); background: transparent; padding: 0.2rem 0.7rem; cursor: pointer; font-family: 'Permanent Marker', cursive; font-size: 0.75rem; color: rgba(255,255,255,0.85); }
 .view-toggle button:last-child { border-right: none; }
-.view-toggle button.active { background: #4a7fcb; color: white; }
-.view-toggle button:hover:not(.active) { background: #e0e0e0; }
-.toggle-cell { text-align: right; background: #f0f0f0; border-bottom: none; padding: 0.25rem 0.5rem; vertical-align: middle; }
+.view-toggle button.active { background: rgba(255,255,255,0.95); color: #C0392B; }
+.view-toggle button:hover:not(.active) { background: rgba(255,255,255,0.18); color: #fff; }
+.toggle-cell { text-align: right; border-left: 2px solid rgba(255,255,255,0.3); vertical-align: middle; }
 
 /* Page-level view toggle */
 .page-toggle { margin-bottom: 1rem; }

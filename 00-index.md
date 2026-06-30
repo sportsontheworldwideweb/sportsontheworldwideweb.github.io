@@ -14,7 +14,7 @@ This project has the following documents, each with one job. Don't blur these re
 | 6 | [scripts/build.py](scripts/build.py) | Regenerates HTML pages in site/ from data/*.json and shared.js/shared.css. |
 | 7 | [scripts/set_result.py](scripts/set_result.py) | Enters a game result and calls build.py. The normal data-entry path. |
 | 8 | [scripts/set_team_elo.py](scripts/set_team_elo.py) | Sets a team's initial ELO and calls build.py. |
-| 9 | [data/](data/) | Source data: 2018.json, 2022.json, 2026.json, teams.json. Not deployed directly. |
+| 9 | [data/](data/) | Source data: 2014.json, 2018.json, 2022.json, 2026.json, teams.json. Not deployed directly. |
 
 ## Site (deployed)
 
@@ -23,6 +23,8 @@ Everything under `site/` is what goes online. The static host points at this fol
 | Path | Responsibility |
 |------|----------------|
 | [site/index.html](site/index.html) | SportsOnTheInternet homepage. |
+| [site/football/worldcup/history.html](site/football/worldcup/history.html) | Year-over-year knockout comparison (F4/F8/F16). Build artifact — do not edit directly. |
+| [site/football/worldcup/2014.html](site/football/worldcup/2014.html) | World Cup 2014 page. Build artifact — do not edit directly. |
 | [site/football/worldcup/2018.html](site/football/worldcup/2018.html) | World Cup 2018 page. Build artifact — do not edit directly. |
 | [site/football/worldcup/2022.html](site/football/worldcup/2022.html) | World Cup 2022 page. Build artifact — do not edit directly. |
 | [site/football/worldcup/2026.html](site/football/worldcup/2026.html) | World Cup 2026 page. Build artifact — do not edit directly. |

@@ -16,7 +16,7 @@ a { color: #1A5276; }
 table { border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; white-space: nowrap; }
 .table-wrap { overflow-x: auto; }
 th, td { padding: 0.4rem 0.6rem; text-align: left; border-bottom: 1px solid #ddd; }
-th { font-family: 'Permanent Marker', cursive; background: #C0392B; color: #FFFFFF; position: sticky; top: 0; }
+th { font-family: 'Permanent Marker', cursive; background: #C0392B; color: #FFFFFF; position: sticky; top: 0; z-index: 2; }
 .num { text-align: right; }
 .narrow { text-align: center; }
 .spacer { padding: 0 0.3rem; }
@@ -35,12 +35,12 @@ tbody tr:hover { background: #EDE8DC; }
 .expand-row label { display: flex; align-items: center; gap: 0.3rem; white-space: nowrap; }
 .expand-row input[type=number] { width: 4.5rem; padding: 0.2rem; }
 .expand-row .ur-cmd { font-family: monospace; flex: 1; min-width: 16rem; padding: 0.2rem; }
-.view-toggle { display: inline-flex; border: 1px solid #bbb; border-radius: 4px; overflow: hidden; }
-.view-toggle button { border: none; border-right: 1px solid #bbb; background: #f0f0f0; padding: 0.2rem 0.7rem; cursor: pointer; font-size: 0.8rem; color: #333; }
+.view-toggle { display: inline-flex; border: 1px solid rgba(255,255,255,0.6); border-radius: 4px; overflow: hidden; }
+.view-toggle button { border: none; border-right: 1px solid rgba(255,255,255,0.4); background: transparent; padding: 0.2rem 0.7rem; cursor: pointer; font-family: 'Permanent Marker', cursive; font-size: 0.75rem; color: rgba(255,255,255,0.85); }
 .view-toggle button:last-child { border-right: none; }
-.view-toggle button.active { background: #4a7fcb; color: white; }
-.view-toggle button:hover:not(.active) { background: #e0e0e0; }
-.toggle-cell { text-align: right; background: #f0f0f0; border-bottom: none; padding: 0.25rem 0.5rem; vertical-align: middle; }
+.view-toggle button.active { background: rgba(255,255,255,0.95); color: #C0392B; }
+.view-toggle button:hover:not(.active) { background: rgba(255,255,255,0.18); color: #fff; }
+.toggle-cell { text-align: right; border-left: 2px solid rgba(255,255,255,0.3); vertical-align: middle; }
 
 /* Page-level view toggle */
 .page-toggle { margin-bottom: 1rem; }
@@ -126,12 +126,15 @@ tbody tr:hover { background: #EDE8DC; }
 </style>
 </head>
 <body>
-<nav><a href="2018.html">2018</a> | <strong>2022</strong> | <a href="2026.html">2026</a> | <a href="../../index.html">Home</a></nav>
+<nav><a href="1998.html">1998</a> | <a href="2002.html">2002</a> | <a href="2006.html">2006</a> | <a href="2010.html">2010</a> | <a href="2014.html">2014</a> | <a href="2018.html">2018</a> | <strong>2022</strong> | <a href="2026.html">2026</a> | <a href="history.html">History</a> | <a href="../../index.html">Home</a></nav>
 <h1>World Cup ELO - 2022</h1>
 
-<div class="page-toggle view-toggle">
-  <button id="tab-matches" class="active" onclick="setPageView('matches')">Match List</button>
-  <button id="tab-rankings" onclick="setPageView('rankings')">Rankings</button>
+<div style="display:flex; align-items:center; gap:1rem; flex-wrap:wrap;">
+  <div class="page-toggle view-toggle">
+    <button id="tab-matches" class="active" onclick="setPageView('matches')">Match List</button>
+    <button id="tab-rankings" onclick="setPageView('rankings')">Rankings</button>
+  </div>
+  <button id="btn-data-entry" onclick="toggleDataEntry()" style="font-family:'Permanent Marker',cursive; font-size:0.75rem; background:transparent; border:1px dashed #aaa; border-radius:4px; padding:0.2rem 0.7rem; cursor:pointer; color:#888;">Data Entry</button>
 </div>
 
 <div id="matches-view">
@@ -932,6 +935,25 @@ const teams = [
   {"name": "Jordan", "shorthand": "JOR", "confederation": "Asia", "flag": "jo"},
   {"name": "DR Congo", "shorthand": "COD", "confederation": "Africa", "flag": "cd"},
   {"name": "Uzbekistan", "shorthand": "UZB", "confederation": "Asia", "flag": "uz"},
+  {"name": "Chile", "shorthand": "CHI", "confederation": "South America", "flag": "cl"},
+  {"name": "Spain", "shorthand": "ESP", "confederation": "Europe", "flag": "es"},
+  {"name": "Greece", "shorthand": "GRE", "confederation": "Europe", "flag": "gr"},
+  {"name": "Italy", "shorthand": "ITA", "confederation": "Europe", "flag": "it"},
+  {"name": "Honduras", "shorthand": "HON", "confederation": "North America", "flag": "hn"},
+  {"name": "Slovenia", "shorthand": "SVN", "confederation": "Europe", "flag": "si"},
+  {"name": "North Korea", "shorthand": "PRK", "confederation": "Asia", "flag": "kp"},
+  {"name": "Slovakia", "shorthand": "SVK", "confederation": "Europe", "flag": "sk"},
+  {"name": "Trinidad and Tobago", "shorthand": "TRI", "confederation": "North America", "flag": "tt"},
+  {"name": "Angola", "shorthand": "ANG", "confederation": "Africa", "flag": "ao"},
+  {"name": "Togo", "shorthand": "TOG", "confederation": "Africa", "flag": "tg"},
+  {"name": "Ukraine", "shorthand": "UKR", "confederation": "Europe", "flag": "ua"},
+  {"name": "Serbia and Montenegro", "shorthand": "SCG", "confederation": "Europe", "flag": "cs"},
+  {"name": "Ireland", "shorthand": "IRL", "confederation": "Europe", "flag": "ie"},
+  {"name": "China", "shorthand": "CHN", "confederation": "Asia", "flag": "cn"},
+  {"name": "Bulgaria", "shorthand": "BUL", "confederation": "Europe", "flag": "bg"},
+  {"name": "Jamaica", "shorthand": "JAM", "confederation": "North America", "flag": "jm"},
+  {"name": "Yugoslavia", "shorthand": "YUG", "confederation": "Europe", "flag": "yu"},
+  {"name": "Romania", "shorthand": "ROU", "confederation": "Europe", "flag": "ro"},
 ];
 // END:teams
 
@@ -969,9 +991,25 @@ const thead = document.querySelector('#matches-view thead');
 //   tbody          — document.getElementById('games')
 //   thead          — document.querySelector('#matches-view thead')
 
-// Data-entry panel is only available in admin mode (?admin in the URL).
-const IS_ADMIN = location.search.includes('admin');
+// Data-entry panel is only available in admin mode (?admin in the URL) or via the toggle button.
+let IS_ADMIN = location.search.includes('admin');
 if (IS_ADMIN) document.title = '[ADMIN] ' + document.title;
+
+function toggleDataEntry() {
+  IS_ADMIN = !IS_ADMIN;
+  const btn = document.getElementById('btn-data-entry');
+  if (IS_ADMIN) {
+    btn.style.color = '#C0392B';
+    btn.style.borderColor = '#C0392B';
+    btn.style.fontWeight = 'bold';
+  } else {
+    btn.style.color = '#888';
+    btn.style.borderColor = '#aaa';
+    btn.style.fontWeight = '';
+    if (matchState.expandRow) { matchState.expandRow.remove(); matchState.expandRow = null; }
+  }
+  render();
+}
 
 // Early guards — must run before confByTeam/flagByTeam are built from these globals.
 // Full structural validation (GAMESETS ordering, team-name coverage, etc.) runs at the
@@ -1017,8 +1055,20 @@ function eloCell(preElo, delta) {
 const ELO_GRADIENT_MAX = 400;
 function eloColor(value) {
   const ratio = Math.max(-1, Math.min(1, value / ELO_GRADIENT_MAX));
-  if (ratio >= 0) return `rgb(${255 - ratio * 105}, 255, ${255 - ratio * 105})`;
-  return `rgb(255, ${255 + ratio * 105}, ${255 + ratio * 105})`;
+  // Neutral: page beige #F5F0E8 = rgb(245,240,232)
+  // Max positive: brand green #27AE60 = rgb(39,174,96)
+  // Max negative: brand red #C0392B = rgb(192,57,43)
+  if (ratio >= 0) {
+    const r = Math.round(245 + ratio * (39  - 245));
+    const g = Math.round(240 + ratio * (174 - 240));
+    const b = Math.round(232 + ratio * (96  - 232));
+    return `rgb(${r},${g},${b})`;
+  } else {
+    const r = Math.round(245 + ratio * (245 - 192));
+    const g = Math.round(240 + ratio * (240 - 57));
+    const b = Math.round(232 + ratio * (232 - 43));
+    return `rgb(${r},${g},${b})`;
+  }
 }
 
 // Date, #, spacer, homeElo, homeFlag, homeScore, sep, awayScore, awayFlag, awayElo
@@ -1115,6 +1165,13 @@ function wireToggle() {
   });
 }
 
+function fixStickyHeader() {
+  const rows = thead.querySelectorAll('tr');
+  if (rows.length < 2) return;
+  const row1H = rows[0].getBoundingClientRect().height;
+  rows[1].querySelectorAll('th').forEach(th => { th.style.top = row1H + 'px'; });
+}
+
 function render() {
   const games = GAMES;
   const participating = new Set();
@@ -1143,10 +1200,11 @@ function render() {
   const ordered = [...confederations].sort((a, b) => (finalTotals[b] || 0) - (finalTotals[a] || 0));
 
   if (matchState.view === 'elo') renderElo(games, ordered, eloRowTotals);
-  else if (matchState.view === 'wld') renderWld(games, ordered);
-  else renderStats(games, ordered);
+  else if (matchState.view === 'wld') renderWld(games, ordered, eloRowTotals);
+  else renderStats(games, ordered, eloRowTotals);
 
   wireToggle();
+  fixStickyHeader();
 }
 
 function renderElo(games, ordered, rowTotals) {
@@ -1170,7 +1228,7 @@ function renderElo(games, ordered, rowTotals) {
   });
 }
 
-function renderWld(games, ordered) {
+function renderWld(games, ordered, eloRowTotals) {
   const rowTotals = computeWldRowTotals(games, ordered);
   const N = ordered.length;
   matchState.colCount = GAME_COL_COUNT + N;
@@ -1179,21 +1237,31 @@ function renderWld(games, ordered) {
     `<tr>${gameColsHeader()}${toggleCellHtml(N)}</tr>` +
     `<tr>${ordered.map(c => `<th class="conf">${c}</th>`).join('')}</tr>`;
 
+  const STICKY = '#FAD7A0';
   games.forEach((game, i) => {
     const played = game.homeScore !== null && game.awayScore !== null;
     const tr = document.createElement('tr');
     tr.innerHTML = gameRowCells(game) +
       ordered.map(c => {
-        if (!played) return `<td class="num conf"></td>`;
+        const bg = `background-color:${eloColor(eloRowTotals[i][c])}`;
+        if (!played) return `<td class="num conf" style="${bg}"></td>`;
         const { w, l, d } = rowTotals[i][c];
-        return `<td class="num conf">${w}-${d}-${l}</td>`;
+        const prev = i > 0 ? rowTotals[i - 1][c] : { w: 0, d: 0, l: 0 };
+        const hi = (val, key) => {
+          if (rowTotals[i][c][key] !== prev[key]) {
+            const tilt = (Math.random() * 10 - 5).toFixed(1);
+            return `<span style="position:relative;display:inline-block">${val}<span style="position:absolute;width:1.05em;height:1.05em;top:50%;left:50%;transform:translate(-50%,-50%) rotate(${tilt}deg);background:${STICKY};display:flex;align-items:center;justify-content:center">${val}</span></span>`;
+          }
+          return val;
+        };
+        return `<td class="num conf" style="${bg}">${hi(w,'w')}-${hi(d,'d')}-${hi(l,'l')}</td>`;
       }).join('');
     if (IS_ADMIN) tr.addEventListener('click', () => toggleExpand(game, tr));
     tbody.appendChild(tr);
   });
 }
 
-function renderStats(games, ordered) {
+function renderStats(games, ordered, _eloRowTotals) {
   const N = ordered.length;
   matchState.colCount = GAME_COL_COUNT + N;
 
