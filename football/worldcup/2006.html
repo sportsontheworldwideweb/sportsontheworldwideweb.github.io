@@ -25,8 +25,15 @@ th { font-family: 'Permanent Marker', cursive; background: #C0392B; color: #FFFF
 .flag { text-align: center; }
 .flag .icon { display: inline-block; width: 2.2em; height: 1.5em; background-size: cover; background-position: center; background-repeat: no-repeat; vertical-align: middle; border: 1px solid #ccc; filter: saturate(0.8); }
 .conf { text-align: center; min-width: 5em; }
-nav { margin: 1.5rem 0 0.5rem; }
-nav a { margin-right: 1rem; color: #1A5276; }
+
+/* Utility bar — meta navigation (year switcher, History, Home, Data Entry).
+   Deliberately understated: smaller and muted relative to the primary tabs
+   below, so the two don't read as the same kind of control. */
+.utility-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.4rem 1rem; margin: 1.5rem 0 0.5rem; font-size: 0.8rem; color: #948f81; }
+.utility-bar a { color: #1A5276; }
+.utility-bar .year-links strong { color: #1a1a1a; }
+.utility-bar .utility-actions { display: flex; align-items: center; gap: 0.6rem; }
+.data-entry-btn { font-family: 'Permanent Marker', cursive; font-size: 0.7rem; background: transparent; border: 1px dashed #aaa; border-radius: 4px; padding: 0.15rem 0.6rem; cursor: pointer; color: #888; }
 
 tbody tr { cursor: pointer; }
 tbody tr:hover { background: #EDE8DC; }
@@ -42,14 +49,24 @@ tbody tr:hover { background: #EDE8DC; }
 .view-toggle button:hover:not(.active) { background: rgba(255,255,255,0.18); color: #fff; }
 .toggle-cell { text-align: right; border-left: 2px solid rgba(255,255,255,0.3); vertical-align: middle; }
 
-/* Page-level view toggle */
+/* Primary tabs — the one dominant nav on the page: which view of this
+   tournament am I looking at. Bigger than the utility bar above and the
+   sub-toggle nested inside Rankings below, so it reads as the main control. */
 .page-toggle { margin-bottom: 1rem; }
+.primary-tabs.view-toggle button { font-size: 0.95rem; padding: 0.45rem 1.1rem; }
 
 /* Rankings */
 #rankings-view { display: none; }
-.rankings-toggle { margin-bottom: 0.5rem; }
-.rankings-filter-controls { display: inline-flex; gap: 1rem; align-items: center; margin-left: 1rem; font-size: 0.85rem; }
-.rankings-filter-controls label { display: flex; align-items: center; gap: 0.3rem; cursor: pointer; user-select: none; }
+.rankings-panel { border: 1px solid rgba(0,0,0,0.08); border-radius: 6px; background: rgba(255,255,255,0.35); padding: 0.6rem 0.8rem 0.3rem; }
+.rankings-controls { display: flex; justify-content: flex-end; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: 0.8rem; margin-bottom: 0.6rem; }
+.rankings-controls label { display: flex; align-items: center; gap: 0.3rem; cursor: pointer; user-select: none; }
+/* Sub-toggle — a settings control nested inside a view, not a nav. Plain
+   gray instead of the red segmented style used for the utility bar/primary tabs. */
+.sub-toggle { display: inline-flex; border: 1px solid #ccc; border-radius: 4px; overflow: hidden; }
+.sub-toggle button { border: none; border-right: 1px solid #ccc; background: #f2f2f2; padding: 0.15rem 0.6rem; cursor: pointer; font-family: 'Fredoka One', cursive; font-size: 0.75rem; color: #555; }
+.sub-toggle button:last-child { border-right: none; }
+.sub-toggle button.active { background: #ddd; color: #1a1a1a; font-weight: bold; }
+.sub-toggle button:hover:not(.active) { background: #e8e8e8; }
 .rankings-cols { font-size: 0.85rem; white-space: nowrap; }
 .rankings-header {
   display: grid;
@@ -126,15 +143,14 @@ tbody tr:hover { background: #EDE8DC; }
 </style>
 </head>
 <body>
-<nav><a href="1998.html">1998</a> | <a href="2002.html">2002</a> | <strong>2006</strong> | <a href="2010.html">2010</a> | <a href="2014.html">2014</a> | <a href="2018.html">2018</a> | <a href="2022.html">2022</a> | <a href="2026.html">2026</a> | <a href="history.html">History</a> | <a href="../../index.html">Home</a></nav>
+<nav class="utility-bar"><span class="year-links"><a href="1998.html">1998</a> | <a href="2002.html">2002</a> | <strong>2006</strong> | <a href="2010.html">2010</a> | <a href="2014.html">2014</a> | <a href="2018.html">2018</a> | <a href="2022.html">2022</a> | <a href="2026.html">2026</a> | <a href="history.html">History</a></span><span class="utility-actions"><a href="../../index.html">Home</a> <button id="btn-data-entry" class="data-entry-btn" onclick="toggleDataEntry()">Data Entry</button></span></nav>
 <h1>World Cup ELO - 2006</h1>
 
-<div style="display:flex; align-items:center; gap:1rem; flex-wrap:wrap;">
-  <div class="page-toggle view-toggle">
-    <button id="tab-matches" class="active" onclick="setPageView('matches')">Match List</button>
-    <button id="tab-rankings" onclick="setPageView('rankings')">Rankings</button>
-  </div>
-  <button id="btn-data-entry" onclick="toggleDataEntry()" style="font-family:'Permanent Marker',cursive; font-size:0.75rem; background:transparent; border:1px dashed #aaa; border-radius:4px; padding:0.2rem 0.7rem; cursor:pointer; color:#888;">Data Entry</button>
+<div class="page-toggle primary-tabs view-toggle">
+  <button id="tab-matches" class="active" onclick="setPageView('matches')">Match List</button>
+  <button id="tab-groups" onclick="setPageView('groups')">Groups</button>
+  <button id="tab-knockout" onclick="setPageView('knockout')">Knockout</button>
+  <button id="tab-rankings" onclick="setPageView('rankings')">Rankings</button>
 </div>
 
 <div id="matches-view">
@@ -145,24 +161,34 @@ tbody tr:hover { background: #EDE8DC; }
 </div>
 
 <div id="rankings-view">
-  <div class="rankings-toggle view-toggle">
-    <button id="tab-rank" class="active" onclick="setRankView('rank')">Rank</button>
-    <button id="tab-scale" onclick="setRankView('scale')">Scale</button>
-  </div>
-  <div class="rankings-filter-controls">
-    <label><input type="checkbox" id="chk-show-elim" onchange="toggleShowEliminated()"> Show eliminated</label>
-    <label id="true-rank-label" style="opacity:1"><input type="checkbox" id="chk-true-rank" onchange="toggleTrueRank()"> True rank</label>
-  </div>
-  <label style="font-size:0.75rem;color:#c00;margin-left:1rem;user-select:none">
-    <input type="checkbox" id="debug-clusters" onchange="renderRankings()"> debug: show binding clusters
-  </label>
-  <div id="rankings-outer">
-    <div id="rank-info"></div>
-    <div class="rankings-cols" id="rankings-cols">
-      <div class="rankings-header" id="rankings-header"></div>
-      <div class="rankings-body" id="rankings-body"></div>
+  <div class="rankings-panel">
+    <div class="rankings-controls">
+      <label><input type="checkbox" id="chk-show-elim" onchange="toggleShowEliminated()"> Show eliminated</label>
+      <label id="true-rank-label" style="opacity:1"><input type="checkbox" id="chk-true-rank" onchange="toggleTrueRank()"> True rank</label>
+      <label style="color:#c00;">
+        <input type="checkbox" id="debug-clusters" onchange="renderRankings()"> debug: show binding clusters
+      </label>
+      <div class="rankings-toggle sub-toggle">
+        <button id="tab-rank" class="active" onclick="setRankView('rank')">Rank</button>
+        <button id="tab-scale" onclick="setRankView('scale')">Scale</button>
+      </div>
+    </div>
+    <div id="rankings-outer">
+      <div id="rank-info"></div>
+      <div class="rankings-cols" id="rankings-cols">
+        <div class="rankings-header" id="rankings-header"></div>
+        <div class="rankings-body" id="rankings-body"></div>
+      </div>
     </div>
   </div>
+</div>
+
+<div id="groups-view">
+  <p style="opacity:0.6; font-style:italic;">Group Stage view — coming soon.</p>
+</div>
+
+<div id="knockout-view">
+  <p style="opacity:0.6; font-style:italic;">Knockout Bracket view — coming soon.</p>
 </div>
 
 <script>
@@ -1909,18 +1935,19 @@ function initRankingsHover() {
   container.addEventListener('mouseleave', scheduleReset);
 }
 
-// ── Page view (Match List ↔ Rankings) ────────────────────────────────────
+// ── Page view (Match List / Rankings / Groups / Knockout) ────────────────
 
+const PAGE_VIEWS = ['matches', 'rankings', 'groups', 'knockout'];
 let currentPageView = null;
 
 function setPageView(view) {
-  if (view !== 'matches' && view !== 'rankings') view = 'matches';
+  if (!PAGE_VIEWS.includes(view)) view = 'matches';
   if (view === currentPageView) return;
   currentPageView = view;
-  document.getElementById('matches-view').style.display = view === 'matches' ? 'block' : 'none';
-  document.getElementById('rankings-view').style.display = view === 'rankings' ? 'block' : 'none';
-  document.getElementById('tab-matches').classList.toggle('active', view === 'matches');
-  document.getElementById('tab-rankings').classList.toggle('active', view === 'rankings');
+  for (const v of PAGE_VIEWS) {
+    document.getElementById(v + '-view').style.display = v === view ? 'block' : 'none';
+    document.getElementById('tab-' + v).classList.toggle('active', v === view);
+  }
   if (view === 'matches') render();
   if (view === 'rankings') renderRankings();
   if (location.hash.slice(1) !== view) history.replaceState(null, '', '#' + view);
