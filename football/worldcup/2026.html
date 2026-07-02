@@ -7,6 +7,31 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Fredoka+One&display=swap" rel="stylesheet">
+<script>
+(function() {
+  function faviconHref(isAdmin, isLocal) {
+    var bg = isAdmin ? '#C0392B' : '#F5F0E8';
+    var fg = isAdmin ? '#FFFFFF' : '#1A5276';
+    var dash = isLocal ? ' stroke-dasharray="3 2.5"' : '';
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">'
+      + '<circle cx="16" cy="16" r="14" fill="' + bg + '" stroke="' + fg + '" stroke-width="2.5"' + dash + '/>'
+      + '<path d="M16,10 L21.7,14.2 L19.5,20.9 L12.5,20.9 L10.3,14.2 Z" fill="' + fg + '"/>'
+      + '</svg>';
+    return 'data:image/svg+xml,' + encodeURIComponent(svg);
+  }
+  window.__setFavicon = function(isAdmin) {
+    var isLocal = ['localhost', '127.0.0.1', ''].indexOf(location.hostname) !== -1;
+    var link = document.querySelector('link[rel="icon"]');
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'icon';
+      document.head.appendChild(link);
+    }
+    link.type = 'image/svg+xml';
+    link.href = faviconHref(isAdmin, isLocal);
+  };
+})();
+</script>
 <style>
 /* Shared styles for all World Cup pages */
 
@@ -1110,11 +1135,11 @@ const games2026 = [
   {
     "gameNumber": 84,
     "homeTeam": "Spain",
-    "homeScore": null,
+    "homeScore": 3,
     "awayTeam": "Austria",
-    "awayScore": null,
+    "awayScore": 0,
     "date": "2026-07-02",
-    "eloChange": null,
+    "eloChange": 15,
     "homeEloPre": 2144,
     "awayEloPre": 1836
   },
@@ -1285,6 +1310,7 @@ const thead = document.querySelector('#matches-view thead');
 // Data-entry panel is only available in admin mode (?admin in the URL) or via the toggle button.
 let IS_ADMIN = location.search.includes('admin');
 if (IS_ADMIN) document.title = '[ADMIN] ' + document.title;
+if (window.__setFavicon) window.__setFavicon(IS_ADMIN);
 
 function toggleDataEntry() {
   IS_ADMIN = !IS_ADMIN;
@@ -1299,6 +1325,7 @@ function toggleDataEntry() {
     btn.style.fontWeight = '';
     if (matchState.expandRow) { matchState.expandRow.remove(); matchState.expandRow = null; }
   }
+  if (window.__setFavicon) window.__setFavicon(IS_ADMIN);
   render();
 }
 
