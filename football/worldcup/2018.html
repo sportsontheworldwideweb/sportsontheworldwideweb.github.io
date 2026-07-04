@@ -9,17 +9,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Fredoka+One&display=swap" rel="stylesheet">
 <script>
 (function() {
-  function faviconHref(isAdmin, isLocal) {
-    var bg = isAdmin ? '#C0392B' : '#F5F0E8';
-    var fg = isAdmin ? '#FFFFFF' : '#1A5276';
+  function faviconHref(isLocal) {
     var dash = isLocal ? ' stroke-dasharray="3 2.5"' : '';
     var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">'
-      + '<circle cx="16" cy="16" r="14" fill="' + bg + '" stroke="' + fg + '" stroke-width="2.5"' + dash + '/>'
-      + '<path d="M16,10 L21.7,14.2 L19.5,20.9 L12.5,20.9 L10.3,14.2 Z" fill="' + fg + '"/>'
+      + '<circle cx="16" cy="16" r="14" fill="#F5F0E8" stroke="#1A5276" stroke-width="2.5"' + dash + '/>'
+      + '<path d="M16,10 L21.7,14.2 L19.5,20.9 L12.5,20.9 L10.3,14.2 Z" fill="#1A5276"/>'
       + '</svg>';
     return 'data:image/svg+xml,' + encodeURIComponent(svg);
   }
-  window.__setFavicon = function(isAdmin) {
+  window.__setFavicon = function() {
     var isLocal = ['localhost', '127.0.0.1', ''].indexOf(location.hostname) !== -1;
     var link = document.querySelector('link[rel="icon"]');
     if (!link) {
@@ -28,8 +26,9 @@
       document.head.appendChild(link);
     }
     link.type = 'image/svg+xml';
-    link.href = faviconHref(isAdmin, isLocal);
+    link.href = faviconHref(isLocal);
   };
+  window.__setFavicon();
 })();
 </script>
 <style>
@@ -51,22 +50,15 @@ th { font-family: 'Permanent Marker', cursive; background: #C0392B; color: #FFFF
 .flag .icon { display: inline-block; width: 2.2em; height: 1.5em; background-size: cover; background-position: center; background-repeat: no-repeat; vertical-align: middle; border: 1px solid #ccc; filter: saturate(0.8); }
 .conf { text-align: center; min-width: 5em; }
 
-/* Utility bar — meta navigation (year switcher, History, Home, Data Entry).
+/* Utility bar — meta navigation (year switcher, History, Home).
    Deliberately understated: smaller and muted relative to the primary tabs
    below, so the two don't read as the same kind of control. */
 .utility-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.4rem 1rem; margin: 1.5rem 0 0.5rem; font-size: 0.8rem; color: #948f81; }
 .utility-bar a { color: #1A5276; }
 .utility-bar .year-links strong { color: #1a1a1a; }
 .utility-bar .utility-actions { display: flex; align-items: center; gap: 0.6rem; }
-.data-entry-btn { font-family: 'Permanent Marker', cursive; font-size: 0.7rem; background: transparent; border: 1px dashed #aaa; border-radius: 4px; padding: 0.15rem 0.6rem; cursor: pointer; color: #888; }
 
-tbody tr { cursor: pointer; }
 tbody tr:hover { background: #EDE8DC; }
-.expand-row td { background: #f4f8ff; border-top: none; cursor: default; padding: 0.5rem 0.8rem; }
-.expand-row .ur-line { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin: 0.3rem 0; }
-.expand-row label { display: flex; align-items: center; gap: 0.3rem; white-space: nowrap; }
-.expand-row input[type=number] { width: 4.5rem; padding: 0.2rem; }
-.expand-row .ur-cmd { font-family: monospace; flex: 1; min-width: 16rem; padding: 0.2rem; }
 .view-toggle { display: inline-flex; border: 1px solid rgba(255,255,255,0.6); border-radius: 4px; overflow: hidden; }
 .view-toggle button { border: none; border-right: 1px solid rgba(255,255,255,0.4); background: transparent; padding: 0.2rem 0.7rem; cursor: pointer; font-family: 'Permanent Marker', cursive; font-size: 0.75rem; color: rgba(255,255,255,0.85); }
 .view-toggle button:last-child { border-right: none; }
@@ -168,7 +160,7 @@ tbody tr:hover { background: #EDE8DC; }
 </style>
 </head>
 <body>
-<nav class="utility-bar"><span class="year-links"><a href="1998.html">1998</a> | <a href="2002.html">2002</a> | <a href="2006.html">2006</a> | <a href="2010.html">2010</a> | <a href="2014.html">2014</a> | <strong>2018</strong> | <a href="2022.html">2022</a> | <a href="2026.html">2026</a> | <a href="history.html">History</a></span><span class="utility-actions"><a href="../../index.html">Home</a> <button id="btn-data-entry" class="data-entry-btn" onclick="toggleDataEntry()">Data Entry</button></span></nav>
+<nav class="utility-bar"><span class="year-links"><a href="1998.html">1998</a> | <a href="2002.html">2002</a> | <a href="2006.html">2006</a> | <a href="2010.html">2010</a> | <a href="2014.html">2014</a> | <strong>2018</strong> | <a href="2022.html">2022</a> | <a href="2026.html">2026</a> | <a href="history.html">History</a></span><span class="utility-actions"><a href="../../index.html">Home</a></span></nav>
 <h1>World Cup ELO - 2018</h1>
 
 <div class="page-toggle primary-tabs view-toggle">
@@ -1042,28 +1034,6 @@ const thead = document.querySelector('#matches-view thead');
 //   tbody          — document.getElementById('games')
 //   thead          — document.querySelector('#matches-view thead')
 
-// Data-entry panel is only available in admin mode (?admin in the URL) or via the toggle button.
-let IS_ADMIN = location.search.includes('admin');
-if (IS_ADMIN) document.title = '[ADMIN] ' + document.title;
-if (window.__setFavicon) window.__setFavicon(IS_ADMIN);
-
-function toggleDataEntry() {
-  IS_ADMIN = !IS_ADMIN;
-  const btn = document.getElementById('btn-data-entry');
-  if (IS_ADMIN) {
-    btn.style.color = '#C0392B';
-    btn.style.borderColor = '#C0392B';
-    btn.style.fontWeight = 'bold';
-  } else {
-    btn.style.color = '#888';
-    btn.style.borderColor = '#aaa';
-    btn.style.fontWeight = '';
-    if (matchState.expandRow) { matchState.expandRow.remove(); matchState.expandRow = null; }
-  }
-  if (window.__setFavicon) window.__setFavicon(IS_ADMIN);
-  render();
-}
-
 // Early guards — must run before confByTeam/flagByTeam are built from these globals.
 // Full structural validation (GAMESETS ordering, team-name coverage, etc.) runs at the
 // bottom of this file once all functions are defined.
@@ -1126,7 +1096,7 @@ function eloColor(value) {
 
 // Date, #, spacer, homeElo, homeFlag, homeScore, sep, awayScore, awayFlag, awayElo
 const GAME_COL_COUNT = 10;
-const matchState = { view: 'elo', colCount: GAME_COL_COUNT, expandRow: null, gameRow: null };
+const matchState = { view: 'elo', colCount: GAME_COL_COUNT };
 
 function gameColsHeader() {
   return (
@@ -1237,8 +1207,6 @@ function render() {
   const confederations = CONFEDERATIONS.filter(c => participating.has(c));
 
   tbody.innerHTML = '';
-  matchState.expandRow = null;
-  matchState.gameRow = null;
 
   if (games.length === 0) {
     thead.innerHTML = `<tr><th>No games</th></tr><tr></tr>`;
@@ -1276,7 +1244,6 @@ function renderElo(games, ordered, rowTotals) {
           ? `<td class="num conf" style="background-color:${eloColor(rowTotals[i][c])}">${rowTotals[i][c]}</td>`
           : `<td class="num conf"></td>`
       ).join('');
-    if (IS_ADMIN) tr.addEventListener('click', () => toggleExpand(game, tr));
     tbody.appendChild(tr);
   });
 }
@@ -1309,7 +1276,6 @@ function renderWld(games, ordered, eloRowTotals) {
         };
         return `<td class="num conf" style="${bg}">${hi(w,'w')}-${hi(d,'d')}-${hi(l,'l')}</td>`;
       }).join('');
-    if (IS_ADMIN) tr.addEventListener('click', () => toggleExpand(game, tr));
     tbody.appendChild(tr);
   });
 }
@@ -1351,81 +1317,8 @@ function renderStats(games, ordered, _eloRowTotals) {
     } else {
       tr.innerHTML = gameRowCells(game) + emptyTd;
     }
-    if (IS_ADMIN) tr.addEventListener('click', () => toggleExpand(game, tr));
     tbody.appendChild(tr);
   });
-}
-
-function toggleExpand(game, tr) {
-  const colCount = matchState.colCount;
-  if (matchState.expandRow) {
-    matchState.expandRow.remove();
-    matchState.expandRow = null;
-    if (matchState.gameRow === tr) { matchState.gameRow = null; return; }
-  }
-  matchState.gameRow = tr;
-  const expandTr = document.createElement('tr');
-  expandTr.className = 'expand-row';
-  const td = document.createElement('td');
-  td.colSpan = colCount;
-
-  const hsVal = game.homeScore != null ? game.homeScore : '';
-  const asVal = game.awayScore != null ? game.awayScore : '';
-  const eloVal = game.eloChange != null ? Math.abs(game.eloChange) : '';
-  const gainsVal = game.eloChange != null ? (game.eloChange >= 0 ? 'home' : 'away') : '';
-  const isDraw = hsVal !== '' && asVal !== '' && hsVal === asVal;
-
-  td.innerHTML = `
-    <div class="ur-line"><strong>#${game.gameNumber}: ${esc(game.homeTeam)} vs ${esc(game.awayTeam)}</strong></div>
-    <div class="ur-line">
-      <label>Home score: <input class="ur-hs" type="number" min="0" value="${hsVal}"></label>
-      <label>Away score: <input class="ur-as" type="number" min="0" value="${asVal}"></label>
-      <label>ELO magnitude (opt): <input class="ur-elo" type="number" min="0" value="${eloVal}"></label>
-      <label class="ur-gains-wrap" style="display:${isDraw ? 'flex' : 'none'}">Who gains ELO:
-        <select class="ur-gains">
-          <option value="" ${gainsVal === '' ? 'selected' : ''}>—</option>
-          <option value="home" ${gainsVal === 'home' ? 'selected' : ''}>${esc(game.homeTeam)}</option>
-          <option value="away" ${gainsVal === 'away' ? 'selected' : ''}>${esc(game.awayTeam)}</option>
-        </select>
-      </label>
-    </div>
-    <div class="ur-line">
-      <button class="ur-gen">Generate command</button>
-      <input class="ur-cmd" type="text" readonly placeholder="command will appear here">
-      <button class="ur-copy">Copy</button>
-    </div>`;
-
-  td.addEventListener('click', e => e.stopPropagation());
-
-  function updateGainsVisibility() {
-    const hs = td.querySelector('.ur-hs').value;
-    const as_ = td.querySelector('.ur-as').value;
-    const draw = hs !== '' && as_ !== '' && hs === as_;
-    td.querySelector('.ur-gains-wrap').style.display = draw ? 'flex' : 'none';
-  }
-  td.querySelector('.ur-hs').addEventListener('input', updateGainsVisibility);
-  td.querySelector('.ur-as').addEventListener('input', updateGainsVisibility);
-
-  td.querySelector('.ur-gen').addEventListener('click', () => {
-    const hs = td.querySelector('.ur-hs').value;
-    const as_ = td.querySelector('.ur-as').value;
-    const elo = td.querySelector('.ur-elo').value;
-    const gains = td.querySelector('.ur-gains').value;
-    const draw = hs !== '' && as_ !== '' && hs === as_;
-    let cmd = `python3 scripts/set_result.py ${YEAR} ${game.gameNumber} ${hs} ${as_}`;
-    if (elo !== '') cmd += ` ${elo} --gains ${draw ? (gains || '???') : (Number(hs) > Number(as_) ? 'home' : 'away')}`;
-    td.querySelector('.ur-cmd').value = cmd;
-  });
-
-  td.querySelector('.ur-copy').addEventListener('click', () => {
-    const cmdInput = td.querySelector('.ur-cmd');
-    cmdInput.select();
-    navigator.clipboard.writeText(cmdInput.value);
-  });
-
-  expandTr.appendChild(td);
-  tr.after(expandTr);
-  matchState.expandRow = expandTr;
 }
 
 // ── Rankings view ──────────────────────────────────────────────────────────

@@ -9,17 +9,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Fredoka+One&display=swap" rel="stylesheet">
 <script>
 (function() {
-  function faviconHref(isAdmin, isLocal) {
-    var bg = isAdmin ? '#C0392B' : '#F5F0E8';
-    var fg = isAdmin ? '#FFFFFF' : '#1A5276';
+  function faviconHref(isLocal) {
     var dash = isLocal ? ' stroke-dasharray="3 2.5"' : '';
     var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">'
-      + '<circle cx="16" cy="16" r="14" fill="' + bg + '" stroke="' + fg + '" stroke-width="2.5"' + dash + '/>'
-      + '<path d="M16,10 L21.7,14.2 L19.5,20.9 L12.5,20.9 L10.3,14.2 Z" fill="' + fg + '"/>'
+      + '<circle cx="16" cy="16" r="14" fill="#F5F0E8" stroke="#1A5276" stroke-width="2.5"' + dash + '/>'
+      + '<path d="M16,10 L21.7,14.2 L19.5,20.9 L12.5,20.9 L10.3,14.2 Z" fill="#1A5276"/>'
       + '</svg>';
     return 'data:image/svg+xml,' + encodeURIComponent(svg);
   }
-  window.__setFavicon = function(isAdmin) {
+  window.__setFavicon = function() {
     var isLocal = ['localhost', '127.0.0.1', ''].indexOf(location.hostname) !== -1;
     var link = document.querySelector('link[rel="icon"]');
     if (!link) {
@@ -28,10 +26,10 @@
       document.head.appendChild(link);
     }
     link.type = 'image/svg+xml';
-    link.href = faviconHref(isAdmin, isLocal);
+    link.href = faviconHref(isLocal);
   };
+  window.__setFavicon();
 })();
-window.__setFavicon(false);
 </script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
