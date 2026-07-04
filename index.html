@@ -3,184 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SportsOnTheInternet</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Fredoka+One&display=swap" rel="stylesheet">
-<script>
-(function() {
-  function faviconHref(isLocal) {
-    var dash = isLocal ? ' stroke-dasharray="3 2.5"' : '';
-    var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">'
-      + '<circle cx="16" cy="16" r="14" fill="#F5F0E8" stroke="#1A5276" stroke-width="2.5"' + dash + '/>'
-      + '<path d="M16,10 L21.7,14.2 L19.5,20.9 L12.5,20.9 L10.3,14.2 Z" fill="#1A5276"/>'
-      + '</svg>';
-    return 'data:image/svg+xml,' + encodeURIComponent(svg);
-  }
-  window.__setFavicon = function() {
-    var isLocal = ['localhost', '127.0.0.1', ''].indexOf(location.hostname) !== -1;
-    var link = document.querySelector('link[rel="icon"]');
-    if (!link) {
-      link = document.createElement('link');
-      link.rel = 'icon';
-      document.head.appendChild(link);
-    }
-    link.type = 'image/svg+xml';
-    link.href = faviconHref(isLocal);
-  };
-  window.__setFavicon();
-})();
-</script>
+<title>This site has moved</title>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   body {
-    font-family: 'Fredoka One', cursive;
-    font-size: 1rem;
-    line-height: 1.5;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     background: #F5F0E8;
     color: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 1.5rem;
+    text-align: center;
   }
-
-  .page {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 2.5rem 1.5rem 5rem;
-  }
-
-  /* Header */
-  .site-header {
-    margin-bottom: 2.5rem;
-  }
-
-  .site-header h1 {
-    font-family: 'Permanent Marker', cursive;
-    font-size: 3rem;
-    color: #1a1a1a;
-    line-height: 1.1;
-  }
-
-  .site-header .tagline {
-    margin-top: 0.5rem;
-    font-size: 1.1rem;
-    color: #555;
-  }
-
-  /* Section cards — look like construction paper stuck to posterboard */
-  .section {
-    background: #fff;
-    border-radius: 3px 6px 4px 5px;
-    box-shadow: 4px 8px 16px rgba(0,0,0,0.25);
-    margin-bottom: 2rem;
-    overflow: hidden;
-  }
-
-  .section-header {
-    font-family: 'Permanent Marker', cursive;
-    font-size: 1.5rem;
-    color: #fff;
-    padding: 0.6rem 1rem;
-    letter-spacing: 0.5px;
-  }
-
-  .section--football .section-header { background: #C0392B; }
-  .section--more    .section-header { background: #1E8449; }
-
-  .section--football { transform: rotate(-0.4deg); }
-  .section--more     { transform: rotate(0.3deg); }
-
-  .section-body {
-    padding: 1rem 1.2rem 1.2rem;
-    background: #FDFAF5;
-  }
-
-  /* Competition sub-groups */
-  .competition-group {
-    margin-bottom: 0.5rem;
-  }
-
-  .competition-header {
-    font-family: 'Permanent Marker', cursive;
-    font-size: 1rem;
-    color: #1a1a1a;
-    margin-bottom: 0.3rem;
-  }
-
-  .section-body ul {
-    list-style: none;
-    padding: 0 0 0 0.5rem;
-  }
-
-  .section-body li {
-    padding: 0.2rem 0;
-    font-size: 1.05rem;
-  }
-
-  .section-body li a {
+  a {
     color: #1A5276;
-    text-decoration: none;
-    font-weight: 400;
-  }
-
-  .section-body li a:hover {
-    text-decoration: underline;
-  }
-
-  .section-body li .desc {
-    color: #666;
-    font-size: 0.95rem;
-  }
-
-  /* Coming soon — yellow sticky note, slightly rotated */
-  .coming-soon-badge {
-    display: inline-block;
-    background: #F4D03F;
-    color: #1a1a1a;
-    font-family: 'Permanent Marker', cursive;
-    font-size: 1rem;
-    padding: 0.3rem 0.9rem;
-    border-radius: 2px 4px 3px 2px;
-    box-shadow: 2px 2px 0 rgba(0,0,0,0.12);
-    transform: rotate(-1.5deg);
-    display: inline-block;
+    font-weight: 600;
   }
 </style>
 </head>
 <body>
-<div class="page">
-
-  <header class="site-header">
-    <h1>SportsOnTheInternet</h1>
-    <p class="tagline">Sports data and visualizations. On the internet.</p>
-  </header>
-
-  <section class="section section--football">
-    <div class="section-header">Football</div>
-    <div class="section-body">
-      <div class="competition-group">
-        <div class="competition-header">World Cup</div>
-        <ul>
-          <li><a href="football/worldcup/2026.html">2026</a> <span class="desc">— USA / Canada / Mexico</span></li>
-          <li><a href="football/worldcup/2022.html">2022</a> <span class="desc">— Qatar</span></li>
-          <li><a href="football/worldcup/2018.html">2018</a> <span class="desc">— Russia</span></li>
-          <li><a href="football/worldcup/2014.html">2014</a> <span class="desc">— Brazil</span></li>
-          <li><a href="football/worldcup/2010.html">2010</a> <span class="desc">— South Africa</span></li>
-          <li><a href="football/worldcup/2006.html">2006</a> <span class="desc">— Germany</span></li>
-          <li><a href="football/worldcup/2002.html">2002</a> <span class="desc">— South Korea / Japan</span></li>
-          <li><a href="football/worldcup/1998.html">1998</a> <span class="desc">— France</span></li>
-          <li><a href="football/worldcup/history.html">History</a> <span class="desc">— semi-finalists across all tournaments</span></li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <section class="section section--more">
-    <div class="section-header">More Sports</div>
-    <div class="section-body">
-      <span class="coming-soon-badge">COMING SOON</span>
-    </div>
-  </section>
-
-</div>
+  <p>This site has moved to <a href="https://sports-on-the-internet-by-david.com/">sports-on-the-internet-by-david.com</a>.</p>
 </body>
 </html>
