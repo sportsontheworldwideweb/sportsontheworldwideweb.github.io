@@ -157,6 +157,31 @@ tbody tr:hover { background: #EDE8DC; }
 #rank-info .tip-delta-pos { color: #6c6; }
 #rank-info .tip-delta-neg { color: #f77; }
 
+/* Knockout bracket */
+#knockout-view { display: none; }
+.bracket { display: flex; align-items: stretch; gap: 2.5rem; overflow-x: auto; padding: 0.5rem 0 1.5rem; }
+.bracket-round { display: flex; flex-direction: column; min-width: 190px; }
+.bracket-round-label { font-family: 'Permanent Marker', cursive; font-size: 0.9rem; color: #C0392B; text-align: center; margin-bottom: 0.6rem; }
+.bracket-round-games { flex: 1; display: flex; flex-direction: column; justify-content: space-around; }
+.bracket-round:not(:first-child) .bracket-game-wrap { position: relative; }
+.bracket-round:not(:first-child) .bracket-game-wrap::before { content: ''; position: absolute; left: -1.25rem; top: 50%; width: 1.25rem; height: 0; border-top: 2px solid #C0392B; opacity: 0.5; }
+.bracket-game-wrap { padding: 0.4rem 0; }
+.bracket-game { border: 1px solid #ddd; border-radius: 6px; background: #fff; font-size: 0.8rem; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.bracket-game-sub { font-family: 'Permanent Marker', cursive; font-size: 0.68rem; color: #948f81; text-align: center; padding: 0.2rem 0.3rem 0; }
+.bracket-date { font-size: 0.68rem; color: #888; text-align: center; padding: 0.2rem 0.3rem; border-bottom: 1px solid #eee; }
+.bracket-team { display: flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.5rem; }
+.bracket-team + .bracket-team { border-top: 1px solid #eee; }
+.bracket-team .icon { display: inline-block; width: 1.6em; height: 1.1em; flex: none; background-size: cover; background-position: center; background-repeat: no-repeat; border: 1px solid #ccc; filter: saturate(0.8); }
+.bracket-team-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bracket-team.winner { font-weight: bold; }
+.bracket-team.loser { opacity: 0.5; }
+.bracket-score { font-weight: bold; }
+.bracket-team.loser .bracket-score { font-weight: normal; }
+.bracket-tbd { color: #999; font-style: italic; font-size: 0.72rem; }
+
+/* Match List: unresolved knockout slot (see homeFrom/awayFrom) */
+.tbd-slot { color: #948f81; font-style: italic; font-size: 0.72rem; white-space: normal; max-width: 8rem; }
+
 </style>
 </head>
 <body>
@@ -205,7 +230,7 @@ tbody tr:hover { background: #EDE8DC; }
 </div>
 
 <div id="knockout-view">
-  <p style="opacity:0.6; font-style:italic;">Knockout Bracket view — coming soon.</p>
+  <div id="knockout-outer"></div>
 </div>
 
 <script>
@@ -1012,7 +1037,8 @@ const games2026 = [
     "date": "2026-06-28",
     "eloChange": -16,
     "homeEloPre": 1575,
-    "awayEloPre": 1748
+    "awayEloPre": 1748,
+    "round": 0
   },
   {
     "gameNumber": 74,
@@ -1023,7 +1049,8 @@ const games2026 = [
     "date": "2026-06-29",
     "eloChange": -8,
     "homeEloPre": 1916,
-    "awayEloPre": 1815
+    "awayEloPre": 1815,
+    "round": 0
   },
   {
     "gameNumber": 75,
@@ -1034,7 +1061,8 @@ const games2026 = [
     "date": "2026-06-29",
     "eloChange": -9,
     "homeEloPre": 1980,
-    "awayEloPre": 1877
+    "awayEloPre": 1877,
+    "round": 0
   },
   {
     "gameNumber": 76,
@@ -1045,7 +1073,8 @@ const games2026 = [
     "date": "2026-06-29",
     "eloChange": 22,
     "homeEloPre": 1988,
-    "awayEloPre": 1910
+    "awayEloPre": 1910,
+    "round": 0
   },
   {
     "gameNumber": 77,
@@ -1056,7 +1085,8 @@ const games2026 = [
     "date": "2026-06-30",
     "eloChange": 11,
     "homeEloPre": 2123,
-    "awayEloPre": 1742
+    "awayEloPre": 1742,
+    "round": 0
   },
   {
     "gameNumber": 78,
@@ -1067,7 +1097,8 @@ const games2026 = [
     "date": "2026-06-30",
     "eloChange": -16,
     "homeEloPre": 1743,
-    "awayEloPre": 1918
+    "awayEloPre": 1918,
+    "round": 0
   },
   {
     "gameNumber": 79,
@@ -1078,7 +1109,8 @@ const games2026 = [
     "date": "2026-06-30",
     "eloChange": 31,
     "homeEloPre": 1912,
-    "awayEloPre": 1902
+    "awayEloPre": 1902,
+    "round": 0
   },
   {
     "gameNumber": 80,
@@ -1089,7 +1121,8 @@ const games2026 = [
     "date": "2026-07-01",
     "eloChange": 8,
     "homeEloPre": 2038,
-    "awayEloPre": 1712
+    "awayEloPre": 1712,
+    "round": 0
   },
   {
     "gameNumber": 81,
@@ -1100,7 +1133,8 @@ const games2026 = [
     "date": "2026-07-01",
     "eloChange": 17,
     "homeEloPre": 1781,
-    "awayEloPre": 1622
+    "awayEloPre": 1622,
+    "round": 0
   },
   {
     "gameNumber": 82,
@@ -1111,7 +1145,8 @@ const games2026 = [
     "date": "2026-07-01",
     "eloChange": 26,
     "homeEloPre": 1884,
-    "awayEloPre": 1842
+    "awayEloPre": 1842,
+    "round": 0
   },
   {
     "gameNumber": 83,
@@ -1122,7 +1157,8 @@ const games2026 = [
     "date": "2026-07-02",
     "eloChange": 23,
     "homeEloPre": 1990,
-    "awayEloPre": 1905
+    "awayEloPre": 1905,
+    "round": 0
   },
   {
     "gameNumber": 84,
@@ -1133,7 +1169,8 @@ const games2026 = [
     "date": "2026-07-02",
     "eloChange": 15,
     "homeEloPre": 2144,
-    "awayEloPre": 1836
+    "awayEloPre": 1836,
+    "round": 0
   },
   {
     "gameNumber": 85,
@@ -1144,7 +1181,8 @@ const games2026 = [
     "date": "2026-07-02",
     "eloChange": 29,
     "homeEloPre": 1914,
-    "awayEloPre": 1785
+    "awayEloPre": 1785,
+    "round": 0
   },
   {
     "gameNumber": 86,
@@ -1155,7 +1193,8 @@ const games2026 = [
     "date": "2026-07-03",
     "eloChange": 3,
     "homeEloPre": 2148,
-    "awayEloPre": 1622
+    "awayEloPre": 1622,
+    "round": 0
   },
   {
     "gameNumber": 87,
@@ -1166,7 +1205,8 @@ const games2026 = [
     "date": "2026-07-03",
     "eloChange": 5,
     "homeEloPre": 2004,
-    "awayEloPre": 1575
+    "awayEloPre": 1575,
+    "round": 0
   },
   {
     "gameNumber": 88,
@@ -1177,7 +1217,232 @@ const games2026 = [
     "date": "2026-07-03",
     "eloChange": -5,
     "homeEloPre": 1800,
-    "awayEloPre": 1746
+    "awayEloPre": 1746,
+    "round": 0
+  },
+  {
+    "gameNumber": 89,
+    "homeTeam": null,
+    "homeScore": null,
+    "awayTeam": null,
+    "awayScore": null,
+    "date": null,
+    "eloChange": null,
+    "round": 1,
+    "homeFrom": null,
+    "awayFrom": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 90,
+    "homeTeam": null,
+    "homeScore": null,
+    "awayTeam": null,
+    "awayScore": null,
+    "date": null,
+    "eloChange": null,
+    "round": 1,
+    "homeFrom": null,
+    "awayFrom": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 91,
+    "homeTeam": null,
+    "homeScore": null,
+    "awayTeam": null,
+    "awayScore": null,
+    "date": null,
+    "eloChange": null,
+    "round": 1,
+    "homeFrom": null,
+    "awayFrom": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 92,
+    "homeTeam": null,
+    "homeScore": null,
+    "awayTeam": null,
+    "awayScore": null,
+    "date": null,
+    "eloChange": null,
+    "round": 1,
+    "homeFrom": null,
+    "awayFrom": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 93,
+    "homeTeam": null,
+    "homeScore": null,
+    "awayTeam": null,
+    "awayScore": null,
+    "date": null,
+    "eloChange": null,
+    "round": 1,
+    "homeFrom": null,
+    "awayFrom": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 94,
+    "homeTeam": null,
+    "homeScore": null,
+    "awayTeam": null,
+    "awayScore": null,
+    "date": null,
+    "eloChange": null,
+    "round": 1,
+    "homeFrom": null,
+    "awayFrom": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 95,
+    "homeTeam": null,
+    "homeScore": null,
+    "awayTeam": null,
+    "awayScore": null,
+    "date": null,
+    "eloChange": null,
+    "round": 1,
+    "homeFrom": null,
+    "awayFrom": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 96,
+    "homeTeam": null,
+    "homeScore": null,
+    "awayTeam": null,
+    "awayScore": null,
+    "date": null,
+    "eloChange": null,
+    "round": 1,
+    "homeFrom": null,
+    "awayFrom": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 97,
+    "homeTeam": null,
+    "homeScore": null,
+    "awayTeam": null,
+    "awayScore": null,
+    "date": null,
+    "eloChange": null,
+    "round": 2,
+    "homeFrom": null,
+    "awayFrom": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 98,
+    "homeTeam": null,
+    "homeScore": null,
+    "awayTeam": null,
+    "awayScore": null,
+    "date": null,
+    "eloChange": null,
+    "round": 2,
+    "homeFrom": null,
+    "awayFrom": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 99,
+    "homeTeam": null,
+    "homeScore": null,
+    "awayTeam": null,
+    "awayScore": null,
+    "date": null,
+    "eloChange": null,
+    "round": 2,
+    "homeFrom": null,
+    "awayFrom": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 100,
+    "homeTeam": null,
+    "homeScore": null,
+    "awayTeam": null,
+    "awayScore": null,
+    "date": null,
+    "eloChange": null,
+    "round": 2,
+    "homeFrom": null,
+    "awayFrom": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 101,
+    "homeTeam": null,
+    "homeScore": null,
+    "awayTeam": null,
+    "awayScore": null,
+    "date": null,
+    "eloChange": null,
+    "round": 3,
+    "homeFrom": null,
+    "awayFrom": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 102,
+    "homeTeam": null,
+    "homeScore": null,
+    "awayTeam": null,
+    "awayScore": null,
+    "date": null,
+    "eloChange": null,
+    "round": 3,
+    "homeFrom": null,
+    "awayFrom": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 103,
+    "homeTeam": null,
+    "homeScore": null,
+    "awayTeam": null,
+    "awayScore": null,
+    "date": null,
+    "eloChange": null,
+    "round": 4,
+    "homeFrom": null,
+    "awayFrom": null,
+    "homeEloPre": null,
+    "awayEloPre": null
+  },
+  {
+    "gameNumber": 104,
+    "homeTeam": null,
+    "homeScore": null,
+    "awayTeam": null,
+    "awayScore": null,
+    "date": null,
+    "eloChange": null,
+    "round": 4,
+    "homeFrom": null,
+    "awayFrom": null,
+    "homeEloPre": null,
+    "awayEloPre": null
   }
 ];
 // END:games2026
@@ -1284,6 +1549,7 @@ const GAMESETS = [
   ['4',       102],
   ['Final',   104]
 ];
+const KNOCKOUT_SIZE = 32; // 32/16/8/4, or null if not yet configured
 const tbody = document.getElementById('games');
 const thead = document.querySelector('#matches-view thead');
 </script>
@@ -1383,6 +1649,22 @@ function toggleCellHtml(colspan) {
     `</div></th>`;
 }
 
+// A knockout-bracket game may not have a concrete team yet — it defers to
+// an earlier game's winner/loser via homeFrom/awayFrom instead. Everywhere a
+// team would be shown, fall back to a "Winner/Loser of Game N" text label.
+function feedLabel(from) {
+  if (!from) return 'TBD';
+  return `${from.result === 'loser' ? 'Loser' : 'Winner'} of Game ${from.game}`;
+}
+
+function flagCellHtml(game, side) {
+  const team = game[side + 'Team'];
+  if (team) {
+    return `<td class="flag"><span class="icon" style="background-image:url('flags/${flagByTeam[team]}.svg');transform:rotate(${flagRotation(team)}deg)" title="${esc(team)}"></span></td>`;
+  }
+  return `<td class="flag tbd-slot">${esc(feedLabel(game[side + 'From']))}</td>`;
+}
+
 function gameRowCells(game) {
   const change = game.eloChange;
   const homeEloDelta = signedElo(change);
@@ -1394,11 +1676,11 @@ function gameRowCells(game) {
     `<td class="narrow">#${game.gameNumber}</td>` +
     `<td class="spacer"></td>` +
     `<td class="elo">${eloCell(game.homeEloPre, homeEloDelta)}</td>` +
-    `<td class="flag"><span class="icon" style="background-image:url('flags/${flagByTeam[game.homeTeam]}.svg');transform:rotate(${flagRotation(game.homeTeam)}deg)" title="${esc(game.homeTeam)}"></span></td>` +
+    flagCellHtml(game, 'home') +
     `<td class="narrow">${homeScore}</td>` +
     `<td class="score-sep">-</td>` +
     `<td class="narrow">${awayScore}</td>` +
-    `<td class="flag"><span class="icon" style="background-image:url('flags/${flagByTeam[game.awayTeam]}.svg');transform:rotate(${flagRotation(game.awayTeam)}deg)" title="${esc(game.awayTeam)}"></span></td>` +
+    flagCellHtml(game, 'away') +
     `<td class="elo">${eloCell(game.awayEloPre, awayEloDelta)}</td>`
   );
 }
@@ -2120,6 +2402,69 @@ function initRankingsHover() {
   container.addEventListener('mouseleave', scheduleReset);
 }
 
+// ── Knockout bracket view ─────────────────────────────────────────────────
+
+// Mirrors knockout.py's rounds_for_size() — see that file for the round
+// shape rationale. Keep the two in sync if this ever changes.
+const KNOCKOUT_ROUND_LABELS = { 32: 'Round of 32', 16: 'Round of 16', 8: 'Quarterfinals', 4: 'Semifinals' };
+function knockoutRounds(size) {
+  const rounds = [];
+  let n = size;
+  while (n > 4) {
+    rounds.push([KNOCKOUT_ROUND_LABELS[n], n / 2]);
+    n /= 2;
+  }
+  rounds.push(['Semifinals', 2]);
+  rounds.push(['Final', 2]);
+  return rounds;
+}
+
+function bracketTeamRowHtml(game, side, decided) {
+  const team = game[side + 'Team'];
+  const score = game[side + 'Score'];
+  if (!team) {
+    return `<div class="bracket-team bracket-tbd">${esc(feedLabel(game[side + 'From']))}</div>`;
+  }
+  const otherScore = game[side === 'home' ? 'awayScore' : 'homeScore'];
+  let cls = 'bracket-team';
+  if (decided && score !== otherScore) cls += score > otherScore ? ' winner' : ' loser';
+  const flag = flagByTeam[team]
+    ? `<span class="icon" style="background-image:url('flags/${flagByTeam[team]}.svg');transform:rotate(${flagRotation(team)}deg)"></span>`
+    : '';
+  const scoreHtml = score != null ? `<span class="bracket-score">${score}</span>` : '';
+  return `<div class="${cls}">${flag}<span class="bracket-team-name">${esc(team)}</span>${scoreHtml}</div>`;
+}
+
+function renderKnockout() {
+  const container = document.getElementById('knockout-outer');
+  if (!KNOCKOUT_SIZE) {
+    container.innerHTML = '<p style="opacity:0.6; font-style:italic;">Knockout bracket not yet configured for this tournament.</p>';
+    return;
+  }
+
+  const rounds = knockoutRounds(KNOCKOUT_SIZE);
+  const lastRound = rounds.length - 1;
+
+  const html = rounds.map(([label, count], roundIdx) => {
+    const games = GAMES.filter(g => g.round === roundIdx).sort((a, b) => a.gameNumber - b.gameNumber);
+    const gamesHtml = games.map((game, gameIdx) => {
+      const decided = game.homeScore != null && game.awayScore != null;
+      const sub = roundIdx === lastRound
+        ? `<div class="bracket-game-sub">${gameIdx === 0 ? 'Third-Place Match' : 'Final'}</div>`
+        : '';
+      return `<div class="bracket-game-wrap"><div class="bracket-game">` +
+        sub +
+        `<div class="bracket-date">${game.date ? formatDate(game.date) : 'Date TBD'}</div>` +
+        bracketTeamRowHtml(game, 'home', decided) +
+        bracketTeamRowHtml(game, 'away', decided) +
+        `</div></div>`;
+    }).join('');
+    return `<div class="bracket-round"><div class="bracket-round-label">${esc(label)}</div><div class="bracket-round-games">${gamesHtml}</div></div>`;
+  }).join('');
+
+  container.innerHTML = `<div class="bracket">${html}</div>`;
+}
+
 // ── Page view (Match List / Rankings / Groups / Knockout) ────────────────
 
 const PAGE_VIEWS = ['matches', 'rankings', 'groups', 'knockout'];
@@ -2135,6 +2480,7 @@ function setPageView(view) {
   }
   if (view === 'matches') render();
   if (view === 'rankings') renderRankings();
+  if (view === 'knockout') renderKnockout();
   if (location.hash.slice(1) !== view) history.replaceState(null, '', '#' + view);
 }
 
@@ -2158,8 +2504,11 @@ function validateContract() {
   }
   const teamNames = new Set(teams.map(t => t.name));
   for (const g of GAMES) {
-    if (!teamNames.has(g.homeTeam)) console.warn(`shared.js: game #${g.gameNumber} homeTeam "${g.homeTeam}" not found in teams — flag and confederation will be missing`);
-    if (!teamNames.has(g.awayTeam)) console.warn(`shared.js: game #${g.gameNumber} awayTeam "${g.awayTeam}" not found in teams — flag and confederation will be missing`);
+    // Knockout-bracket games may legitimately have a null team pending an
+    // earlier game's result (see homeFrom/awayFrom) — only warn when a team
+    // name is actually present but unrecognized.
+    if (g.homeTeam != null && !teamNames.has(g.homeTeam)) console.warn(`shared.js: game #${g.gameNumber} homeTeam "${g.homeTeam}" not found in teams — flag and confederation will be missing`);
+    if (g.awayTeam != null && !teamNames.has(g.awayTeam)) console.warn(`shared.js: game #${g.gameNumber} awayTeam "${g.awayTeam}" not found in teams — flag and confederation will be missing`);
   }
   // Full ELO chain sync check: walk every game in order, tracking each team's
   // running ELO from TEAM_ELOS through completed results (mirrors derive_elos in

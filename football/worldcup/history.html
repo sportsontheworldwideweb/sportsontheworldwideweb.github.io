@@ -157,6 +157,31 @@ tbody tr:hover { background: #EDE8DC; }
 #rank-info .tip-delta-pos { color: #6c6; }
 #rank-info .tip-delta-neg { color: #f77; }
 
+/* Knockout bracket */
+#knockout-view { display: none; }
+.bracket { display: flex; align-items: stretch; gap: 2.5rem; overflow-x: auto; padding: 0.5rem 0 1.5rem; }
+.bracket-round { display: flex; flex-direction: column; min-width: 190px; }
+.bracket-round-label { font-family: 'Permanent Marker', cursive; font-size: 0.9rem; color: #C0392B; text-align: center; margin-bottom: 0.6rem; }
+.bracket-round-games { flex: 1; display: flex; flex-direction: column; justify-content: space-around; }
+.bracket-round:not(:first-child) .bracket-game-wrap { position: relative; }
+.bracket-round:not(:first-child) .bracket-game-wrap::before { content: ''; position: absolute; left: -1.25rem; top: 50%; width: 1.25rem; height: 0; border-top: 2px solid #C0392B; opacity: 0.5; }
+.bracket-game-wrap { padding: 0.4rem 0; }
+.bracket-game { border: 1px solid #ddd; border-radius: 6px; background: #fff; font-size: 0.8rem; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.bracket-game-sub { font-family: 'Permanent Marker', cursive; font-size: 0.68rem; color: #948f81; text-align: center; padding: 0.2rem 0.3rem 0; }
+.bracket-date { font-size: 0.68rem; color: #888; text-align: center; padding: 0.2rem 0.3rem; border-bottom: 1px solid #eee; }
+.bracket-team { display: flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.5rem; }
+.bracket-team + .bracket-team { border-top: 1px solid #eee; }
+.bracket-team .icon { display: inline-block; width: 1.6em; height: 1.1em; flex: none; background-size: cover; background-position: center; background-repeat: no-repeat; border: 1px solid #ccc; filter: saturate(0.8); }
+.bracket-team-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bracket-team.winner { font-weight: bold; }
+.bracket-team.loser { opacity: 0.5; }
+.bracket-score { font-weight: bold; }
+.bracket-team.loser .bracket-score { font-weight: normal; }
+.bracket-tbd { color: #999; font-style: italic; font-size: 0.72rem; }
+
+/* Match List: unresolved knockout slot (see homeFrom/awayFrom) */
+.tbd-slot { color: #948f81; font-style: italic; font-size: 0.72rem; white-space: normal; max-width: 8rem; }
+
 .year-cell {
   font-family: 'Permanent Marker', cursive;
   font-size: 1.1rem;
